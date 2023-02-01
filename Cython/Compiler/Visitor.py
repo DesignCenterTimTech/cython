@@ -835,6 +835,169 @@ class PrintTree(TreeVisitor):
 
             return result
 
+""" My Modification start """
+from . import ModuleNode
+class PrintTreePy(PrintTree):
+    """Prints a python representation of the tree to standard output."""
+    def __call__(self, tree, phase=None):
+        print("Making a Python file format from AST")
+        print(self.print_Node(tree))
+        return tree
+    
+    def print_children(self, parent, attrs = None, exclude = None):
+        if parent is None: return None
+        result = ""
+        for attr in parent.child_attrs:
+            if attrs is not None and attr not in attrs: continue
+            if exclude is not None and attr in exclude: continue
+            child = getattr(parent, attr)
+            if child is not None:
+                if type(child) is list:
+                    for child_element in child:
+                        result += self.print_Node(child_element)
+                else:
+                    result += self.print_Node(child)
+        return result
+        
+    def print_Node(self, node):
+        result = ""
+        if isinstance(node, ModuleNode.ModuleNode):
+            result += self.print_children(node)
+        elif isinstance(node, ExprNodes.NameNode):
+            result += node.name
+        elif isinstance(node, Nodes.StatListNode):
+            result += self.print_children(node)
+        elif isinstance(node, Nodes.SingleAssignmentNode):
+            result += self.print_SingleAssignmentNode(node)
+        elif isinstance(node, Nodes.CFuncDefNode):
+            result += self.print_CFuncDefNode(node)
+        elif isinstance(node, Nodes.CNameDeclaratorNode):
+            result += node.name
+        elif isinstance(node, Nodes.CFuncDeclaratorNode):
+            result += self.print_CFuncDeclaratorNode(node)
+        elif isinstance(node, Nodes.CArgDeclNode):
+            result += self.print_CArgDeclNode(node)
+        elif isinstance(node, ExprNodes.IntNode):
+            result += node.value
+        elif isinstance(node, Nodes.CImportStatNode):
+            result += self.print_CImportStatNode(node)
+        elif isinstance(node, Nodes.ReturnStatNode):
+            result += self.print_ReturnStatNode(node)
+        elif isinstance(node, Nodes.ForInStatNode):
+            result += self.print_ForInStatNode(node)
+        elif isinstance(node, ExprNodes.IteratorNode):
+            result += self.print_IteratorNode(node)
+        elif isinstance(node, ExprNodes.SimpleCallNode):
+            result += self.print_SimpleCallNode(node)
+        elif isinstance(node, ExprNodes.NumBinopNode):
+            result += self.print_NumBinopNode(node)
+        elif isinstance(node, Nodes.InPlaceAssignmentNode):
+            result += self.print_InPlaceAssignmentNode(node)
+        elif isinstance(node, Nodes.ExprStatNode):
+            result += self.print_ExprStatNode(node)
+        elif isinstance(node, ExprNodes.SequenceNode):
+            result += self.print_SequenceNode(node)
+        else:
+            result += "\n%s%s\n" % (self._indent, type(node))
+        return result
+
+    def print_SequenceNode(self, node):
+        arguments = []
+        for arg in node.args:
+            arguments.append(self.print_Node(arg))
+        if isinstance(node, ExprNodes.ListNode):
+            result = "[%s]" % (", ".join(arguments))
+        else: # tuple
+            result = "(%s)" % (", ".join(arguments))
+        return result
+
+    def print_ExprStatNode(self, node):
+        result = "%s%s\n" % (self._indent, 
+                             self.print_Node(node.expr))
+        return result
+
+    def print_InPlaceAssignmentNode(self, node):
+        result = "%s%s %s= %s\n" % (self._indent,
+                                    self.print_Node(node.lhs), 
+                                    node.operator, 
+                                    self.print_Node(node.rhs))
+        return result       
+
+    def print_NumBinopNode(self, node):
+        result = "%s %s %s" % (self.print_Node(node.operand1), 
+                               node.operator, 
+                               self.print_Node(node.operand2))
+        return result
+
+    def print_SimpleCallNode(self, node):
+        arguments = []
+        for arg in node.args:
+            arguments.append(self.print_Node(arg))
+            
+        result = "%s(%s)" % (self.print_Node(node.function),
+                             ", ".join(arguments))
+        return result
+
+    def print_IteratorNode(self, node):
+        result = "iter(%s)" % self.print_Node(node.sequence)
+        return result
+
+    def print_ForInStatNode(self, node):
+        result = "%sfor %s in %s: # %s\n" % (self._indent, 
+                                             self.print_Node(node.target), 
+                                             self.print_Node(node.iterator),
+                                             self.print_Node(node.item)) # iterator staff
+        self.indent()
+        result += self.print_Node(node.body)
+        self.unindent()
+        return result
+
+    def print_ReturnStatNode(self, node):
+        result = "%sreturn %s\n" % (self._indent, self.print_Node(node.value))
+        return result
+
+    def print_CImportStatNode(self, node):
+        if node.as_name:
+            result = "import %s as %s\n" % (node.module_name, 
+                                            node.as_name)
+        else:
+            result = "import %s\n" % (node.module_name)
+        return result
+
+    def print_CArgDeclNode(self, node):
+        if node.default:
+            result = "%s = %s" % (self.print_Node(node.declarator),
+                                  self.print_Node(node.default))
+        else:
+            result = "%s" % self.print_Node(node.declarator)
+        return result
+
+    def print_CFuncDeclaratorNode(self, node):
+        arguments = []
+        for arg in node.args:
+            arguments.append(self.print_Node(arg))
+        result = "%s(%s):" % (self.print_Node(node.base), 
+                              ", ".join(arguments))
+        return result
+
+    def print_CFuncDefNode(self, node):
+        result = "%sdef %s\n" % (self._indent, 
+                                 self.print_Node(node.declarator))
+        self.indent()
+        result += self.print_Node(node.body)
+        self.unindent()
+        return result
+
+    def print_SingleAssignmentNode(self, node):
+        #if isinstance(node.rhs, ExprNodes.ImportNode):
+        #    result = "import %s\n" % self.print_Node(node.lhs)
+        #else:
+        result = "%s%s = %s\n" % (self._indent, 
+                                  self.print_Node(node.lhs), 
+                                  self.print_Node(node.rhs))
+        return result
+""" My Modification end """
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
