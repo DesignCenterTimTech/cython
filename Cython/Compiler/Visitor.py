@@ -824,7 +824,7 @@ class PrintTree(TreeVisitor):
             elif isinstance(node, ExprNodes.ExprNode):
                 t = node.type
                 result += "(type=%s)" % repr(t)
-            elif node.pos:
+            if node.pos:
                 pos = node.pos
                 path = pos[0].get_description()
                 if '/' in path:
@@ -1020,10 +1020,10 @@ class PrintTreePy(PrintTree):
         #    result +=        self.print_MergedSequenceNode(node)
         #elif isinstance(node, ExprNodes.SetNode):
         #    result +=        self.print_SetNode(node)
-        #elif isinstance(node, ExprNodes.DictNode):
-        #    result +=        self.print_DictNode(node)
-        #elif isinstance(node, ExprNodes.DictItemNode):
-        #    result +=        self.print_DictItemNode(node)
+        elif isinstance(node, ExprNodes.DictNode):
+            result +=        self.print_DictNode(node)
+        elif isinstance(node, ExprNodes.DictItemNode):
+            result +=        self.print_DictItemNode(node)
         #elif isinstance(node, ExprNodes.SortedDictKeysNode):
         #    result +=        self.print_SortedDictKeysNode(node)
         #elif isinstance(node, ExprNodes.Py3ClassNode):
@@ -1077,7 +1077,12 @@ class PrintTreePy(PrintTree):
         if isinstance(node, ExprNodes.PyConstNode):
             result += '"%s"' % node.value
         elif isinstance(node, ExprNodes.ConstNode):
-            result += "%s" % node.value
+            if isinstance(node, ExprNodes.CharNode) or \
+               isinstance(node, ExprNodes.UnicodeNode):
+                result += '"%s"' % node.value
+            else:
+                result += "%s" % node.value
+            
         #elif isinstance(node, ExprNodes.ImagNode):
         #    result += 
         #elif isinstance(node, ExprNodes.NewExprNode):
@@ -1177,12 +1182,24 @@ class PrintTreePy(PrintTree):
                 arguments.append(self.print_Node(arg))
             result = "%s(%s)" % (self.print_Node(node.function),
                                  ", ".join(arguments))
-        #if isinstance(node, ExprNodes.InlinedDefNodeCallNode):
+        #elif isinstance(node, ExprNodes.InlinedDefNodeCallNode):
         #    result += ""
-        #if isinstance(node, ExprNodes.GeneralCallNode):
-        #    result += ""
+        elif isinstance(node, ExprNodes.GeneralCallNode):
+            result += self.print_GeneralCallNode(node)
         else:
             result += self.print_UnknownNode(node)
+        return result
+
+    def print_GeneralCallNode(self, node):
+        arguments = []
+        for arg in node.positional_args.args:
+            arguments.append(self.print_Node(arg))
+        for arg in node.keyword_args.key_value_pairs:
+            arguments.append("%s = %s" % (arg.key.value,
+                                          self.print_Node(arg.value)))
+        
+        result = "%s(%s)" % (self.print_Node(node.function),
+                             ", ".join(arguments))
         return result
 
     def print_NumPyMethodCallNode(self, node):
@@ -1236,11 +1253,15 @@ class PrintTreePy(PrintTree):
         return result
 
     def print_DictNode(self, node):
-        result = ""
+        arguments = []
+        for dict_pair in node.key_value_pairs:
+            arguments.append(self.print_Node(dict_pair))
+        result = "{%s}" % ", ".join(arguments)
         return result
 
     def print_DictItemNode(self, node):
-        result = ""
+        result = "%s: %s" % (self.print_Node(node.key),
+                             self.print_Node(node.value))
         return result
 
     def print_SortedDictKeysNode(self, node):
@@ -1405,8 +1426,8 @@ class PrintTreePy(PrintTree):
         #    result +=    self.print_SwitchCaseNode(node)
         #elif isinstance(node, Nodes.SwitchStatNode):
         #    result +=    self.print_SwitchStatNode(node)
-        #elif isinstance(node, Nodes.WithStatNode):
-        #    result +=    self.print_WithStatNode(node)
+        elif isinstance(node, Nodes.WithStatNode):
+            result +=    self.print_WithStatNode(node)
         #elif isinstance(node, Nodes.TryExceptStatNode):
         #    result +=    self.print_TryExceptStatNode(node)
         #elif isinstance(node, Nodes.TryFinallyStatNode):
@@ -1415,8 +1436,8 @@ class PrintTreePy(PrintTree):
         #    result +=    self.print_GILExitNode(node)
         elif isinstance(node, Nodes.CImportStatNode):
             result +=    self.print_CImportStatNode(node)
-        #elif isinstance(node, Nodes.FromCImportStatNode):
-        #    result +=    self.print_FromCImportStatNode(node)
+        elif isinstance(node, Nodes.FromCImportStatNode):
+            result +=    self.print_FromCImportStatNode(node)
         elif isinstance(node, Nodes.FromImportStatNode):
             result +=    self.print_FromImportStatNode(node)
         #elif isinstance(node, Nodes.CnameDecoratorNode):
@@ -1564,7 +1585,12 @@ class PrintTreePy(PrintTree):
         return result
 
     def print_WithStatNode(self, node):
-        result = ""
+        result = "%swith %s as %s:\n" % (self._indent,
+                                              self.print_Node(node.manager), 
+                                              self.print_Node(node.target))
+        self.indent()
+        result += "%s" % self.print_Node(node.body.body.body.stats[1])
+        self.unindent() 
         return result
 
     def print_TryExceptStatNode(self, node):
@@ -1588,7 +1614,14 @@ class PrintTreePy(PrintTree):
         return result
 
     def print_FromCImportStatNode(self, node):
-        result = ""
+        for argument in node.imported_names:
+            if argument[2]:
+                result = "from %s import %s as %s\n" % (node.module_name, 
+                                                        argument[1],
+                                                        argument[2])
+            else:
+                result = "from %s import %s\n" % (node.module_name, 
+                                                  argument[1])
         return result
 
     def print_FromImportStatNode(self, node):
@@ -1700,6 +1733,133 @@ class PrintTreePy(PrintTree):
         result = "<ParallelNode not made>\n"
         return result
 ###======================================================================
+from operator import attrgetter
+class PrintSkipTree(PrintTree):
+    _last_pos = 0
+    _positions = []
+    _text = []
+    """ Makes .py code out of AST """
+
+    class Position():
+        def __init__(self, line, pos, indent, node):
+            self.line = line
+            self.pos = pos
+            self.indent = indent
+            self.node = node
+
+    def __call__(self, tree, phase=None):
+        print("Skip tree print")
+
+        positions = self.fill_pos(tree)
+        positions.sort(key = attrgetter("line", "pos", "indent"))
+        positions.append(self.Position(positions[-1].line, -1, '', 0))
+        self._positions = positions
+        
+        path = tree.pos[0].get_description()
+        with open(path, 'r') as f:
+            self._text = f.readlines()
+        
+        print("##################CODE FILE START##################")
+        print(self.print_Node(tree))
+        print("###################CODE FILE END###################")
+        
+        #for pos in self._positions:
+        #    print(pos.line, pos.pos, pos.indent, pos.node)
+        return tree
+
+    def fill_pos(self, node):
+        # add info about node pos
+        positions = []
+        if node is None: return None
+        if node.pos and isinstance(node, Nodes.StatNode):
+                pos = node.pos
+                path = pos[0].get_description()
+                if '/' in path:
+                    path = path.split('/')[-1]
+                if '\\' in path:
+                    path = path.split('\\')[-1]
+                positions.append(self.Position(pos[1] - 1, 0, self._indent, node))
+        
+        # add info about children pos
+        self.indent()
+        for attr in node.child_attrs:
+            children = getattr(node, attr)
+            if children is not None:
+                if type(children) is list:
+                    for child in children:
+                        positions.extend(self.fill_pos(child))
+                else:
+                    positions.extend(self.fill_pos(children))
+        self.unindent()
+        
+        return positions
+        
+    def print_Node(self, node):
+        if node is None: return None
+        result = ""
+        
+        if isinstance(node, Nodes.StatNode):
+            if self.check_IfNotC(node):
+                result += self.print_ByPos(node)
+            else:
+                result += self.print_CNode(node)
+        
+        for attr in node.child_attrs:
+            children = getattr(node, attr)
+            if children is not None:
+                if type(children) is list:
+                    for child in children:
+                        result += self.print_Node(child)
+                else:
+                    result += self.print_Node(children)
+
+        return result
+
+    def print_CNode(self, node):
+        result = ""
+        return result
+
+    def check_IfNotC(self, node):
+        if node is None: return True
+        
+        s_type = str(type(node))
+        s_type = s_type[s_type.rfind(".") + 1:-2]
+        if s_type[0] == "C" and s_type[0:1] == s_type[0:1].upper():
+            return False
+            
+        for attr in node.child_attrs:
+            children = getattr(node, attr)
+            if children is not None:
+                if type(children) is list:
+                    for child in children:
+                        if not self.check_IfNotC(child): return False
+                else:
+                    if not self.check_IfNotC(children): return False
+        
+        #print(s_type)
+        return True
+
+    def get_Pos(self, node):
+        length = len(self._positions)
+        for i in range(length):
+            if self._positions[i].node == node:
+                cur_pos  = self._positions[i]
+                next_pos = self._positions[i + 1]
+                return cur_pos, next_pos
+        return 0, 0
+
+    def print_ByPos(self, node):
+        cur_pos, next_pos = self.get_Pos(node)
+        result = ""
+        if cur_pos.line == next_pos.line:
+            result += "" + self._text[cur_pos.line][cur_pos.pos:next_pos.pos]
+        else:
+            result += "" + self._text[cur_pos.line][cur_pos.pos:]
+            for i in range(cur_pos.line + 1, next_pos.line):
+                result += self._text[i]
+            result += self._text[next_pos.line][:next_pos.pos]
+        
+        return result
 """ My Modification end """
 
 if __name__ == "__main__":
