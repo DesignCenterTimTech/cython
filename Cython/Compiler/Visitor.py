@@ -836,904 +836,14 @@ class PrintTree(TreeVisitor):
             return result
 
 """ My Modification start """
-from . import ModuleNode
-from . import UtilNodes
-class PrintTreePy(PrintTree):
-    """Prints a python representation of the tree to standard output."""
-    def __call__(self, tree, phase=None):
-        print("Making a Python file format from AST")
-        print(self.print_Node(tree))
-        return tree
-    
-    def print_children(self, parent, attrs = None, exclude = None):
-        if parent is None: return None
-        result = ""
-        for attr in parent.child_attrs:
-            if attrs is not None and attr not in attrs: continue
-            if exclude is not None and attr in exclude: continue
-            child = getattr(parent, attr)
-            if child is not None:
-                if type(child) is list:
-                    for child_element in child:
-                        result += self.print_Node(child_element)
-                else:
-                    result += self.print_Node(child)
-        return result
-        
-    def print_UnknownNode(self, node):
-        result = "\n# in %s() found %s\n" % (inspect.stack()[1][3], 
-                                             type(node))
-        return result
-    
-    def print_Node(self, node):
-        result = ""
-        if not node:
-            result += "None"
-        elif isinstance(node, ModuleNode.ModuleNode):
-            result +=         self.print_ModuleNode(node)
-        elif isinstance(node, ExprNodes.CmpNode):
-            result +=        self.print_CmpNode(node)
-        elif isinstance(node, Nodes.LoopNode):
-            result +=    self.print_LoopNode(node)
-        elif isinstance(node, ExprNodes.ExprNode):
-            result +=        self.print_ExprNode(node)
-        #elif isinstance(node, ExprNodes.ComprehensionAppendNode):
-        #    result +=        self.print_ComprehensionAppendNode(node)
-        #elif isinstance(node, UtilNodes.TempsBlockNode):
-        #    result +=        self.print_TempsBlockNode(node)
-        #elif isinstance(node, Nodes.CompilerDirectivesNode):
-        #    result +=    self.print_CompilerDirectivesNode(node)
-        elif isinstance(node, Nodes.StatListNode):
-            result +=    self.print_StatListNode(node)
-        elif isinstance(node, Nodes.StatNode):
-            result +=    self.print_StatNode(node)
-        elif isinstance(node, Nodes.CDeclaratorNode):
-            result +=    self.print_CDeclaratorNode(node)
-        elif isinstance(node, Nodes.CArgDeclNode):
-            result +=    self.print_CArgDeclNode(node)
-        #elif isinstance(node, Nodes.CBaseTypeNode):
-        #    result +=    self.print_CBaseTypeNode(node)
-        #elif isinstance(node, Nodes.CAnalysedBaseTypeNode):
-        #    result +=    self.print_CAnalysedBaseTypeNode(node)
-        #elif isinstance(node, Nodes.PyArgDeclNode):
-        #    result +=    self.print_PyArgDeclNode(node)
-        #elif isinstance(node, Nodes.DecoratorNode):
-        #    result +=    self.print_DecoratorNode(node)
-        elif isinstance(node, Nodes.IfClauseNode):
-            result +=    self.print_IfClauseNode(node)
-        #elif isinstance(node, Nodes.DictIterationNextNode):
-        #    result +=    self.print_DictIterationNextNode(node)
-        #elif isinstance(node, Nodes.SetIterationNextNode):
-        #    result +=    self.print_SetIterationNextNode(node)
-        #elif isinstance(node, Nodes.ExceptClauseNode):
-        #    result +=    self.print_ExceptClauseNode(node)
-        #elif isinstance(node, Nodes.ParallelNode):
-        #    result +=    self.print_ParallelNode(node)
-        else:
-            result += self.print_UnknownNode(node)
-        return result
-#==============================================================================
-    def print_ModuleNode(self, node):
-        result = self.print_children(node)
-        return result
-#==============================================================================      
-    def print_CmpNode(self, node):
-        result = ""
-        if isinstance(node, ExprNodes.PrimaryCmpNode):
-            result += "%s %s %s%s" % (self.print_Node(node.operand1),
-                                          node.operator,
-                                          self.print_Node(node.operand2),
-                                          self.print_CmpNode(node.cascade))
-        elif isinstance(node, ExprNodes.CascadedCmpNode):
-            result += " %s %s%s" % (node.operator,
-                                        self.print_Node(node.operand2),
-                                        self.print_CmpNode(node.cascade))
-        return result
-#==============================================================================      
-    def print_LoopNode(self, node):
-        result = ""
-        if isinstance(node, Nodes.WhileStatNode):
-            result += self.print_WhileStatNode(node)
-        elif isinstance(node, Nodes._ForInStatNode):
-            result += self.print__ForInStatNode(node)
-        elif isinstance(node, Nodes.ForFromStatNode):
-            result += self.print_ForFromStatNode(node)
-        else:
-            result += self.print_UnknownNode(node)
-        
-        return result
-        
-    def print_WhileStatNode(self, node):
-        result = ""
-        return result
+'''
+    TO DO
+    - check if correct with templates
+    - fix incorrect indent problem
+'''
 
-    def print__ForInStatNode(self, node):
-        result = ""
-        if isinstance(node, Nodes.ForInStatNode):
-            result += "%sfor %s in %s:\n" % (self._indent, 
-                                            self.print_Node(node.target), 
-                                            self.print_Node(node.iterator))
-        #if isinstance(node, Nodes.AsyncForStatNode):
-        #    result += 
-        else:
-            result += self.print_UnknownNode(node)
-        self.indent()
-        result += self.print_Node(node.body)
-        self.unindent()
-        return result
-
-    def print_ForFromStatNode(self, node):
-        result = ""
-        return result
-#==============================================================================    
-    def print_ExprNode(self, node): # call subclasses
-        result = ""
-        if isinstance(node, ExprNodes.AtomicExprNode):
-            result +=      self.print_AtomicExprNode(node)
-        #elif isinstance(node, ExprNodes.BackquoteNode):
-        #    result +=        self.print_BackquoteNode(node)
-        elif isinstance(node, ExprNodes.ImportNode):
-            result +=      self.print_ImportNode(node)
-        elif isinstance(node, ExprNodes.IteratorNode):
-            result +=        self.print_IteratorNode(node)
-        #elif isinstance(node, ExprNodes.AsyncIteratorNode):
-        #    result +=        self.print_AsyncIteratorNode(node)
-        #elif isinstance(node, ExprNodes.WithExitCallNode):
-        #    result +=        self.print_WithExitCallNode(node)
-        #elif isinstance(node, ExprNodes.TempNode):
-        #    result +=        self.print_TempNode(node)
-        #elif isinstance(node, ExprNodes.RawCNameExprNode):
-        #    result +=        self.print_RawCNameExprNode(node)
-        #elif isinstance(node, ExprNodes.JoinedStrNode):
-        #    result +=        self.print_JoinedStrNode(node)
-        #elif isinstance(node, ExprNodes.FormattedValueNode):
-        #    result +=        self.print_FormattedValueNode(node)
-        #elif isinstance(node, ExprNodes._IndexingBaseNode):
-        #    result +=        self.print__IndexingBaseNode(node)
-        #elif isinstance(node, ExprNodes.MemoryCopyNode):
-        #    result +=        self.print_MemoryCopyNode(node)
-        #elif isinstance(node, ExprNodes.SliceIndexNode):
-        #    result +=        self.print_SliceIndexNode(node)
-        #elif isinstance(node, ExprNodes.SliceNode):
-        #    result +=        self.print_SliceNode(node)
-        elif isinstance(node, ExprNodes.CallNode):
-            result +=        self.print_CallNode(node)
-        #elif isinstance(node, ExprNodes.NumPyMethodCallNode):
-        #    result +=        self.print_NumPyMethodCallNode(node)
-        #elif isinstance(node, ExprNodes.PythonCapiFunctionNode):
-        #    result +=        self.print_PythonCapiFunctionNode(node)
-        #elif isinstance(node, ExprNodes.AsTupleNode):
-        #    result +=        self.print_AsTupleNode(node)
-        #elif isinstance(node, ExprNodes.MergedDictNode):
-        #    result +=        self.print_MergedDictNode(node)
-        #elif isinstance(node, ExprNodes.AttributeNode):
-        #    result +=        self.print_AttributeNode(node)
-        #elif isinstance(node, ExprNodes.StarredUnpackingNode):
-        #    result +=        self.print_StarredUnpackingNode(node)
-        elif isinstance(node, ExprNodes.SequenceNode):
-            result +=        self.print_SequenceNode(node)
-        #elif isinstance(node, ExprNodes.ScopedExprNode):
-        #    result +=        self.print_ScopedExprNode(node)
-        #elif isinstance(node, ExprNodes.InlinedGeneratorExpressionNode):
-        #    result +=        self.print_InlinedGeneratorExpressionNode(node)
-        #elif isinstance(node, ExprNodes.MergedSequenceNode):
-        #    result +=        self.print_MergedSequenceNode(node)
-        #elif isinstance(node, ExprNodes.SetNode):
-        #    result +=        self.print_SetNode(node)
-        elif isinstance(node, ExprNodes.DictNode):
-            result +=        self.print_DictNode(node)
-        elif isinstance(node, ExprNodes.DictItemNode):
-            result +=        self.print_DictItemNode(node)
-        #elif isinstance(node, ExprNodes.SortedDictKeysNode):
-        #    result +=        self.print_SortedDictKeysNode(node)
-        #elif isinstance(node, ExprNodes.Py3ClassNode):
-        #    result +=        self.print_Py3ClassNode(node)
-        #elif isinstance(node, ExprNodes.PyClassMetaclassNode):
-        #    result +=        self.print_PyClassMetaclassNode(node)
-        #elif isinstance(node, ExprNodes.ClassCellInjectorNode):
-        #    result +=        self.print_ClassCellInjectorNode(node)
-        #elif isinstance(node, ExprNodes.ClassCellNode):
-        #    result +=        self.print_ClassCellNode(node)
-        #elif isinstance(node, ExprNodes.CodeObjectNode):
-        #    result +=        self.print_CodeObjectNode(node)
-        #elif isinstance(node, ExprNodes.DefaultLiteralArgNode):
-        #    result +=        self.print_DefaultLiteralArgNode(node)
-        #elif isinstance(node, ExprNodes.DefaultNonLiteralArgNode):
-        #    result +=        self.print_DefaultNonLiteralArgNode(node)
-        #elif isinstance(node, ExprNodes.YieldExprNode):
-        #    result +=        self.print_YieldExprNode(node)
-        #elif isinstance(node, ExprNodes.UnopNode):
-        #    result +=        self.print_UnopNode(node)
-        #elif isinstance(node, ExprNodes.TypecastNode):
-        #    result +=        self.print_TypecastNode(node)
-        #elif isinstance(node, ExprNodes.CythonArrayNode):
-        #    result +=        self.print_CythonArrayNode(node)
-        #elif isinstance(node, ExprNodes.SizeofNode):
-        #    result +=        self.print_SizeofNode(node)
-        #elif isinstance(node, ExprNodes.TypeidNode):
-        #    result +=        self.print_TypeidNode(node)
-        #elif isinstance(node, ExprNodes.TypeofNode):
-        #    result +=        self.print_TypeofNode(node)
-        elif isinstance(node, ExprNodes.BinopNode):
-            result +=        self.print_BinopNode(node)
-        #elif isinstance(node, ExprNodes.BoolBinopNode):
-        #    result +=        self.print_BoolBinopNode(node)
-        #elif isinstance(node, ExprNodes.BoolBinopResultNode):
-        #    result +=        self.print_BoolBinopResultNode(node)
-        #elif isinstance(node, ExprNodes.CondExprNode):
-        #    result +=        self.print_CondExprNode(node)
-        #elif isinstance(node, ExprNodes.CoercionNode):
-        #    result +=        self.print_CoercionNode(node)
-        #elif isinstance(node, ExprNodes.ModuleRefNode):
-        #    result +=        self.print_ModuleRefNode(node)
-        #elif isinstance(node, ExprNodes.DocstringRefNode):
-        #    result +=        self.print_DocstringRefNode(node)
-        else:
-            result += self.print_UnknownNode(node)
-        return result
-        
-    def print_AtomicExprNode(self, node):
-        result = ""
-        if isinstance(node, ExprNodes.PyConstNode):
-            result += '"%s"' % node.value
-        elif isinstance(node, ExprNodes.ConstNode):
-            if isinstance(node, ExprNodes.CharNode) or \
-               isinstance(node, ExprNodes.UnicodeNode):
-                result += '"%s"' % node.value
-            else:
-                result += "%s" % node.value
-            
-        #elif isinstance(node, ExprNodes.ImagNode):
-        #    result += 
-        #elif isinstance(node, ExprNodes.NewExprNode):
-        #    result += 
-        elif isinstance(node, ExprNodes.NameNode):
-            result += "%s" % node.name 
-        #elif isinstance(node, ExprNodes.NextNode):
-        #    result += 
-        #elif isinstance(node, ExprNodes.AsyncNextNode):
-        #    result += 
-        #elif isinstance(node, ExprNodes.ExcValueNode):
-        #    result += 
-        #elif isinstance(node, ExprNodes.ParallelThreadsAvailableNode):
-        #    result += 
-        #elif isinstance(node, ExprNodes.ParallelThreadIdNode):
-        #    result += 
-        #elif isinstance(node, ExprNodes.GlobalsExprNode):
-        #    result += 
-        #elif isinstance(node, ExprNodes.PyClassLocalsExprNode):
-        #    result += 
-        #elif isinstance(node, ExprNodes.TempRefNode):
-        #    result += 
-        #elif isinstance(node, ExprNodes.ResultRefNode):
-        #    result += 
-        else:
-            result += self.print_UnknownNode(node)
-        
-        '''if hasattr(node, "name"):
-            result = "%s" % node.name
-        elif isinstance(node, ExprNodes.UnicodeNode):
-            result = '"%s"' % node.value
-        elif hasattr(node, "value"):
-            result = "%s" % node.value
-        else:
-            result = "%s" % type(node)'''
-        return result
-
-    def print_BackquoteNode(self, node):
-        result = ""
-        return result
-
-    def print_ImportNode(self, node):
-        result = "__import__(%s, globals(), None, %s, %s)" % (self.print_Node(node.module_name),
-                                                              self.print_Node(node.name_list),
-                                                              node.level)
-        return result
-
-    def print_IteratorNode(self, node):
-        result = "iter(%s)" % self.print_Node(node.sequence)
-        return result
-
-    def print_AsyncIteratorNode(self, node):
-        result = ""
-        return result
-
-    def print_WithExitCallNode(self, node):
-        result = ""
-        return result
-
-    def print_TempNode(self, node):
-        result = ""
-        return result
-
-    def print_RawCNameExprNode(self, node):
-        result = ""
-        return result
-
-    def print_JoinedStrNode(self, node):
-        result = ""
-        return result
-
-    def print_FormattedValueNode(self, node):
-        result = ""
-        return result
-
-    def print__IndexingBaseNode(self, node):
-        result = ""
-        return result
-
-    def print_MemoryCopyNode(self, node):
-        result = ""
-        return result
-
-    def print_SliceIndexNode(self, node):
-        result = ""
-        return result
-
-    def print_SliceNode(self, node):
-        result = ""
-        return result
-
-    def print_CallNode(self, node):
-        result = ""
-        if isinstance(node, ExprNodes.SimpleCallNode):
-            arguments = []
-            for arg in node.args:
-                arguments.append(self.print_Node(arg))
-            result = "%s(%s)" % (self.print_Node(node.function),
-                                 ", ".join(arguments))
-        #elif isinstance(node, ExprNodes.InlinedDefNodeCallNode):
-        #    result += ""
-        elif isinstance(node, ExprNodes.GeneralCallNode):
-            result += self.print_GeneralCallNode(node)
-        else:
-            result += self.print_UnknownNode(node)
-        return result
-
-    def print_GeneralCallNode(self, node):
-        arguments = []
-        for arg in node.positional_args.args:
-            arguments.append(self.print_Node(arg))
-        for arg in node.keyword_args.key_value_pairs:
-            arguments.append("%s = %s" % (arg.key.value,
-                                          self.print_Node(arg.value)))
-        
-        result = "%s(%s)" % (self.print_Node(node.function),
-                             ", ".join(arguments))
-        return result
-
-    def print_NumPyMethodCallNode(self, node):
-        result = ""
-        return result
-
-    def print_PythonCapiFunctionNode(self, node):
-        result = ""
-        return result
-
-    def print_AsTupleNode(self, node):
-        result = ""
-        return result
-
-    def print_MergedDictNode(self, node):
-        result = ""
-        return result
-
-    def print_AttributeNode(self, node):
-        result = ""
-        return result
-
-    def print_StarredUnpackingNode(self, node):
-        result = ""
-        return result
-
-    def print_SequenceNode(self, node):
-        arguments = []
-        for arg in node.args:
-            arguments.append(self.print_Node(arg))
-        if isinstance(node, ExprNodes.ListNode):
-            result = "[%s]" % (", ".join(arguments))
-        else: # tuple
-            result = "(%s)" % (", ".join(arguments))
-        return result
-
-    def print_ScopedExprNode(self, node):
-        result = ""
-        return result
-
-    def print_InlinedGeneratorExpressionNode(self, node):
-        result = ""
-        return result
-
-    def print_MergedSequenceNode(self, node):
-        result = ""
-        return result
-
-    def print_SetNode(self, node):
-        result = ""
-        return result
-
-    def print_DictNode(self, node):
-        arguments = []
-        for dict_pair in node.key_value_pairs:
-            arguments.append(self.print_Node(dict_pair))
-        result = "{%s}" % ", ".join(arguments)
-        return result
-
-    def print_DictItemNode(self, node):
-        result = "%s: %s" % (self.print_Node(node.key),
-                             self.print_Node(node.value))
-        return result
-
-    def print_SortedDictKeysNode(self, node):
-        result = ""
-        return result
-
-    def print_Py3ClassNode(self, node):
-        result = ""
-        return result
-
-    def print_PyClassMetaclassNode(self, node):
-        result = ""
-        return result
-
-    def print_ClassCellInjectorNode(self, node):
-        result = ""
-        return result
-
-    def print_ClassCellNode(self, node):
-        result = ""
-        return result
-
-    def print_CodeObjectNode(self, node):
-        result = ""
-        return result
-
-    def print_DefaultLiteralArgNode(self, node):
-        result = ""
-        return result
-
-    def print_DefaultNonLiteralArgNode(self, node):
-        result = ""
-        return result
-
-    def print_YieldExprNode(self, node):
-        result = ""
-        return result
-
-    def print_UnopNode(self, node):
-        result = ""
-        return result
-
-    def print_TypecastNode(self, node):
-        result = ""
-        return result
-
-    def print_CythonArrayNode(self, node):
-        result = ""
-        return result
-
-    def print_SizeofNode(self, node):
-        result = ""
-        return result
-
-    def print_TypeidNode(self, node):
-        result = ""
-        return result
-
-    def print_TypeofNode(self, node):
-        result = ""
-        return result
-
-    def print_BinopNode(self, node):
-        result = "%s %s %s" % (self.print_Node(node.operand1), 
-                               node.operator, 
-                               self.print_Node(node.operand2))
-        return result
-
-    def print_BoolBinopNode(self, node):
-        result = ""
-        return result
-
-    def print_BoolBinopResultNode(self, node):
-        result = ""
-        return result
-
-    def print_CondExprNode(self, node):
-        result = ""
-        return result
-
-    def print_CoercionNode(self, node):
-        result = ""
-        return result
-
-    def print_ModuleRefNode(self, node):
-        result = ""
-        return result
-
-    def print_DocstringRefNode(self, node):
-        result = ""
-        return result
-#==============================================================================
-    def print_ComprehensionAppendNode(self, node): # call subclasses?
-        result = "<ComprehensionAppendNode not made>\n"
-        return result
-#==============================================================================
-    def print_TempsBlockNode(self, node): # no subclasses
-        result = "<TempsBlockNode not made>\n"
-        return result
-#==============================================================================
-    def print_CompilerDirectivesNode(self, node): # no subclasses
-        result = "<CompilerDirectivesNode>\n"
-        return result
-#==============================================================================
-    def print_StatListNode(self, node):
-        result = ""
-        for stat in node.stats:
-            result += self.print_Node(stat)
-        if not node.stats:
-            result += "%spass" % self._indent
-        return result
-#==============================================================================
-    def print_StatNode(self, node): # call subclasses
-        result = ""
-        if    isinstance(node, Nodes.CDefExternNode):
-            result +=     self.print_CDefExternNode(node)
-        #elif isinstance(node, Nodes.CVarDefNode):
-        #    result +=    self.print_CVarDefNode(node)
-        #elif isinstance(node, Nodes.CStructOrUnionDefNode):
-        #    result +=    self.print_CStructOrUnionDefNode(node)
-        #elif isinstance(node, Nodes.CEnumDefNode):
-        #    result +=    self.print_CEnumDefNode(node)
-        #elif isinstance(node, Nodes.CEnumDefItemNode):
-        #    result +=    self.print_CEnumDefItemNode(node)
-        #elif isinstance(node, Nodes.CTypeDefNode):
-        #    result +=    self.print_CTypeDefNode(node)
-        #elif isinstance(node, Nodes.OverrideCheckNode):
-        #    result +=    self.print_OverrideCheckNode(node)
-        #elif isinstance(node, Nodes.PropertyNode):
-        #    result +=    self.print_PropertyNode(node)
-        #elif isinstance(node, Nodes.GlobalNode):
-        #    result +=    self.print_GlobalNode(node)
-        #elif isinstance(node, Nodes.NonlocalNode):
-        #    result +=    self.print_NonlocalNode(node)
-        elif isinstance(node, Nodes.ExprStatNode):
-            result +=    self.print_ExprStatNode(node)
-        elif isinstance(node, Nodes.AssignmentNode):
-            result +=    self.print_AssignmentNode(node)
-        #elif isinstance(node, Nodes.PrintStatNode):
-        #    result +=    self.print_PrintStatNode(node)
-        #elif isinstance(node, Nodes.ExecStatNode):
-        #    result +=    self.print_ExecStatNode(node)
-        #elif isinstance(node, Nodes.DelStatNode):
-        #    result +=    self.print_DelStatNode(node)
-        #elif isinstance(node, Nodes.PassStatNode):
-        #    result +=    self.print_PassStatNode(node)
-        #elif isinstance(node, Nodes.BreakStatNode):
-        #    result +=    self.print_BreakStatNode(node)
-        #elif isinstance(node, Nodes.ContinueStatNode):
-        #    result +=    self.print_ContinueStatNode(node)
-        elif isinstance(node, Nodes.ReturnStatNode):
-            result +=    self.print_ReturnStatNode(node)
-        #elif isinstance(node, Nodes.RaiseStatNode):
-        #    result +=    self.print_RaiseStatNode(node)
-        #elif isinstance(node, Nodes.ReraiseStatNode):
-        #    result +=    self.print_ReraiseStatNode(node)
-        #elif isinstance(node, Nodes.AssertStatNode):
-        #    result +=    self.print_AssertStatNode(node)
-        elif isinstance(node, Nodes.IfStatNode):
-            result +=    self.print_IfStatNode(node)
-        #elif isinstance(node, Nodes.SwitchCaseNode):
-        #    result +=    self.print_SwitchCaseNode(node)
-        #elif isinstance(node, Nodes.SwitchStatNode):
-        #    result +=    self.print_SwitchStatNode(node)
-        elif isinstance(node, Nodes.WithStatNode):
-            result +=    self.print_WithStatNode(node)
-        #elif isinstance(node, Nodes.TryExceptStatNode):
-        #    result +=    self.print_TryExceptStatNode(node)
-        #elif isinstance(node, Nodes.TryFinallyStatNode):
-        #    result +=    self.print_TryFinallyStatNode(node)
-        #elif isinstance(node, Nodes.GILExitNode):
-        #    result +=    self.print_GILExitNode(node)
-        elif isinstance(node, Nodes.CImportStatNode):
-            result +=    self.print_CImportStatNode(node)
-        elif isinstance(node, Nodes.FromCImportStatNode):
-            result +=    self.print_FromCImportStatNode(node)
-        elif isinstance(node, Nodes.FromImportStatNode):
-            result +=    self.print_FromImportStatNode(node)
-        #elif isinstance(node, Nodes.CnameDecoratorNode):
-        #    result +=    self.print_CnameDecoratorNode(node)
-        elif isinstance(node, Nodes.CFuncDefNode):
-            result +=    self.print_CFuncDefNode(node)
-        else:
-            result += self.print_UnknownNode(node)
-        return result
-
-    def print_CDefExternNode(self, node):
-        result = ""
-        return result
-
-    def print_CVarDefNode(self, node):
-        result = ""
-        return result
-
-    def print_CStructOrUnionDefNode(self, node):
-        result = ""
-        return result
-
-    def print_CEnumDefNode(self, node):
-        result = ""
-        return result
-
-    def print_CEnumDefItemNode(self, node):
-        result = ""
-        return result
-
-    def print_CTypeDefNode(self, node):
-        result = ""
-        return result
-
-    def print_OverrideCheckNode(self, node):
-        result = ""
-        return result
-
-    def print_PropertyNode(self, node):
-        result = ""
-        return result
-
-    def print_GlobalNode(self, node):
-        result = ""
-        return result
-
-    def print_NonlocalNode(self, node):
-        result = ""
-        return result
-
-    def print_ExprStatNode(self, node):
-        result = "%s%s\n" % (self._indent, 
-                             self.print_Node(node.expr))
-        return result
-
-    def print_AssignmentNode(self, node):
-        result = ""
-        if isinstance(node, Nodes.SingleAssignmentNode):
-            result += "%s%s = %s\n" % (self._indent,
-                                       self.print_Node(node.lhs),
-                                       self.print_Node(node.rhs))
-        elif isinstance(node, Nodes.CascadedAssignmentNode):
-            arguments = []
-            for lhs in node.lhs_list:
-                arguments.append(self.print_Node(lhs))
-            result += "%s%s = %s\n" % (self._indent,
-                                       " = ".join(arguments),
-                                       self.print_Node(node.rhs))
-        elif isinstance(node, Nodes.ParallelAssignmentNode):
-            for stat in node.stats:
-                result += self.print_Node(stat)
-        elif isinstance(node, Nodes.InPlaceAssignmentNode):
-            result += "%s%s %s= %s\n" % (self._indent,
-                                         self.print_Node(node.lhs), 
-                                         node.operator, 
-                                         self.print_Node(node.rhs))
-        #elif isinstance(node, Nodes.WithTargetAssignmentStatNode):
-        #    result += ""
-        else:
-            result += self.print_UnknownNode(node)
-        return result
-
-    def print_PrintStatNode(self, node):
-        result = ""
-        return result
-
-    def print_ExecStatNode(self, node):
-        result = ""
-        return result
-
-    def print_DelStatNode(self, node):
-        result = ""
-        return result
-
-    def print_PassStatNode(self, node):
-        result = ""
-        return result
-
-    def print_BreakStatNode(self, node):
-        result = ""
-        return result
-
-    def print_ContinueStatNode(self, node):
-        result = ""
-        return result
-
-    def print_ReturnStatNode(self, node):
-        result = "%sreturn %s\n" % (self._indent, self.print_Node(node.value))
-        return result
-
-    def print_RaiseStatNode(self, node):
-        result = ""
-        return result
-
-    def print_ReraiseStatNode(self, node):
-        result = ""
-        return result
-
-    def print_AssertStatNode(self, node):
-        result = ""
-        return result
-
-    def print_IfStatNode(self, node):
-        arguments = []
-        for if_clause in node.if_clauses:
-            arguments.append(self.print_Node(if_clause))
-        if node.else_clause:
-            result = "%sif %s\n" % (self._indent, 
-                                    ("%selif " % self._indent).join(arguments))
-            result += "%selse:\n" % self._indent
-            self.indent()
-            result += self.print_Node(node.else_clause)
-            self.unindent()
-        else:
-            result = "%sif %s:%s" % (self._indent, 
-                                     " , ".join(arguments))        
-        return result
-
-    def print_SwitchCaseNode(self, node):
-        result = ""
-        return result
-
-    def print_SwitchStatNode(self, node):
-        result = ""
-        return result
-
-    def print_WithStatNode(self, node):
-        result = "%swith %s as %s:\n" % (self._indent,
-                                              self.print_Node(node.manager), 
-                                              self.print_Node(node.target))
-        self.indent()
-        result += "%s" % self.print_Node(node.body.body.body.stats[1])
-        self.unindent() 
-        return result
-
-    def print_TryExceptStatNode(self, node):
-        result = ""
-        return result
-
-    def print_TryFinallyStatNode(self, node):
-        result = ""
-        return result
-
-    def print_GILExitNode(self, node):
-        result = ""
-        return result
-
-    def print_CImportStatNode(self, node):
-        if node.as_name:
-            result = "import %s as %s\n" % (node.module_name, 
-                                            node.as_name)
-        else:
-            result = "import %s\n" % (node.module_name)
-        return result
-
-    def print_FromCImportStatNode(self, node):
-        for argument in node.imported_names:
-            if argument[2]:
-                result = "from %s import %s as %s\n" % (node.module_name, 
-                                                        argument[1],
-                                                        argument[2])
-            else:
-                result = "from %s import %s\n" % (node.module_name, 
-                                                  argument[1])
-        return result
-
-    def print_FromImportStatNode(self, node):
-        result = "%s\n" % self.print_Node(node.module)
-        return result
-
-    def print_CnameDecoratorNode(self, node):
-        result = ""
-        return result
-        
-    def print_CFuncDefNode(self, node):
-        result = "%sdef %s\n" % (self._indent, 
-                                 self.print_Node(node.declarator))
-        self.indent()
-        result += self.print_Node(node.body)
-        self.unindent()
-        return result
-#==============================================================================
-    def print_CDeclaratorNode(self, node): # call subclasses
-        result = ""
-        if   isinstance(node, Nodes.CNameDeclaratorNode):
-            result +=    self.print_CNameDeclaratorNode(node)
-        #elif isinstance(node, Nodes.CPtrDeclaratorNode):
-        #    result +=    self.print_CPtrDeclaratorNode(node)
-        #elif isinstance(node, Nodes.CReferenceDeclaratorNode):
-        #    result +=    self.print_CReferenceDeclaratorNode(node)
-        #elif isinstance(node, Nodes.CArrayDeclaratorNode):
-        #    result +=    self.print_CArrayDeclaratorNode(node)
-        elif isinstance(node, Nodes.CFuncDeclaratorNode):
-            result +=    self.print_CFuncDeclaratorNode(node)
-        #elif isinstance(node, Nodes.CConstDeclaratorNode):
-        #    result +=    self.print_CConstDeclaratorNode(node)
-        else:
-            result += self.print_UnknownNode(node)
-        return result
-
-    def print_CNameDeclaratorNode(self, node):
-        result = node.name
-        return result
-        
-    def print_CPtrDeclaratorNode(self, node):
-        result = ""
-        return result
-        
-    def print_CReferenceDeclaratorNode(self, node):
-        result = ""
-        return result
-        
-    def print_CArrayDeclaratorNode(self, node):
-        result = ""
-        return result
- 
-    def print_CFuncDeclaratorNode(self, node):
-        arguments = []
-        for arg in node.args:
-            arguments.append(self.print_Node(arg))
-        result = "%s(%s):" % (self.print_Node(node.base), 
-                              ", ".join(arguments))
-        return result
-        
-    def print_CConstDeclaratorNode(self, node):
-        result = ""
-        return result
-#==============================================================================
-    def print_CArgDeclNode(self, node):
-        if node.default:
-            result = "%s = %s" % (self.print_Node(node.declarator),
-                                  self.print_Node(node.default))
-        else:
-            result = "%s" % self.print_Node(node.declarator)
-        return result
-#==============================================================================
-    def print_CBaseTypeNode(self, node): # call subclasses
-        result = "<CBaseTypeNode not made>\n"
-        return result
-#==============================================================================
-    def print_CAnalysedBaseTypeNode(self, node): # no subclasses
-        result = "<CAnalysedBaseTypeNode not made>\n" # not used on our phase?
-        return result
-#==============================================================================
-    def print_PyArgDeclNode(self, node): # no subclasses
-        result = "<PyArgDeclNode not made>\n"
-        return result
-#==============================================================================
-    def print_DecoratorNode(self, node): # no subclasses
-        result = "<DecoratorNode not made>\n"
-        return result
-#==============================================================================
-    def print_IfClauseNode(self, node): # no subclasses
-        result = "%s:\n" % (self.print_Node(node.condition))
-        self.indent()
-        result += self.print_Node(node.body)
-        self.unindent()
-        return result
-#==============================================================================
-    def print_DictIterationNextNode(self, node): # no subclasses
-        result = "<DictIterationNextNode not made>\n"
-        return result
-#==============================================================================
-    def print_SetIterationNextNode(self, node): # no subclasses
-        result = "<SetIterationNextNode not made>\n"
-        return result
-#==============================================================================
-    def print_ExceptClauseNode(self, node): # no subclasses
-        result = "<ExceptClauseNode not made>\n"
-        return result
-#==============================================================================
-    def print_ParallelNode(self, node): # no subclasses
-        result = "<ParallelNode not made>\n"
-        return result
-###======================================================================
 from operator import attrgetter
+from re import findall
 class PrintSkipTree(PrintTree):
     _last_pos = 0
     _positions = []
@@ -1800,23 +910,229 @@ class PrintSkipTree(PrintTree):
         
         if isinstance(node, Nodes.StatNode):
             if self.check_IfNotC(node):
-                result += self.print_ByPos(node)
+                result += self.print_StatByPos(node)
             else:
+                self.indent()
                 result += self.print_CNode(node)
+                self.unindent()
         
-        for attr in node.child_attrs:
-            children = getattr(node, attr)
-            if children is not None:
-                if type(children) is list:
-                    for child in children:
-                        result += self.print_Node(child)
-                else:
-                    result += self.print_Node(children)
-
+        else:
+            for attr in node.child_attrs:
+                children = getattr(node, attr)
+                if children is not None:
+                    if type(children) is list:
+                        for child in children:
+                            result += self.print_Node(child)
+                    else:
+                        result += self.print_Node(children)
+        
         return result
 
     def print_CNode(self, node):
         result = ""
+        #elif isinstance(node, Nodes.CDefExternNode):
+        #    result += self.print_(node)
+        if   isinstance(node, Nodes.CDeclaratorNode):
+            result += self.print_CDeclaratorNode(node)
+        elif isinstance(node, Nodes.CBaseTypeNode):
+            result += self.print_CBaseTypeNode(node)
+        elif isinstance(node, Nodes.CVarDefNode):
+            result += self.print_CVarDefNode(node)
+        elif isinstance(node, Nodes.CStructOrUnionDefNode):
+            result += self.print_CStructOrUnionDefNode(node)
+        elif isinstance(node, Nodes.CEnumDefNode):
+            result += self.print_CEnumDefNode(node)
+        elif isinstance(node, Nodes.CTypeDefNode):
+            result += self.print_CTypeDefNode(node)
+        elif isinstance(node, Nodes.CFuncDefNode):
+            result += self.print_CFuncDefNode(node)
+        elif isinstance(node, Nodes.CClassDefNode):
+            result += self.print_CClassDefNode(node)
+        elif isinstance(node, Nodes.CImportStatNode):
+            result += self.print_CImportStatNode(node)
+        elif isinstance(node, Nodes.FromCImportStatNode):
+            result += self.print_FromCImportStatNode(node)
+        else:
+            result += self.print_UnknownNode(node)
+        return result
+
+    def print_CUnopNode(self, node):
+        # Upgrade self.print_ExprByPos to change expressions
+        # DereferenceNode *
+        # forbidden DecrementIncrementNode ++/-- ???
+        # AmpersandNode &
+        
+        result = ""
+        return result
+
+    def print_CDefExternNode(self, node):
+        result = ""
+        return result
+
+    def print_CDeclaratorNode(self, node, s_type = ""):
+        result = ""
+        
+        # analise whether there are no more c expressions, print it if true 
+        if self.check_IfNotCChildren(node):
+            s_expr = self.print_ExprByPos(node)
+            if "=" in s_expr: # initialisation
+                result += "%s" % s_expr
+            elif "[" in s_expr: # list declaration
+                name, size = s_expr.split("[")
+                result += "%s = [None] * %s" % (name, size[:-1]) 
+            elif s_type: # declaration with annotation
+                result += "%s : %s" % (s_expr, s_type)
+            else: # simple declaration
+                result += "%s" % s_expr
+        
+        elif isinstance(node, Nodes.CNameDeclaratorNode):
+            result += "%s" % node.name
+        elif isinstance(node, Nodes.CPtrDeclaratorNode):
+            result += "%s" % self.print_CDeclaratorNode(node.base, s_type)
+        elif isinstance(node, Nodes.CReferenceDeclaratorNode):
+            result += "%s" % self.print_CDeclaratorNode(node.base, s_type)
+        elif isinstance(node, Nodes.CArrayDeclaratorNode):
+            result += "%s" % self.print_CDeclaratorNode(node.base, s_type) 
+        elif isinstance(node, Nodes.CConstDeclaratorNode):
+            result += "%s" % self.print_CDeclaratorNode(node.base, s_type) 
+        elif isinstance(node, Nodes.CFuncDeclaratorNode):
+            result += "%s" % self.print_CFuncDeclaratorNode(node)   
+        else:
+            result += self.print_UnknownNode(node) 
+                   
+        return result
+        
+    def print_CFuncDeclaratorNode(self, node):
+        arguments = []
+        for arg in node.args:
+            arguments.append(self.print_CArgDeclNode(arg))
+        
+        result = "@cython.cfunc\n"
+        if node.exception_value:
+            result += "@cython.exceptval(%s)\n" % node.exception_value.value
+        result += "def %s(%s)" % (node.base.name,
+                                  ", ".join(arguments))
+        return result
+                                      
+    def print_CArgDeclNode(self, node):        
+        result = "%s" % self.print_CDeclaratorNode(node.declarator)
+        return result
+
+    def print_CBaseTypeNode(self, node):
+        if   isinstance(node, Nodes.CSimpleBaseTypeNode):
+            result = self.print_CSimpleBaseTypeNode(node)
+        elif isinstance(node, Nodes.CConstTypeNode):
+            result = self.print_CBaseTypeNode(node.base_type)
+        else:
+            result = self.print_UnknownNode(node)   
+        return result
+
+    def print_CSimpleBaseTypeNode(self, node):
+        result = ""
+        if node.is_basic_c_type:
+            result += "cython."
+        for path in node.module_path:
+            result += "%s." % path
+        result += "%s" % node.name
+        return result
+
+    def print_CVarDefNode(self, node):
+        # node.visibility: public, _protected, __private__ - not used
+        s_type = self.print_CBaseTypeNode(node.base_type) # now not fully correct use
+        
+        result = ""
+        for declarator in node.declarators:
+            s_stat = "%s%s\n" % (self._indent,
+                                 self.print_CDeclaratorNode(declarator, s_type))
+            #if "=" in s_stat: # to print only assignment statements
+            result += s_stat
+
+        return result
+
+    def print_CStructOrUnionDefNode(self, node):
+        arguments = []
+        for arg in node.attributes:
+            arguments.append(self.print_CVarDefNode(arg)[:-1])
+        result = "%s = cython.%s(\n%s\n)\n\n" % (node.name, 
+                                                 node.kind, 
+                                                 ",\n".join(arguments))
+        return result
+
+    def print_CEnumDefNode(self, node):
+        self.indent()
+        arguments = []
+        for (i, item) in enumerate(node.items):
+            s_item = self.print_CEnumDefItemNode(item)
+            if "=" not in s_item:
+                if i == 0:
+                    s_item += " = 0"
+                else:
+                    s_prev_item = arguments[i - 1]
+                    s_item += " %s + 1" % s_prev_item[s_prev_item.find("="):]
+            arguments.append(s_item)
+        self.unindent()
+        result = "class %s():\n%s\n\n" % (node.name,
+                                          "\n".join(arguments))
+        return result
+
+    def print_CEnumDefItemNode(self, node):
+        # make more clever - add values from 0 if there are None
+        result = "%s%s" % (self._indent,
+                           self.print_ExprByPos(node))
+        return result
+
+    def print_CTypeDefNode(self, node):
+        result = "%s = %s\n" % (self.print_CDeclaratorNode(node.declarator),
+                                self.print_CBaseTypeNode(node.base_type))
+        return result
+
+    def print_CFuncDefNode(self, node):
+        # node.visibility: public, _protected, __private__ - not used
+        s_type = self.print_CBaseTypeNode(node.base_type) # now not fully correct use
+        
+        #    def f() -> type: body
+        result = "%s -> %s:\n%s\n" % (self.print_CDeclaratorNode(node.declarator, s_type),
+                                      s_type,
+                                      self.print_Node(node.body))
+        
+        return result
+
+    def print_CClassDefNode(self, node):
+        arguments = []
+        for base in node.bases.args:
+            arguments.append(base.name)
+            
+        result = "%s@cython.cclass\n%sclass %s(%s):\n" % (self._indent,
+                                                          self._indent,
+                                                          node.class_name,
+                                                           ", ".join(arguments))
+        self.indent()
+        result += "%s" % (self.print_Node(node.body))
+        self.unindent()
+        return result
+
+    def print_CImportStatNode(self, node):
+        if node.as_name:
+            result = "import %s as %s\n" % (node.module_name, 
+                                            node.as_name)
+        else:
+            result = "import %s\n" % (node.module_name)
+        return result
+
+    def print_FromCImportStatNode(self, node):
+        for argument in node.imported_names:
+            if argument[2]:
+                result = "from %s import %s as %s\n" % (node.module_name, 
+                                                        argument[1],
+                                                        argument[2])
+            else:
+                result = "from %s import %s\n" % (node.module_name, 
+                                                  argument[1])
+        return result
+
+    def print_UnknownNode(self, node):
+        result = "\n# in %s() found %s\n" % (inspect.stack()[1][3], 
+                                             type(node))
         return result
 
     def check_IfNotC(self, node):
@@ -1824,9 +1140,14 @@ class PrintSkipTree(PrintTree):
         
         s_type = str(type(node))
         s_type = s_type[s_type.rfind(".") + 1:-2]
-        if s_type[0] == "C" and s_type[0:1] == s_type[0:1].upper():
+        if findall('C[A-Z]', s_type):
             return False
             
+        return self.check_IfNotCChildren(node)
+
+    def check_IfNotCChildren(self, node):
+        if node is None: return True
+
         for attr in node.child_attrs:
             children = getattr(node, attr)
             if children is not None:
@@ -1835,20 +1156,19 @@ class PrintSkipTree(PrintTree):
                         if not self.check_IfNotC(child): return False
                 else:
                     if not self.check_IfNotC(children): return False
-        
-        #print(s_type)
         return True
 
     def get_Pos(self, node):
-        length = len(self._positions)
-        for i in range(length):
-            if self._positions[i].node == node:
-                cur_pos  = self._positions[i]
-                next_pos = self._positions[i + 1]
-                return cur_pos, next_pos
+        for (i, position) in enumerate(self._positions):
+            if position.node == node:
+                cur_pos  = position
+                for (j, position2) in enumerate(self._positions[i + 1:]):
+                    if (position2.indent <= position.indent):
+                        next_pos = position2
+                        return cur_pos, next_pos
         return 0, 0
 
-    def print_ByPos(self, node):
+    def print_StatByPos(self, node):
         cur_pos, next_pos = self.get_Pos(node)
         result = ""
         if cur_pos.line == next_pos.line:
@@ -1859,6 +1179,40 @@ class PrintSkipTree(PrintTree):
                 result += self._text[i]
             result += self._text[next_pos.line][:next_pos.pos]
         
+        result = result.replace(";", "")
+        return result
+        
+    def print_ExprByPos(self, node):
+        end_sym = [',', '\n']
+        brackets_sym = ['[', ']', '(', ')', '<', '>']
+        brackets_op_sym = ['[', '(', '<']
+        brackets_cl_sym = [']', ')', '>']
+        brackets_cnt = [0, 0, 0]
+        quotation_sym = ["'", '"', "'''"] # will add later
+    
+        line = node.pos[1] - 1
+        pos = node.pos[2] 
+        
+        str_line = self._text[line][pos:] # improve for statements in more lines
+        
+        for (index, char) in enumerate(str_line):
+            if   char in brackets_op_sym:
+                brackets_ind = brackets_op_sym.index(char)
+                brackets_cnt[brackets_ind] += 1
+            elif char in brackets_cl_sym:
+                brackets_ind = brackets_cl_sym.index(char)
+                if brackets_cnt[brackets_ind] == 0:
+                    result = "%s" % (str_line[:index])
+                    return result
+                else:
+                    brackets_cnt[brackets_ind] -= 1
+            elif char in end_sym and brackets_cnt.count(0) == len(brackets_cnt):
+                result = "%s" % (str_line[:index])
+                return result
+        
+        result = "%s" % (str_line)
+        # not till end, but till ',' maybe
+        # go till ',|\n' and the same amount of ( and ), [ and ] and so on
         return result
 """ My Modification end """
 
