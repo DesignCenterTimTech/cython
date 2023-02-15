@@ -838,8 +838,22 @@ class PrintTree(TreeVisitor):
 """ My Modification start """
 '''
     TO DO
-    - check if correct with templates
-    - fix incorrect indent problem
+    - check if correct with decorators
+
+    - add what to do with:
+        - TypecastNode - !<type>what -> cython.cast(type, what(), typecheck=)
+        - CUnopNode:
+            - DereferenceNode *
+            - DecrementIncrementNode ++/-- ???
+            - AmpersandNode - !&x -> cython.address(x)
+        - SizeofTypeNode - !sizeof(type) -> cython.sizeof(changed_type) + look cython.pointer()
+        - SizeofVarNode - !sizeof(type) -> cython.sizeof(same var)
+        - NullNode - !NULL -> cython.NULL
+    
+        - TypeidNode (C++)
+    
+    Maybe add cython.declare() for declarations?
+        cython.declare(cython.int, visibility=)
 '''
 
 from operator import attrgetter
@@ -857,24 +871,37 @@ class PrintSkipTree(PrintTree):
             self.indent = indent
             self.node = node
 
+    def indent(self):
+        self._indent += "    "
+
+    def unindent(self):
+        self._indent = self._indent[:-4]
+
     def __call__(self, tree, phase=None):
-        print("Skip tree print")
+        print("# Skip tree print")
 
         positions = self.fill_pos(tree)
         positions.sort(key = attrgetter("line", "pos", "indent"))
         positions.append(self.Position(positions[-1].line, -1, '', 0))
         self._positions = positions
         
-        path = tree.pos[0].get_description()
-        with open(path, 'r') as f:
+        path_in = tree.pos[0].get_description()
+        if path_in.endswith(".pxd"):
+            return tree
+        with open(path_in, 'r') as f:
             self._text = f.readlines()
         
-        print("##################CODE FILE START##################")
-        print(self.print_Node(tree))
-        print("###################CODE FILE END###################")
+        py_code = "import cython\nfrom enum import Enum\n"
+        py_code += self.print_Node(tree)
         
-        #for pos in self._positions:
-        #    print(pos.line, pos.pos, pos.indent, pos.node)
+        path_out = tree.pos[0].get_description()
+        if path_out.endswith(".pyx") or path_out.endswith(".pxd"):
+            path_out = path_out[:-3] + "py"
+        
+        with open(path_out, "w") as f:
+            f.write(py_code)
+            
+        print(py_code)
         return tree
 
     def fill_pos(self, node):
@@ -912,9 +939,9 @@ class PrintSkipTree(PrintTree):
             if self.check_IfNotC(node):
                 result += self.print_StatByPos(node)
             else:
-                self.indent()
+                #self.indent()
                 result += self.print_CNode(node)
-                self.unindent()
+                #self.unindent()
         
         else:
             for attr in node.child_attrs:
@@ -930,9 +957,9 @@ class PrintSkipTree(PrintTree):
 
     def print_CNode(self, node):
         result = ""
-        #elif isinstance(node, Nodes.CDefExternNode):
-        #    result += self.print_(node)
-        if   isinstance(node, Nodes.CDeclaratorNode):
+        if   isinstance(node, Nodes.CDefExternNode):
+            result += self.print_CDefExternNode(node)
+        elif isinstance(node, Nodes.CDeclaratorNode):
             result += self.print_CDeclaratorNode(node)
         elif isinstance(node, Nodes.CBaseTypeNode):
             result += self.print_CBaseTypeNode(node)
@@ -956,17 +983,8 @@ class PrintSkipTree(PrintTree):
             result += self.print_UnknownNode(node)
         return result
 
-    def print_CUnopNode(self, node):
-        # Upgrade self.print_ExprByPos to change expressions
-        # DereferenceNode *
-        # forbidden DecrementIncrementNode ++/-- ???
-        # AmpersandNode &
-        
-        result = ""
-        return result
-
     def print_CDefExternNode(self, node):
-        result = ""
+        result = "# extern %s\n" % (node.include_file)
         return result
 
     def print_CDeclaratorNode(self, node, s_type = ""):
@@ -1007,11 +1025,13 @@ class PrintSkipTree(PrintTree):
         for arg in node.args:
             arguments.append(self.print_CArgDeclNode(arg))
         
-        result = "@cython.cfunc\n"
+        result = "%s@cython.cfunc\n" % self._indent
         if node.exception_value:
-            result += "@cython.exceptval(%s)\n" % node.exception_value.value
-        result += "def %s(%s)" % (node.base.name,
-                                  ", ".join(arguments))
+            result += "%s@cython.exceptval(%s)\n" % (self._indent, 
+                                                     node.exception_value.value)
+        result += "%sdef %s(%s)" % (self._indent,
+                                    node.base.name,
+                                    ", ".join(arguments))
         return result
                                       
     def print_CArgDeclNode(self, node):        
@@ -1051,8 +1071,10 @@ class PrintSkipTree(PrintTree):
 
     def print_CStructOrUnionDefNode(self, node):
         arguments = []
+        self.indent()
         for arg in node.attributes:
             arguments.append(self.print_CVarDefNode(arg)[:-1])
+        self.unindent()
         result = "%s = cython.%s(\n%s\n)\n\n" % (node.name, 
                                                  node.kind, 
                                                  ",\n".join(arguments))
@@ -1071,8 +1093,8 @@ class PrintSkipTree(PrintTree):
                     s_item += " %s + 1" % s_prev_item[s_prev_item.find("="):]
             arguments.append(s_item)
         self.unindent()
-        result = "class %s():\n%s\n\n" % (node.name,
-                                          "\n".join(arguments))
+        result = "class %s(Enum):\n%s\n\n" % (node.name,
+                                              "\n".join(arguments))
         return result
 
     def print_CEnumDefItemNode(self, node):
@@ -1091,9 +1113,11 @@ class PrintSkipTree(PrintTree):
         s_type = self.print_CBaseTypeNode(node.base_type) # now not fully correct use
         
         #    def f() -> type: body
-        result = "%s -> %s:\n%s\n" % (self.print_CDeclaratorNode(node.declarator, s_type),
-                                      s_type,
-                                      self.print_Node(node.body))
+        result = "%s -> %s:\n" % (self.print_CDeclaratorNode(node.declarator, s_type),
+                                      s_type)
+        self.indent()
+        result += "%s\n" % (self.print_Node(node.body))
+        self.unindent()
         
         return result
 
@@ -1184,6 +1208,7 @@ class PrintSkipTree(PrintTree):
         
     def print_ExprByPos(self, node):
         end_sym = [',', '\n']
+        continue_sym = [',', '\\']
         brackets_sym = ['[', ']', '(', ')', '<', '>']
         brackets_op_sym = ['[', '(', '<']
         brackets_cl_sym = [']', ')', '>']
@@ -1193,7 +1218,19 @@ class PrintSkipTree(PrintTree):
         line = node.pos[1] - 1
         pos = node.pos[2] 
         
-        str_line = self._text[line][pos:] # improve for statements in more lines
+        # check for incorrect (too late) pos
+        first_char = self._text[line][pos]
+        if first_char in  (brackets_sym + end_sym + ["="]):
+            # go left till start of expr
+            pos -= 1
+            while (self._text[line][pos] not in end_sym + brackets_sym):
+                pos -= 1
+            pos += 1
+        
+        str_line = self._text[line][pos:]
+        while str_line[-1] in continue_sym:
+            line += 1
+            str_line += self._text[line]
         
         for (index, char) in enumerate(str_line):
             if   char in brackets_op_sym:
@@ -1214,7 +1251,6 @@ class PrintSkipTree(PrintTree):
         # not till end, but till ',' maybe
         # go till ',|\n' and the same amount of ( and ), [ and ] and so on
         return result
-""" My Modification end """
 
 if __name__ == "__main__":
     import doctest
