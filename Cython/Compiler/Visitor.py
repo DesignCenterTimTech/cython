@@ -841,19 +841,11 @@ class PrintTree(TreeVisitor):
     - check if correct with decorators
 
     - add what to do with:
-        - TypecastNode - !<type>what -> cython.cast(type, what(), typecheck=)
         - CUnopNode:
-            - DereferenceNode *
-            - DecrementIncrementNode ++/-- ???
-            - AmpersandNode - !&x -> cython.address(x)
-        - SizeofTypeNode - !sizeof(type) -> cython.sizeof(changed_type) + look cython.pointer()
-        - SizeofVarNode - !sizeof(type) -> cython.sizeof(same var)
-        - NullNode - !NULL -> cython.NULL
+            - DereferenceNode * ?
+            - DecrementIncrementNode ++/-- ?
     
         - TypeidNode (C++)
-    
-    Maybe add cython.declare() for declarations?
-        cython.declare(cython.int, visibility=)
 '''
 
 from operator import attrgetter
@@ -1104,17 +1096,18 @@ class PrintSkipTree(PrintTree):
         return result
 
     def print_CTypeDefNode(self, node):
+        s_type = self.print_CBaseTypeNode(node.base_type)
         result = "%s = %s\n" % (self.print_CDeclaratorNode(node.declarator),
-                                self.print_CBaseTypeNode(node.base_type))
+                                self.print_TypeTree(node.declarator) % s_type)
         return result
 
     def print_CFuncDefNode(self, node):
         # node.visibility: public, _protected, __private__ - not used
-        s_type = self.print_CBaseTypeNode(node.base_type) # now not fully correct use
+        s_type = self.print_CBaseTypeNode(node.base_type) 
         
         #    def f() -> type: body
         result = "%s -> %s:\n" % (self.print_CDeclaratorNode(node.declarator, s_type),
-                                      s_type)
+                                  self.print_TypeTree(node.declarator) % s_type)
         self.indent()
         result += "%s\n" % (self.print_Node(node.body))
         self.unindent()
@@ -1126,10 +1119,11 @@ class PrintSkipTree(PrintTree):
         for base in node.bases.args:
             arguments.append(base.name)
             
-        result = "%s@cython.cclass\n%sclass %s(%s):\n" % (self._indent,
-                                                          self._indent,
-                                                          node.class_name,
-                                                           ", ".join(arguments))
+        result = "%s@cython.cclass\n"\
+                 "%sclass %s(%s):\n" % (self._indent,
+                                        self._indent,
+                                        node.class_name,
+                                        ", ".join(arguments))
         self.indent()
         result += "%s" % (self.print_Node(node.body))
         self.unindent()
@@ -1204,6 +1198,7 @@ class PrintSkipTree(PrintTree):
             result += self._text[next_pos.line][:next_pos.pos]
         
         result = result.replace(";", "")
+        result = self.improve_Expr(node, result)
         return result
         
     def print_ExprByPos(self, node):
@@ -1240,17 +1235,125 @@ class PrintSkipTree(PrintTree):
                 brackets_ind = brackets_cl_sym.index(char)
                 if brackets_cnt[brackets_ind] == 0:
                     result = "%s" % (str_line[:index])
+                    result = self.improve_Expr(node, result)
                     return result
                 else:
                     brackets_cnt[brackets_ind] -= 1
             elif char in end_sym and brackets_cnt.count(0) == len(brackets_cnt):
                 result = "%s" % (str_line[:index])
+                result = self.improve_Expr(node, result)
                 return result
         
         result = "%s" % (str_line)
-        # not till end, but till ',' maybe
-        # go till ',|\n' and the same amount of ( and ), [ and ] and so on
+        result = self.improve_Expr(node, result)
         return result
+        
+    def print_TypeTree(self, node):
+        result = ""
+        
+        if isinstance(node, Nodes.CNameDeclaratorNode):
+            result += "%s"
+        elif isinstance(node, Nodes.CPtrDeclaratorNode):
+            result += "cython.pointer(%s)" % self.print_TypeTree(node.base)
+        elif isinstance(node, Nodes.CReferenceDeclaratorNode):
+            result += "%s&" % self.print_TypeTree(node.base)
+        elif isinstance(node, Nodes.CArrayDeclaratorNode):
+            result += "%s[%s]" % (self.print_TypeTree(node.base), node.dimension)
+        else:
+            result = "%s" % self.print_TypeTree(node.base)
+        
+        return result
+        
+    # changes in expressions c-like constructions, see classes in isinstance()
+    def improve_Expr(self, node, expr):
+        if node is None: return True
+        line = node.pos[1] - 1
+        pos = node.pos[2]
+        
+        # for each inline c expression 
+        # fill line, expression position
+        # expression pattern -> changed pattern
+        if   isinstance(node, ExprNodes.TypecastNode):
+            # get start of expr till <.> func_name( 
+            expr_str = self._text[line][pos:]
+            start = findall("<.+>[\w|\[|\]| ]+\(", expr_str)[0]
+            start_pos = len(start)
+            
+            # get end of expr till )
+            brackets_cnt = 1
+            for (end_pos, char) in enumerate(expr_str[start_pos:], start_pos):
+                if   char == "(": brackets_cnt += 1
+                elif char == ")": brackets_cnt -= 1
+                
+                if brackets_cnt == 0:
+                    break
+            end_pos += 1
+            
+            pattern = "%s%s" % (start, expr_str[start_pos:end_pos])
+            s_type = self.print_CBaseTypeNode(node.base_type)
+            changed = "cython.cast(%s, %s, typecheck= %s)" % \
+                      (self.print_TypeTree(node.declarator) % s_type,
+                       self.print_ExprByPos(node.operand),
+                       node.typecheck)
+            expr = expr.replace(pattern, changed)
+            
+        elif isinstance(node, ExprNodes.AmpersandNode):
+            expr_str = self._text[line][pos:]
+            # get operand &.
+            pattern = "&" + findall("[\w|\[|\]]+", expr_str)[0]
+            changed = "cython.address(%s)" % pattern[1:]
+            expr = expr.replace(pattern, changed)
+
+        elif isinstance(node, ExprNodes.SizeofTypeNode):
+            expr_str = self._text[line][pos + len("sizeof("):]
+            # get operand till )
+            brackets_cnt = 1
+            for (end_pos, char) in enumerate(expr_str):
+                if   char == "(": brackets_cnt += 1
+                elif char == ")": brackets_cnt -= 1
+                
+                if brackets_cnt == 0:
+                    break
+            
+            pattern = "sizeof(%s)" % expr_str[:end_pos]
+            s_type = self.print_CBaseTypeNode(node.base_type)
+            changed = "cython.sizeof(%s)" % (self.print_TypeTree(node.declarator) % s_type)
+            expr = expr.replace(pattern, changed)
+            
+        elif isinstance(node, ExprNodes.SizeofVarNode):
+            expr_str = self._text[line][pos + len("sizeof("):]
+            # get operand till )
+            brackets_cnt = 1
+            for (end_pos, char) in enumerate(expr_str):
+                if   char == "(": brackets_cnt += 1
+                elif char == ")": brackets_cnt -= 1
+                
+                if brackets_cnt == 0:
+                    break
+                    
+            pattern = "sizeof(%s)" % expr_str[:end_pos]
+            changed = "cython.%s" % pattern
+            expr = expr.replace(pattern, changed)
+            
+        elif isinstance(node, ExprNodes.NullNode): # done
+            pattern = "NULL"
+            changed = "cython.NULL"
+            print("%s -> %s" % (pattern, changed))
+            expr = expr.replace(pattern, changed)
+            
+        # else try to improve children
+        else:
+            for attr in node.child_attrs:
+                children = getattr(node, attr)
+                if children is not None:
+                    if type(children) is list:
+                        for child in children:
+                             expr = self.improve_Expr(child, expr)  
+                    else:
+                        expr = self.improve_Expr(children, expr)  
+        
+        return expr
+""" My Modification end """
 
 if __name__ == "__main__":
     import doctest
