@@ -1299,47 +1299,54 @@ class PrintSkipTree(PrintTree):
             
         elif isinstance(node, ExprNodes.AmpersandNode):
             expr_str = self._text[line][pos:]
-            # get operand &.
+            # get operand &var
             pattern = "&" + findall("[\w|\[|\]]+", expr_str)[0]
             changed = "cython.address(%s)" % pattern[1:]
             expr = expr.replace(pattern, changed)
 
         elif isinstance(node, ExprNodes.SizeofTypeNode):
-            expr_str = self._text[line][pos + len("sizeof("):]
-            # get operand till )
+            # add borders of len 1 to replace sizeof() correctrly            
+            expr_str = self._text[line][pos - 1:]
+            start_pos = len("sizeof(") + 1
+            # get operand till closing bracket
             brackets_cnt = 1
-            for (end_pos, char) in enumerate(expr_str):
+            for (end_pos, char) in enumerate(expr_str[start_pos:], start_pos):
                 if   char == "(": brackets_cnt += 1
                 elif char == ")": brackets_cnt -= 1
-                
                 if brackets_cnt == 0:
                     break
+            end_pos += 1
             
-            pattern = "sizeof(%s)" % expr_str[:end_pos]
+            pattern = expr_str[:end_pos]
             s_type = self.print_CBaseTypeNode(node.base_type)
-            changed = "cython.sizeof(%s)" % (self.print_TypeTree(node.declarator) % s_type)
+            changed = "%scython.sizeof(%s)" % \
+                      (expr_str[:1],
+                       self.print_TypeTree(node.declarator) % s_type)
             expr = expr.replace(pattern, changed)
             
         elif isinstance(node, ExprNodes.SizeofVarNode):
-            expr_str = self._text[line][pos + len("sizeof("):]
-            # get operand till )
+            # add borders of len 1 to replace sizeof() correctrly            
+            expr_str = self._text[line][pos - 1:]
+            start_pos = len("sizeof(") + 1
+            # get operand till closing bracket
             brackets_cnt = 1
-            for (end_pos, char) in enumerate(expr_str):
+            for (end_pos, char) in enumerate(expr_str[start_pos:], start_pos):
                 if   char == "(": brackets_cnt += 1
-                elif char == ")": brackets_cnt -= 1
-                
+                elif char == ")": brackets_cnt -= 1  
                 if brackets_cnt == 0:
                     break
+            end_pos += 1
                     
-            pattern = "sizeof(%s)" % expr_str[:end_pos]
-            changed = "cython.%s" % pattern
+            pattern = expr_str[:end_pos]
+            changed = expr_str[:1] + "cython." + pattern[1:]
             expr = expr.replace(pattern, changed)
             
-        elif isinstance(node, ExprNodes.NullNode): # done
-            pattern = "NULL"
-            changed = "cython.NULL"
-            print("%s -> %s" % (pattern, changed))
-            expr = expr.replace(pattern, changed)
+        elif isinstance(node, ExprNodes.NullNode):
+            # add borders of len 1 to replace NULL correctrly
+            expr_str = self._text[line][pos - 1:pos + len("NULL") + 1]
+            pattern = expr_str
+            changed = expr_str[:2] + "cython.NULL" + expr_str[-2:]
+            expr = expr.replace(pattern, changed, 1)
             
         # else try to improve children
         else:
