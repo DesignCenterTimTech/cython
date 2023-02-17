@@ -139,6 +139,7 @@ def inject_utility_code_stage_factory(context):
 
 def create_pipeline(context, mode, exclude_classes=()):
     assert mode in ('pyx', 'py', 'pxd')
+    from .Visitor import PrintSkipTree
     from .Visitor import PrintTree
     from .ParseTreeTransforms import WithTransform, NormalizeTree, PostParse, PxdPostParse
     from .ParseTreeTransforms import ForwardDeclareTypes, InjectGilHandling, AnalyseDeclarationsTransform
@@ -180,6 +181,7 @@ def create_pipeline(context, mode, exclude_classes=()):
     # compilation stage.
     stages = [
         NormalizeTree(context),
+        PrintSkipTree(),
         PostParse(context),
         _specific_post_parse,
         TrackNumpyAttributes(),

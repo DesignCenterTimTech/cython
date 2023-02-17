@@ -883,17 +883,17 @@ class PrintSkipTree(PrintTree):
         with open(path_in, 'r') as f:
             self._text = f.readlines()
         
-        py_code = "import cython\nfrom enum import Enum\n"
+        py_code = "import cython\n"
         py_code += self.print_Node(tree)
         
         path_out = tree.pos[0].get_description()
         if path_out.endswith(".pyx") or path_out.endswith(".pxd"):
-            path_out = path_out[:-3] + "py"
+            path_out = "m_" + path_out[:-3] + "py"
         
         with open(path_out, "w") as f:
             f.write(py_code)
             
-        print(py_code)
+        #print(py_code)
         return tree
 
     def fill_pos(self, node):
@@ -989,7 +989,10 @@ class PrintSkipTree(PrintTree):
                 result += "%s" % s_expr
             elif "[" in s_expr: # list declaration
                 name, size = s_expr.split("[")
-                result += "%s = [None] * %s" % (name, size[:-1]) 
+                if size[:-1]:
+                    result += "%s = [None] * %s" % (name, size[:-1])
+                else:
+                    result += "%s" % name
             elif s_type: # declaration with annotation
                 result += "%s : %s" % (s_expr, s_type)
             else: # simple declaration
@@ -1085,8 +1088,8 @@ class PrintSkipTree(PrintTree):
                     s_item += " %s + 1" % s_prev_item[s_prev_item.find("="):]
             arguments.append(s_item)
         self.unindent()
-        result = "class %s(Enum):\n%s\n\n" % (node.name,
-                                              "\n".join(arguments))
+        result = "class %s():\n%s\n\n" % (node.name,
+                                          "\n".join(arguments))
         return result
 
     def print_CEnumDefItemNode(self, node):
@@ -1274,7 +1277,7 @@ class PrintSkipTree(PrintTree):
         # fill line, expression position
         # expression pattern -> changed pattern
         if   isinstance(node, ExprNodes.TypecastNode):
-            # get start of expr till <.> func_name( 
+            # get start of expr till <.> type
             expr_str = self._text[line][pos:]
             start = findall("<.+>[\w|\[|\]| ]+\(", expr_str)[0]
             start_pos = len(start)
