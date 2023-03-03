@@ -850,6 +850,7 @@ class PrintTree(TreeVisitor):
 
 from operator import attrgetter
 from re import findall
+import os
 class PrintSkipTree(PrintTree):
     _last_pos = 0
     _positions = []
@@ -871,29 +872,39 @@ class PrintSkipTree(PrintTree):
 
     def __call__(self, tree, phase=None):
         print("# Skip tree print")
+        path_in = tree.pos[0].get_description()
+        if path_in.endswith(".py"):
+            # nothing to change in .py file
+            return tree
 
         positions = self.fill_pos(tree)
         positions.sort(key = attrgetter("line", "pos", "indent"))
         positions.append(self.Position(positions[-1].line, -1, '', 0))
         self._positions = positions
         
-        path_in = tree.pos[0].get_description()
-        if path_in.endswith(".pxd"):
-            return tree
-        with open(path_in, 'r') as f:
-            self._text = f.readlines()
+        try:
+            f = open(path_in, 'r')
+        except:
+            # stdlib from Includes
+            path_in = __file__[:__file__.rfind(".") - 16] + "Includes/" + path_in
+            f = open(path_in, 'r')
+        
+        self._text = f.readlines()
+        f.close()
         
         py_code = "import cython\n"
         py_code += self.print_Node(tree)
         
         path_out = tree.pos[0].get_description()
-        if path_out.endswith(".pyx") or path_out.endswith(".pxd"):
-            path_out = "m_" + path_out[:-3] + "py"
+        path_out = path_out[:-3] + "py"
+        print(" %%%% %s\n" % path_out)
+        if "/" in path_out:
+            os.makedirs(os.path.dirname(path_out), exist_ok=True)
         
         with open(path_out, "w") as f:
             f.write(py_code)
             
-        #print(py_code)
+        print(py_code)
         return tree
 
     def fill_pos(self, node):
@@ -976,9 +987,73 @@ class PrintSkipTree(PrintTree):
         return result
 
     def print_CDefExternNode(self, node):
-        result = "# extern %s\n" % (node.include_file)
+        # should make a shared object, then CDLL it
+        # cc -fPIC -shared -o libfun.so function.c
+        result = ""
+        c_name = node.include_file
+        if not c_name:
+            # cdef extern from *:
+            result += "%s\n" % self.print_Node(node.body)
+            return result
+        
+        elif "<" not in c_name:
+            so_name = c_name[:c_name.rfind(".")] + ".so"
+        else:
+            so_name = "%s.so" % (c_name[1:c_name.rfind(".")])
+            c_name = "/usr/include/%s" % (node.include_file[1:-1])
+        
+        os.system("cc -fPIC -shared -o %s %s" % (so_name, c_name))
+        result += "exported_lib = ctypes.CDLL(%s)\n" % node.include_file
+        for stat in node.body.stats:
+            result += self.print_CTypes_Node(stat)
+        
         return result
 
+    def print_CTypes_Node(self, node):
+        # special print for extern ctypes from C
+        result = ""
+        if isinstance(node, Nodes.CVarDefNode):
+            result += self.print_CTypes_VarDefNode(node)
+        else:
+            result += self.print_CNode(node)
+        return result
+
+    def print_CTypes_VarDefNode(self, node):
+        result = ""
+        base = node.declarators[0]
+        is_func = False
+        # check whether it is a function declaration
+        while hasattr(base, "base"):
+            if isinstance(base, Nodes.CFuncDeclaratorNode):
+                is_func = True
+                break    
+            base = base.base
+        
+        if is_func:
+            # base has Nodes.CFuncDeclaratorNode type
+            full_type = self.print_Ctypes_FullType(node)
+            func_name = base.base.name
+            arguments = []
+            for arg in base.args:
+                arguments.append(self.print_Ctypes_FullType(arg))
+            result += "exported_lib.%s.restype = %s\n" % (func_name, 
+                                                          full_type)
+            result += "exported_lib.%s.argtypes = [%s]\n" % (func_name, 
+                                                             ", ". join(arguments))
+            result += "%s = exported_lib.%s\n\n" % (func_name, func_name)
+        else:
+            result += self.print_CVarDefNode(node)
+        return result
+        
+    def print_Ctypes_FullType(self, node):
+        s_type = self.print_CBaseTypeNode(node.base_type, ctypes = True)
+        if hasattr(node, "declarator"):
+            base = node.declarator
+        else:
+            base = node.declarators[0]
+        full_type = self.print_TypeTree(base, ctypes = True) % s_type
+        return full_type
+        
     def print_CDeclaratorNode(self, node, s_type = ""):
         result = ""
         
@@ -994,8 +1069,15 @@ class PrintSkipTree(PrintTree):
                 else:
                     result += "%s" % name
             elif s_type: # declaration with annotation
-                result += "%s : %s" % (s_expr, s_type)
+                if s_type == s_expr:
+                    result += "%s" % (s_expr)
+                else:
+                    result += "%s : %s" % (s_expr, s_type)
             else: # simple declaration
+                if   '"' in s_expr:
+                    s_expr = s_expr[:s_expr.find('"')]
+                elif "'" in s_expr:
+                    s_expr = s_expr[:s_expr.find("'")]
                 result += "%s" % s_expr
         
         elif isinstance(node, Nodes.CNameDeclaratorNode):
@@ -1024,41 +1106,62 @@ class PrintSkipTree(PrintTree):
         if node.exception_value:
             result += "%s@cython.exceptval(%s)\n" % (self._indent, 
                                                      node.exception_value.value)
+        base = node.base
+        while not hasattr(base, "name"):
+            base = base.base
         result += "%sdef %s(%s)" % (self._indent,
-                                    node.base.name,
+                                    base.name,
                                     ", ".join(arguments))
         return result
                                       
-    def print_CArgDeclNode(self, node):        
-        result = "%s" % self.print_CDeclaratorNode(node.declarator)
+    def print_CArgDeclNode(self, node):  
+        s_type = self.print_CBaseTypeNode(node.base_type)
+        full_type = self.print_TypeTree(node.declarator) % s_type
+        result = "%s" % self.print_CDeclaratorNode(node.declarator, full_type)
         return result
 
-    def print_CBaseTypeNode(self, node):
+    def print_CBaseTypeNode(self, node, ctypes = False):
         if   isinstance(node, Nodes.CSimpleBaseTypeNode):
-            result = self.print_CSimpleBaseTypeNode(node)
+            result = self.print_CSimpleBaseTypeNode(node, ctypes)
         elif isinstance(node, Nodes.CConstTypeNode):
-            result = self.print_CBaseTypeNode(node.base_type)
+            result = self.print_CBaseTypeNode(node.base_type, ctypes)
         else:
             result = self.print_UnknownNode(node)   
         return result
 
-    def print_CSimpleBaseTypeNode(self, node):
+    def print_CSimpleBaseTypeNode(self, node, ctypes = False):
         result = ""
         if node.is_basic_c_type:
-            result += "cython."
+            if ctypes:
+                result += "ctypes."
+            else:
+                result += "cython."
         for path in node.module_path:
             result += "%s." % path
-        result += "%s" % node.name
+            
+        double_longness = ["double", "longdouble"]
+        int_longness = ["int", "long", "longlong", "short"]
+            
+        s_type = node.name
+        if s_type == "int":
+            s_type = int_longness[node.longness]
+        elif s_type == "double":
+            s_type = double_longness[node.longness]
+        if not node.signed and "size_t" not in s_type:
+            s_type = "u" + s_type
+            
+        result += "%s" % s_type
         return result
 
     def print_CVarDefNode(self, node):
         # node.visibility: public, _protected, __private__ - not used
-        s_type = self.print_CBaseTypeNode(node.base_type) # now not fully correct use
+        s_type = self.print_CBaseTypeNode(node.base_type)
         
         result = ""
         for declarator in node.declarators:
+            full_type = self.print_TypeTree(declarator) % s_type
             s_stat = "%s%s\n" % (self._indent,
-                                 self.print_CDeclaratorNode(declarator, s_type))
+                                 self.print_CDeclaratorNode(declarator, full_type))
             #if "=" in s_stat: # to print only assignment statements
             result += s_stat
 
@@ -1070,9 +1173,14 @@ class PrintSkipTree(PrintTree):
         for arg in node.attributes:
             arguments.append(self.print_CVarDefNode(arg)[:-1])
         self.unindent()
+        '''
         result = "%s = cython.%s(\n%s\n)\n\n" % (node.name, 
                                                  node.kind, 
                                                  ",\n".join(arguments))
+        '''
+        result = "# cython.%s\n" % (node.kind)
+        result += "class %s():\n%s\n\n" % (node.name, 
+                                           "\n".join(arguments))
         return result
 
     def print_CEnumDefNode(self, node):
@@ -1251,19 +1359,27 @@ class PrintSkipTree(PrintTree):
         result = self.improve_Expr(node, result)
         return result
         
-    def print_TypeTree(self, node):
+    def print_TypeTree(self, node, ctypes = False):
         result = ""
         
         if isinstance(node, Nodes.CNameDeclaratorNode):
-            result += "%s"
-        elif isinstance(node, Nodes.CPtrDeclaratorNode):
-            result += "cython.pointer(%s)" % self.print_TypeTree(node.base)
+            return "%s"
+            
+        next_step = self.print_TypeTree(node.base, ctypes)
+        if isinstance(node, Nodes.CPtrDeclaratorNode):
+            if ctypes:
+                result += "ctypes.POINTER(%s)" % next_step
+            else:
+                result += "cython.pointer(%s)" % next_step
         elif isinstance(node, Nodes.CReferenceDeclaratorNode):
-            result += "%s&" % self.print_TypeTree(node.base)
+            if ctypes:
+                result += "ctypes.addressof(%s)" % next_step
+            else:
+                result += "cython.address(%s)" % next_step
         elif isinstance(node, Nodes.CArrayDeclaratorNode):
-            result += "%s[%s]" % (self.print_TypeTree(node.base), node.dimension)
+            result += "%s[%s]" % (next_step, node.dimension)
         else:
-            result = "%s" % self.print_TypeTree(node.base)
+            result = "%s" % next_step
         
         return result
         
@@ -1279,7 +1395,12 @@ class PrintSkipTree(PrintTree):
         if   isinstance(node, ExprNodes.TypecastNode):
             # get start of expr till <.> type
             expr_str = self._text[line][pos:]
-            start = findall("<.+>[\w|\[|\]| ]+\(", expr_str)[0]
+            start = findall("<.+>[\w|\[|\]| ]+\(", expr_str)#[0]
+            if start:
+                start = start[0]
+            else:
+                print(" # EXPRESSION %s" % expr)
+                return expr
             start_pos = len(start)
             
             # get end of expr till )
