@@ -181,7 +181,10 @@ def create_pipeline(context, mode, exclude_classes=()):
     # compilation stage.
     stages = [
         NormalizeTree(context),
+        
+        # MIPT: add new stage of pyrex->python generation to cython pipeline
         PrintSkipTree(),
+        
         PostParse(context),
         _specific_post_parse,
         TrackNumpyAttributes(),
