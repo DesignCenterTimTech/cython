@@ -245,11 +245,13 @@ class FileSourceDescriptor(SourceDescriptor):
         return lines
 
     def get_description(self):
+        # MIPT: fix incorrect behaviour - in old version with .path_description instead
+        #       of .filename always got try brunch, even not in current directory
         try:
-            return os.path.relpath(self.path_description)
+            return os.path.relpath(self.filename)
         except ValueError:
             # path not under current directory => use complete file path
-            return self.path_description
+            return self.filename
 
     def get_error_description(self):
         path = self.filename
