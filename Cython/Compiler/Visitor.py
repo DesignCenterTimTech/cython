@@ -1084,12 +1084,13 @@ class PrintSkipTree(PrintTree):
    
     # MIPT: base function for printing different declarations 
     #       as CDeclarator nodes chains
-    def print_CDeclaratorNode(self, node, s_type = ""):
+    #       see print_CFuncDeclaratorNode() to understand from_cvardef
+    def print_CDeclaratorNode(self, node, s_type = "", from_cvardef = False):
         result = ""
         
         # analise whether there are no more c expressions, print it if true 
         if self.check_IfNotCChildren(node):
-            s_expr = self.print_ExprByPos(node)
+            s_expr = self.print_ExprByPos(node).strip()
             if "=" in s_expr: # initialisation
                 result += "%s" % s_expr
             elif "[" in s_expr: # list declaration
@@ -1114,35 +1115,47 @@ class PrintSkipTree(PrintTree):
         elif isinstance(node, Nodes.CNameDeclaratorNode):
             result += "%s" % node.name
         elif isinstance(node, Nodes.CFuncDeclaratorNode):
-            result += "%s" % self.print_CFuncDeclaratorNode(node)   
+            result += "%s" % self.print_CFuncDeclaratorNode(node, from_cvardef)   
         else:
             # CPtrDeclaratorNode
             # CReferenceDeclaratorNode
             # CArrayDeclaratorNode
             # CConstDeclaratorNode
-            result += "%s" % self.print_CDeclaratorNode(node.base, s_type)
+            result += "%s" % self.print_CDeclaratorNode(node.base, s_type, from_cvardef)
                    
         return result
     
     # MIPT: prints function declarator with cython decorator for functions
     #       note: only function call, without function body
-    def print_CFuncDeclaratorNode(self, node):
-        arguments = []
-        for arg in node.args:
-            arguments.append(self.print_CArgDeclNode(arg))
-        
-        result = "@cython.cfunc\n"
-        if node.exception_value:
-            result += "%s@cython.exceptval(%s)\n" % (self._indent, 
-                                                     node.exception_value.value)
+    #
+    #       can be called by 2 possible parents: (see from_funcdef var)
+    #       1) CFuncDefNode - cdef func(arguments):\n <body from sibling>
+    #       2) CVarDefNode  - cdef func(arguments) <no body, just declaration>
+    #       2nd version can be seen in 2.1) function/class declarations or in 
+    #       2.2) extern statements, see print_CTypes_VarDefNode()
+    def print_CFuncDeclaratorNode(self, node, from_cvardef = False):
         # in declarator chain get function name
         base = node.base
         while not hasattr(base, "name"):
             base = base.base
+        
+        if from_cvardef:
+            # just declaration
+            result = "%s : function" % (base.name)
+        else:
+            # used in function definition
+            arguments = []
+            for arg in node.args:
+                arguments.append(self.print_CArgDeclNode(arg))
             
-        result += "%sdef %s(%s)" % (self._indent,
-                                    base.name,
-                                    ", ".join(arguments))
+            result = "@cython.cfunc\n"
+            if node.exception_value:
+                result += "%s@cython.exceptval(%s)\n" % (self._indent, 
+                                                         node.exception_value.value)
+                
+            result += "%sdef %s(%s)" % (self._indent,
+                                        base.name,
+                                        ", ".join(arguments))
         return result
     
     # MIPT: prints basic argument declaration: type                                
@@ -1199,8 +1212,7 @@ class PrintSkipTree(PrintTree):
         for declarator in node.declarators:
             full_type = self.print_TypeTree(declarator) % s_type
             s_stat = "%s%s\n" % (self._indent,
-                                 self.print_CDeclaratorNode(declarator, full_type))
-            #if "=" in s_stat: # to print only assignment statements
+                                 self.print_CDeclaratorNode(declarator, full_type, from_cvardef = True))
             result += s_stat
 
         return result
@@ -1314,13 +1326,14 @@ class PrintSkipTree(PrintTree):
         # change name(.pxd) to m_name(.pxd)
         module = node.module_name
         module = module[:module.rfind(".") + 1] + "m_" + module[module.rfind(".") + 1:]
+        result = ""
         for argument in node.imported_names:
             if argument[2]:
-                result = "from %s import %s as %s\n" % (module, 
+                result += "from %s import %s as %s\n" % (module, 
                                                         argument[1],
                                                         argument[2])
             else:
-                result = "from %s import %s\n" % (module, 
+                result += "from %s import %s\n" % (module, 
                                                   argument[1])
         return result
 
@@ -1479,32 +1492,17 @@ class PrintSkipTree(PrintTree):
         
         # static cast expression <type>(...)
         if isinstance(node, ExprNodes.TypecastNode):
-            # get start of expr till <.> type
+            # get typecast start
             expr_str = self._text[line][pos:]
-            start = findall("<.+>[\w|\[|\]| ]+\(", expr_str)#[0]
-            if start:
-                start = start[0]
-            else:
-                print(" # EXPRESSION %s" % expr)
-                return expr
-            start_pos = len(start)
+            operand = self.print_ExprByPos(node.operand)
             
-            # get end of expr till )
-            brackets_cnt = 1
-            for (end_pos, char) in enumerate(expr_str[start_pos:], start_pos):
-                if   char == "(": brackets_cnt += 1
-                elif char == ")": brackets_cnt -= 1
-                
-                if brackets_cnt == 0:
-                    break
-            end_pos += 1
-            
-            pattern = "%s%s" % (start, expr_str[start_pos:end_pos])
+            pattern = expr_str[:expr_str.find(operand) + len(operand)]
             s_type = self.print_CBaseTypeNode(node.base_type)
             changed = "cython.cast(%s, %s, typecheck= %s)" % \
                       (self.print_TypeTree(node.declarator) % s_type,
-                       self.print_ExprByPos(node.operand),
+                       operand,
                        node.typecheck)
+            #print("%s -> %s" % (pattern, changed))
             expr = expr.replace(pattern, changed)
        
         # regular &... expression
