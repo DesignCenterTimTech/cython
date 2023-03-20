@@ -1135,6 +1135,14 @@ def cythonize(module_list, exclude=None, nthreads=0, aliases=None, quiet=False, 
     # cythonize() is often followed by the (non-Python-buffered)
     # compiler output, flush now to avoid interleaving output.
     sys.stdout.flush()
+    
+    # MIPT: change the name of resulted .so library -> no intersection with 
+    #       our modified .py file when imported
+    for m in module_list:
+        prev_name = m.name
+        m.name = prev_name[:prev_name.rfind("/") + 1] + "_non_m_" \
+               + prev_name[prev_name.rfind("/") + 1:]
+   
     return module_list
 
 
