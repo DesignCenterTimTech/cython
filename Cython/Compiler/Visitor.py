@@ -893,7 +893,7 @@ class PrintSkipTree(PrintTree):
         py_code += self.print_Node(tree)
         
         # get output path name
-        path_out = tree.pos[0].get_description()
+        path_out = tree.pos[0].path_description
         # change /name.pxd->/m_name.pxd of a .pxd lib 
         # for no intersection with possible py files
         if path_out.endswith(".pxd"):
@@ -1331,7 +1331,9 @@ class PrintSkipTree(PrintTree):
     def print_FromCImportStatNode(self, node):
         # change name(.pxd) to m_name(.pxd)
         module = node.module_name
-        module = module[:module.rfind(".") + 1] + "m_" + module[module.rfind(".") + 1:]
+        module = "." * node.relative_level + \
+                 module[:module.rfind(".") + 1] + "m_" + \
+                 module[module.rfind(".") + 1:]
         result = ""
         for argument in node.imported_names:
             if argument[2]:
