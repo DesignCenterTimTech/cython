@@ -915,17 +915,19 @@ class PrintSkipTree(PrintTree):
         # add info about node pos
         positions = []
         if node is None: return None
-        if node.pos and isinstance(node, Nodes.StatNode):
-                pos = node.pos
-                path = pos[0].get_description()
-                if '/' in path:
-                    path = path.split('/')[-1]
-                if '\\' in path:
-                    path = path.split('\\')[-1]
-                positions.append(self.Position(pos[1] - 1, 0, self._indent, node))
+        if node.pos and isinstance(node, Nodes.StatNode) or
+                        isinstance(node, Nodes.StatListNode):
+            pos = node.pos
+            path = pos[0].get_description()
+            if '/' in path:
+                path = path.split('/')[-1]
+            if '\\' in path:
+                path = path.split('\\')[-1]
+            positions.append(self.Position(pos[1] - 1, 0, self._indent, node))
         
         # add info about children pos
         self.indent()
+
         for attr in node.child_attrs:
             children = getattr(node, attr)
             if children is not None:
@@ -935,7 +937,6 @@ class PrintSkipTree(PrintTree):
                 else:
                     positions.extend(self.fill_pos(children))
         self.unindent()
-        
         return positions
     
     # MIPT: Block of main generating(printing) functions
