@@ -843,8 +843,10 @@ import os
 class PrintSkipTree(PrintTree):
     # MIPT: _positions - code markers, 
     #       _text - original pyrex code
+    #       _structs - list of struct names from code
     _positions = []
     _text = []
+    _structs = ["list", "dict", "tuple"]
 
     # MIPT: Supporting class for markers to transfer code directly
     class Position():
@@ -915,7 +917,7 @@ class PrintSkipTree(PrintTree):
         # add info about node pos
         positions = []
         if node is None: return None
-        if node.pos and isinstance(node, Nodes.StatNode) or
+        if node.pos and isinstance(node, Nodes.StatNode) or \
                         isinstance(node, Nodes.StatListNode):
             pos = node.pos
             path = pos[0].get_description()
@@ -1103,6 +1105,8 @@ class PrintSkipTree(PrintTree):
             elif s_type: # declaration with annotation
                 if s_type == s_expr:
                     result += "%s" % (s_expr)
+                elif s_type in self._structs:
+                    result += "%s = %s()" % (s_expr, s_type)
                 else:
                     result += "%s : %s" % (s_expr, s_type)
             else: # simple declaration
@@ -1229,6 +1233,7 @@ class PrintSkipTree(PrintTree):
         result = "# cython.%s\n" % (node.kind)
         result += "class %s():\n%s\n\n" % (node.name, 
                                            "\n".join(arguments))
+        self._structs.append(node.name)
         return result
 
     # MIPT: prints enum construction as python class, assigns values when needed
