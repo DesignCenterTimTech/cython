@@ -1402,7 +1402,13 @@ class PrintSkipTree(PrintTree):
     # MIPT: transfers sourse code expression corresponded to given node
     #  def: expression is a part of code, which starts at a node pos or efore it,
     #       ends at the end of a line or ',', and has correct sequence of nested brackets
-    def print_ExprByPos(self, node):
+    def print_ExprByPos(self, node, is_improve = True):
+        result = self.print_ExprByPosCore(node)
+        if is_improve:
+            result = self.improve_Expr(node, result)
+        return result
+        
+    def print_ExprByPosCore(self, node):
         end_sym = [',', '\n']
         continue_sym = [',', '\\']
         brackets_sym = ['[', ']', '(', ')', '<', '>']
@@ -1439,17 +1445,14 @@ class PrintSkipTree(PrintTree):
                 brackets_ind = brackets_cl_sym.index(char)
                 if brackets_cnt[brackets_ind] == 0:
                     result = "%s" % (str_line[:index])
-                    result = self.improve_Expr(node, result)
                     return result
                 else:
                     brackets_cnt[brackets_ind] -= 1
             elif char in end_sym and brackets_cnt.count(0) == len(brackets_cnt):
                 result = "%s" % (str_line[:index])
-                result = self.improve_Expr(node, result)
                 return result
         
         result = "%s" % (str_line)
-        result = self.improve_Expr(node, result)
         return result
         
     # MIPT: specific line construction for correct cython/stypes types chain print
@@ -1494,15 +1497,15 @@ class PrintSkipTree(PrintTree):
         if isinstance(node, ExprNodes.TypecastNode):
             # get typecast start
             expr_str = self._text[line][pos:]
-            operand = self.print_ExprByPos(node.operand)
+            operand = self.print_ExprByPos(node.operand, is_improve = False)
             
             pattern = expr_str[:expr_str.find(operand) + len(operand)]
             s_type = self.print_CBaseTypeNode(node.base_type)
             changed = "cython.cast(%s, %s, typecheck= %s)" % \
                       (self.print_TypeTree(node.declarator) % s_type,
-                       operand,
+                       self.improve_Expr(node.operand, operand),
                        node.typecheck)
-            #print("%s -> %s" % (pattern, changed))
+            #print(" expr: %s\n operand: %s\n %s -> %s" % (expr, operand, pattern, changed))
             expr = expr.replace(pattern, changed)
        
         # regular &... expression
