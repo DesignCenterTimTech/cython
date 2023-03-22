@@ -844,10 +844,19 @@ class PrintSkipTree(PrintTree):
     # MIPT: _positions - code markers, 
     #       _text - original pyrex code
     #       _structs - list of struct names from code
+    #       _python_dir - python3-dev dir path
     _positions = []
     _text = []
     _structs = ["list", "dict", "tuple"]
+    _python_dir = ""
 
+    # MIPT: Get python3-dev dir path
+    def get_Python_dir(self, path):
+        for filename in os.listdir(path):
+            if filename.startswith("python3."):
+                result = "%s%s/" % (path, filename)
+        return result
+        
     # MIPT: Supporting class for markers to transfer code directly
     class Position():
         def __init__(self, line, pos, indent, node):
@@ -865,6 +874,8 @@ class PrintSkipTree(PrintTree):
     # MIPT: function for generating python code from pyrex source AST
     def __call__(self, tree, phase=None):
         print("# Python code print")
+        
+        self._python_dir = self.get_Python_dir("/usr/include/")
         
         # get source code file name
         path_in = tree.pos[0].get_description()
@@ -1016,15 +1027,20 @@ class PrintSkipTree(PrintTree):
             # cdef extern from *:
             result += "%s\n" % self.print_Node(node.body)
             return result
-        elif "<" not in c_name:
-            # regular file extern
-            so_name = c_name[:c_name.rfind(".")] + ".so"
-        else:
+        elif "<" in c_name:
             # C stdlib file extern
             so_name = "%s.so" % (c_name[1:c_name.rfind(".")])
             c_name = "/usr/include/%s" % (node.include_file[1:-1])
+        elif c_name == "Python.h":
+            # Python.h specific case
+            so_name = c_name
+            c_name = "%sPython.h" % self._python_dir
+        else:
+            # regular file extern
+            so_name = c_name[:c_name.rfind(".")] + ".so"
         
         os.system("cc -fPIC -shared -o %s %s" % (so_name, c_name))
+
         result += "exported_lib = ctypes.CDLL(%s)\n" % c_name
         for stat in node.body.stats:
             result += self.print_CTypes_Node(stat)
