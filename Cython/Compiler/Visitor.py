@@ -849,6 +849,7 @@ class PrintSkipTree(PrintTree):
     _text = []
     _structs = ["list", "dict", "tuple"]
     _python_dir = ""
+    _source_root = "/usr/include/"
 
     # MIPT: Get python3-dev dir path
     def get_Python_dir(self, path):
@@ -856,6 +857,13 @@ class PrintSkipTree(PrintTree):
             if filename.startswith("python3."):
                 result = "%s%s/" % (path, filename)
         return result
+    
+    def get_source(self, filename):
+        for rootdir, dirs, files in os.walk(self._source_root):
+            for file in files:       
+                if file == filename:
+                    return "%s/%s" % (rootdir, file)
+        return 0
         
     # MIPT: Supporting class for markers to transfer code directly
     class Position():
@@ -1029,8 +1037,12 @@ class PrintSkipTree(PrintTree):
             return result
         elif "<" in c_name:
             # C stdlib file extern
-            so_name = "%s.so" % (c_name[1:c_name.rfind(".")])
-            c_name = "/usr/include/%s" % (node.include_file[1:-1])
+            c_name = c_name[1:-1]
+            so_name = "%s.so" % (c_name[:c_name.rfind(".")])
+            c_name = self.get_source(c_name)
+            if not c_name:
+                result += "# Couldn't find file %s" % node.include_file
+                return result
         elif c_name == "Python.h":
             # Python.h specific case
             so_name = c_name
@@ -1241,10 +1253,14 @@ class PrintSkipTree(PrintTree):
     # MIPT: prints struct or union constructions as python classes
     def print_CStructOrUnionDefNode(self, node):
         arguments = []
-        self.indent()
-        for arg in node.attributes:
-            arguments.append(self.print_CVarDefNode(arg)[:-1])
-        self.unindent()
+        
+        if node.attributes:
+            self.indent()
+            for arg in node.attributes:
+                arguments.append(self.print_CVarDefNode(arg)[:-1])
+            self.unindent()
+        else:
+            print(" Improve later")
 
         result = "# cython.%s\n" % (node.kind)
         result += "class %s():\n%s\n\n" % (node.name, 
