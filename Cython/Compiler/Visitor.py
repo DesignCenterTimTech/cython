@@ -1031,11 +1031,35 @@ class PrintSkipTree(PrintTree):
     def print_CDefExternNode(self, node):
         result = ""
         c_name = node.include_file
-        if not c_name:
+        if "<" in c_name:
+            c_name = c_name[1:-1]
+        
+        call_path = os.getcwd()
+        lib_path = node.pos[0].get_description()
+        print(lib_path)
+        lib_path = os.path.dirname(lib_path)
+        print(lib_path)
+        std_marker = "Cython/Includes/"
+        if std_marker in lib_path:
+            lib_path = lib_path[lib_path.find(std_marker) + len(std_marker):]
+        
+        if lib_path:
+            os.makedirs(lib_path, exist_ok=True)
+            os.chdir(lib_path)
+        
+        if ".h" in c_name:
+            # include header file - create a .c file and compile it
+            h_name = c_name
+            c_name = h_name.replace(".h", ".c")
+            with open(c_name, 'w') as f:
+                f.write("#include <%s>\n" % h_name)
+            so_name = c_name.replace(".c", ".so")
+            
+        elif not c_name:
             # cdef extern from *:
             result += "%s\n" % self.print_Node(node.body)
             return result
-        elif "<" in c_name:
+            '''elif "<" in c_name:
             # C stdlib file extern
             c_name = c_name[1:-1]
             so_name = "%s.so" % (c_name[:c_name.rfind(".")])
@@ -1043,18 +1067,23 @@ class PrintSkipTree(PrintTree):
             if not c_name:
                 result += "# Couldn't find file %s" % node.include_file
                 return result
-        elif c_name == "Python.h":
+            elif c_name == "Python.h":
             # Python.h specific case
             so_name = c_name
-            c_name = "%sPython.h" % self._python_dir
+            c_name = "%sPython.h" % self._python_dir'''
         else:
             # regular file extern
             so_name = c_name[:c_name.rfind(".")] + ".so"
         
         os.system("cc -fPIC -shared -o %s %s" % (so_name, c_name))
+        #print("cc -fPIC -shared -o %s %s" % (so_name, c_name))
+        #print(so_name, c_name, lib_path)
+        os.chdir(call_path)
 
+        so_name = os.path.relpath(so_name)
         result += "import ctypes\n"
-        result += "exported_lib = ctypes.CDLL('%s')\n" % c_name
+        result += "exported_lib = ctypes.CDLL('%s')\n" % \
+                  ("/".join((lib_path, so_name)))
         for stat in node.body.stats:
             result += self.print_CTypes_Node(stat)
         
@@ -1064,6 +1093,9 @@ class PrintSkipTree(PrintTree):
     #       only CVarDefNode behave differently in extern -> different print
     #       also var and enum declarations are stubs for now because of
     #       no implementation in ctypes
+    
+    #       Attention: extern vars can be incorrect in case of #define ->
+    #       need to add variables in .c, then import via ctypes
     def print_CTypes_Node(self, node):
         result = ""
         if isinstance(node, Nodes.CVarDefNode):
@@ -1074,6 +1106,11 @@ class PrintSkipTree(PrintTree):
             raw_result = self.print_CNode(node).split("\n")[1:]
             raw_result = [s.strip() for s in raw_result]
             result += "\n".join(raw_result)
+        elif isinstance(node, Nodes.CTypeDefNode):
+            type = self.print_Ctypes_FullType(node)
+            name = self.print_CNode(node)
+            name = name[:name.find("=")].strip()
+            result += "%s = %s\n" % (name, type)
         else:
             result += self.print_CNode(node)
         return result
@@ -1132,12 +1169,9 @@ class PrintSkipTree(PrintTree):
             name = self.print_CVarDefNode(node)
             name = name[:name.find(":")].strip()
             type = self.print_Ctypes_FullType(node)
-            result += "def %s():\n" % name
-            self.indent()
-            result += "%sreturn %s.in_dll(exported_lib, '%s')\n" % (self._indent,
-                                                                    type,
-                                                                    name)
-            self.unindent()
+            result += "%s = %s.in_dll(exported_lib, '%s')\n" % (name,
+                                                                type,
+                                                                name)
         return result
    
     # MIPT: function for correct variable type print in CTypes style
@@ -1253,7 +1287,7 @@ class PrintSkipTree(PrintTree):
         # prints library path if any
         if node.is_basic_c_type:
             if ctypes:
-                result += "ctypes."
+                result += "ctypes.c_"
             else:
                 result += "cython."
         for path in node.module_path:
@@ -1268,9 +1302,12 @@ class PrintSkipTree(PrintTree):
             s_type = int_longness[node.longness]
         elif s_type == "double":
             s_type = double_longness[node.longness]
+        elif ctypes and s_type == "char":
+            s_type = "byte"
+            
         if not node.signed and "size_t" not in s_type:
             s_type = "u" + s_type
-            
+        
         result += "%s" % s_type
         return result
 
@@ -1374,6 +1411,9 @@ class PrintSkipTree(PrintTree):
 
     # MIPT: prints decorators taking them from source code
     def print_Decorators(self, node):
+        if not hasattr(node, "decorators"):
+            return ""
+        
         decorators = []
         if node.decorators:
             for decorator in node.decorators:
