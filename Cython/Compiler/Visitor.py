@@ -849,7 +849,7 @@ class PrintSkipTree(PrintTree):
     _text = []
     _structs = ["list", "dict", "tuple"]
     _python_dir = ""
-    _source_root = "/usr/include/"
+    _source_root = "/usr/include"
 
     # MIPT: Get python3-dev dir path
     def get_Python_dir(self, path):
@@ -1061,12 +1061,39 @@ class PrintSkipTree(PrintTree):
 
     # MIPT: main function for printing nodes in extern statement 
     #       only CVarDefNode behave differently in extern -> different print
+    #       also var and enum declarations are stubs for now because of
+    #       no implementation in ctypes
     def print_CTypes_Node(self, node):
         result = ""
         if isinstance(node, Nodes.CVarDefNode):
             result += self.print_CTypes_VarDefNode(node)
+        elif isinstance(node, Nodes.CStructOrUnionDefNode):
+            result += self.print_CTypes_StructOrUnionDefNode(node)
+        elif isinstance(node, Nodes.CEnumDefNode):
+            result += "# no implementation for enum in ctypes\n"
         else:
             result += self.print_CNode(node)
+        return result
+
+    # MIPT: prints struct or union constructions in extern statement
+    def print_CTypes_StructOrUnionDefNode(self, node):
+        arguments = []
+        
+        result = "# cython.%s\n" % (node.kind)
+        result += "class %s(ctypes.Structure): pass\n" % (node.name)        
+        self.indent()
+        if node.attributes:
+            for arg in node.attributes:
+                type = self.print_Ctypes_FullType(arg)
+                name = self.print_CVarDefNode(arg)
+                name = name[:name.find(":")].strip()
+                arguments.append('("%s", %s)' % (name, type))
+
+        result += "%s._fields_ = [%s]\n\n" % (node.name,
+                                             ", ".join(arguments))
+        self.unindent()       
+                                      
+        self._structs.append(node.name)
         return result
 
     # MIPT: CVarDefNode print in extern statement
@@ -1254,17 +1281,17 @@ class PrintSkipTree(PrintTree):
     def print_CStructOrUnionDefNode(self, node):
         arguments = []
         
+        result = "# cython.%s\n" % (node.kind)
+        result += "class %s():" % (node.name)
+        self.indent()
         if node.attributes:
-            self.indent()
             for arg in node.attributes:
                 arguments.append(self.print_CVarDefNode(arg)[:-1])
-            self.unindent()
+            result += "%s\n" % ("\n".join(arguments))
         else:
-            print(" Improve later")
+            result += " pass\n\n"
+        self.unindent()
 
-        result = "# cython.%s\n" % (node.kind)
-        result += "class %s():\n%s\n\n" % (node.name, 
-                                           "\n".join(arguments))
         self._structs.append(node.name)
         return result
 
