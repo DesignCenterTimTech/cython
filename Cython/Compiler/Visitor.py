@@ -861,7 +861,7 @@ class PrintSkipTree(PrintTree):
     def get_source(self, filename):
         for rootdir, dirs, files in os.walk(self._source_root):
             for file in files:       
-                if file == filename:
+                if file == filename and not rootdir.endswith("/compat"):
                     return "%s/%s" % (rootdir, file)
         return 0
         
@@ -1053,7 +1053,8 @@ class PrintSkipTree(PrintTree):
         
         os.system("cc -fPIC -shared -o %s %s" % (so_name, c_name))
 
-        result += "exported_lib = ctypes.CDLL(%s)\n" % c_name
+        result += "import ctypes\n"
+        result += "exported_lib = ctypes.CDLL('%s')\n" % c_name
         for stat in node.body.stats:
             result += self.print_CTypes_Node(stat)
         
@@ -1125,7 +1126,16 @@ class PrintSkipTree(PrintTree):
                                                              ", ". join(arguments))
             result += "%s = exported_lib.%s\n\n" % (func_name, func_name)
         else:
-            result += self.print_CVarDefNode(node)
+            # variable definition
+            name = self.print_CVarDefNode(node)
+            name = name[:name.find(":")].strip()
+            type = self.print_Ctypes_FullType(node)
+            result += "def %s():\n" % name
+            self.indent()
+            result += "%sreturn %s.in_dll(exported_lib, '%s')\n" % (self._indent,
+                                                                    type,
+                                                                    name)
+            self.unindent()
         return result
    
     # MIPT: function for correct variable type print in CTypes style
