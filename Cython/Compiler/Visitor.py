@@ -1071,7 +1071,9 @@ class PrintSkipTree(PrintTree):
         elif isinstance(node, Nodes.CStructOrUnionDefNode):
             result += self.print_CTypes_StructOrUnionDefNode(node)
         elif isinstance(node, Nodes.CEnumDefNode):
-            result += "# no implementation for enum in ctypes\n"
+            raw_result = self.print_CNode(node).split("\n")[1:]
+            raw_result = [s.strip() for s in raw_result]
+            result += "\n".join(raw_result)
         else:
             result += self.print_CNode(node)
         return result
