@@ -1035,7 +1035,7 @@ class PrintSkipTree(PrintTree):
         result = ""
         c_name = node.include_file
         if not c_name:
-            return "# got blank extern"
+            return "# got blank extern\n"
         if "<" in c_name:
             c_name = c_name[1:-1]
 
