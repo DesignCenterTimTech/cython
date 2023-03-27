@@ -883,7 +883,8 @@ class PrintSkipTree(PrintTree):
 
     # MIPT: function for generating python code from pyrex source AST
     def __call__(self, tree, phase=None):
-        print("# Python code print")
+        if os.getenv("CYTHON2PYTHON_DEBUG"):
+            print("# Python code print")
 
         self._python_dir = self.get_Python_dir("/usr/include/")
 
@@ -930,8 +931,9 @@ class PrintSkipTree(PrintTree):
         with open(path_out, "w") as f:
             f.write(py_code)
 
-        print("# Code written in file %s\n" % path_out)
-        print(py_code)
+        if os.getenv("CYTHON2PYTHON_DEBUG"):
+            print("# Code written in file %s\n" % path_out)
+            print(py_code)
         return tree
 
     # MIPT: fill code markers
@@ -1035,7 +1037,9 @@ class PrintSkipTree(PrintTree):
         result = ""
         c_name = node.include_file
         if not c_name:
-            return "# got blank extern\n"
+            if int(os.getenv("CYTHON2PYTHON_DEBUG", "1")) >= 2:
+                return "# got blank extern\n"
+            return ""
         if "<" in c_name:
             c_name = c_name[1:-1]
 
