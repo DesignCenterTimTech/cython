@@ -909,6 +909,7 @@ class PrintSkipTree(PrintTree):
         f.close()
         
         py_code = "import cython\n"
+        py_code += "NULL = cython.NULL\n"
         py_code += self.print_Node(tree)
         
         # get output path name
@@ -1270,9 +1271,8 @@ class PrintSkipTree(PrintTree):
             
             result = "@cython.cfunc\n"
             if node.exception_value:
-                result += "%s@cython.exceptval(%s)\n" % (self._indent, 
+                result += "%s@cython.exceptval(%s)\n" % (self._indent,
                                                          node.exception_value.value)
-                
             result += "%sdef %s(%s)" % (self._indent,
                                         base.name,
                                         ", ".join(arguments))
@@ -1688,13 +1688,12 @@ class PrintSkipTree(PrintTree):
             changed = expr_str[:1] + "cython." + pattern[1:]
             expr = expr.replace(pattern, changed)
         
-        # just NULL  
-        elif isinstance(node, ExprNodes.NullNode):
-            # add borders of len 1 to replace NULL correctrly
-            pattern = self._text[line][pos - 1:pos + 5]
-            changed = pattern[:1] + "cython.NULL" + pattern[-1:]
-            expr = expr.replace(pattern, changed, 1)
-            
+        # just NULL  - made a var for it
+        #elif isinstance(node, ExprNodes.NullNode):
+        #    # add borders of len 1 to replace NULL correctrly
+        #    pattern = self._text[line][pos - 1:pos + 5]
+        #    changed = pattern[:1] + "cython.NULL" + pattern[-1:]
+        #    expr = expr.replace(pattern, changed, 1)
         # else try to improve children
         else:
             for attr in node.child_attrs:
