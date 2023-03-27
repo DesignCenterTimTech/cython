@@ -1140,8 +1140,12 @@ def cythonize(module_list, exclude=None, nthreads=0, aliases=None, quiet=False, 
     #       our modified .py file when imported
     for m in module_list:
         prev_name = m.name
-        m.name = prev_name[:prev_name.rfind("/") + 1] + "_non_m_" \
-               + prev_name[prev_name.rfind("/") + 1:]
+        if "/" in prev_name:
+            m.name = prev_name[:prev_name.rfind("/") + 1] + "_non_m_" \
+                   + prev_name[prev_name.rfind("/") + 1:]
+        else:
+            m.name = prev_name[:prev_name.rfind(".") + 1] + "_non_m_" \
+                   + prev_name[prev_name.rfind(".") + 1:]
    
     return module_list
 
