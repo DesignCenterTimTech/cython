@@ -1398,9 +1398,12 @@ class PrintSkipTree(PrintTree):
         s_type = self.print_CBaseTypeNode(node.base_type) 
         
         result = self.print_Decorators(node)
-        result += "%s%s -> %s:\n" %(self._indent,
-                                    self.print_CDeclaratorNode(node.declarator, s_type),
-                                    self.print_TypeTree(node.declarator) % s_type)
+        result += "%s%s" % (self._indent,
+                            self.print_CDeclaratorNode(node.declarator, s_type))
+        if not s_type == "None":
+            result += "-> %s:\n" % self.print_TypeTree(node.declarator) % s_type
+        else:
+            result += ":\n"
         self.indent()
         result += "%s\n" % (self.print_Node(node.body))
         self.unindent()
