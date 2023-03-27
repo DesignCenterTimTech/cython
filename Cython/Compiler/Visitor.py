@@ -854,7 +854,7 @@ class PrintSkipTree(PrintTree):
     # MIPT: Get python3-dev dir path
     def get_Python_dir(self, path):
         for filename in os.listdir(path):
-            if filename.startswith("python3."):
+            if filename.startswith("python2."):
                 result = "%s%s/" % (path, filename)
         return result
     
@@ -884,7 +884,7 @@ class PrintSkipTree(PrintTree):
         print("# Python code print")
         
         self._python_dir = self.get_Python_dir("/usr/include/")
-        
+
         # get source code file name
         path_in = tree.pos[0].get_description()
         if path_in.endswith(".py"):
@@ -1031,6 +1031,8 @@ class PrintSkipTree(PrintTree):
     def print_CDefExternNode(self, node):
         result = ""
         c_name = node.include_file
+        if not c_name:
+            return "# got blank extern"
         if "<" in c_name:
             c_name = c_name[1:-1]
         
@@ -1048,8 +1050,8 @@ class PrintSkipTree(PrintTree):
         if ".h" in c_name:
             # include header file - create a .c file and compile it
             h_name = c_name
-            c_name = h_name.replace(".h", ".c")
-            with open(c_name, 'w') as f:
+            c_name = h_name.replace(".h", ".c") 
+            with open(c_name, 'a') as f:  
                 f.write("#include <%s>\n" % h_name)
                 f.write("#include <stdio.h>\n")
             so_name = c_name.replace(".c", ".so")
@@ -1071,7 +1073,7 @@ class PrintSkipTree(PrintTree):
             for stat in node.body.stats:
                 code += self.print_CTypes_Node(stat)        
         
-        os.system("cc -fPIC -shared -o %s %s" % (so_name, c_name))
+        os.system("g++ -fPIC -I%s -shared -o %s %s" % (self._python_dir, so_name, c_name))
         os.chdir(call_path)
 
         so_name = os.path.relpath(so_name)
@@ -1168,9 +1170,19 @@ class PrintSkipTree(PrintTree):
             # add variables for compiling for change via define
             if c_file:
                 c_type = self._text[node.pos[1] - 1]
-                c_type = c_type[:c_type.find(name)].strip()
+                if "cdef" in c_type:
+                    c_type = c_type[c_type.find("cdef") + 5:c_type.find(name)].strip()
+                else:
+                    c_type = c_type[:c_type.find(name)].strip()
                 export_name = "_my_cython_var_" + name
+                check_name = "MY_CASE_" +  name
+                # not the best desicion - file bigger with each compile, think about it later
+                c_file.write("#ifdef %s\n" % (name))
+                c_file.write("#ifndef %s\n" % (check_name))
+                c_file.write("#define %s\n" % (check_name))
                 c_file.write("%s %s = %s;\n" % (c_type, export_name, name))
+                c_file.write("#endif\n")
+                c_file.write("#endif\n")
             result += "%s = %s.in_dll(exported_lib, '%s').value\n" % (name,
                                                                       type,
                                                                       export_name)
@@ -1333,7 +1345,7 @@ class PrintSkipTree(PrintTree):
         arguments = []
         
         result = "# cython.%s\n" % (node.kind)
-        result += "class %s():" % (node.name)
+        result += "class %s():\n" % (node.name)
         self.indent()
         if node.attributes:
             for arg in node.attributes:
