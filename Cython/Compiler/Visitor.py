@@ -853,11 +853,13 @@ class PrintSkipTree(PrintTree):
 
     # MIPT: Get python3-dev dir path
     def get_Python_dir(self, path):
+        result = "/"
         for filename in os.listdir(path):
-            if filename.startswith("python2."):
+            if filename.startswith("python3."):
                 result = "%s%s/" % (path, filename)
         return result
     
+    # MIPT: Get source of filename file
     def get_source(self, filename):
         for rootdir, dirs, files in os.walk(self._source_root):
             for file in files:       
@@ -1699,6 +1701,13 @@ class PrintSkipTree(PrintTree):
         #    expr = expr.replace(pattern, changed, 1)
         # else try to improve children
         else:
+            # change except Expr, name: expressions
+            exception_expr = findall("except [\w|\[|\]]+,[ |\w|\[|\]]+:", expr)
+            if exception_expr:
+                for exception in exception_expr:
+                    new_expr = exception.replace(",", " as ")
+                    expr = expr.replace(exception, new_expr)
+        
             for attr in node.child_attrs:
                 children = getattr(node, attr)
                 if children is not None:
