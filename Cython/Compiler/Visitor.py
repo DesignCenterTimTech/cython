@@ -835,13 +835,13 @@ class PrintTree(TreeVisitor):
 
             return result
 
-# MIPT: Add new class for generating python code from pyrex code 
+# MIPT: Add new class for generating python code from pyrex code
 #       based on cython debug function for printing AST
 from operator import attrgetter
 from re import findall
 import os
 class PrintSkipTree(PrintTree):
-    # MIPT: _positions - code markers, 
+    # MIPT: _positions - code markers,
     #       _text - original pyrex code
     #       _structs - list of struct names from code
     #       _python_dir - python3-dev dir path
@@ -858,15 +858,15 @@ class PrintSkipTree(PrintTree):
             if filename.startswith("python3."):
                 result = "%s%s/" % (path, filename)
         return result
-    
+
     # MIPT: Get source of filename file
     def get_source(self, filename):
         for rootdir, dirs, files in os.walk(self._source_root):
-            for file in files:       
+            for file in files:
                 if file == filename and not rootdir.endswith("/compat"):
                     return "%s/%s" % (rootdir, file)
         return 0
-        
+
     # MIPT: Supporting class for markers to transfer code directly
     class Position():
         def __init__(self, line, pos, indent, node):
@@ -884,7 +884,7 @@ class PrintSkipTree(PrintTree):
     # MIPT: function for generating python code from pyrex source AST
     def __call__(self, tree, phase=None):
         print("# Python code print")
-        
+
         self._python_dir = self.get_Python_dir("/usr/include/")
 
         # get source code file name
@@ -898,38 +898,38 @@ class PrintSkipTree(PrintTree):
         positions.sort(key = attrgetter("line", "pos", "indent"))
         positions.append(self.Position(positions[-1].line, -1, '', 0))
         self._positions = positions
-        
+
         try:
             f = open(path_in, 'r')
         except:
             # stdlib from pyrex Includes
             path_in = __file__[:__file__.rfind(".") - 16] + "Includes/" + path_in
             f = open(path_in, 'r')
-        
+
         # get source code
         self._text = f.readlines()
         f.close()
-        
+
         py_code = "import cython\n"
         py_code += "NULL = cython.NULL\n"
         py_code += self.print_Node(tree)
-        
+
         # get output path name
         path_out = tree.pos[0].path_description
-        # change /name.pxd->/m_name.pxd of a .pxd lib 
+        # change /name.pxd->/m_name.pxd of a .pxd lib
         # for no intersection with possible py files
         if path_out.endswith(".pxd"):
             path_out = path_out[:path_out.rfind("/") + 1] + "m_"\
                      + path_out[path_out.rfind("/") + 1:]
         path_out = path_out[:-3] + "py"
-        
+
         # create dirs if needed
         if "/" in path_out:
             os.makedirs(os.path.dirname(path_out), exist_ok=True)
-        
+
         with open(path_out, "w") as f:
             f.write(py_code)
-            
+
         print("# Code written in file %s\n" % path_out)
         print(py_code)
         return tree
@@ -948,7 +948,7 @@ class PrintSkipTree(PrintTree):
             if '\\' in path:
                 path = path.split('\\')[-1]
             positions.append(self.Position(pos[1] - 1, 0, self._indent, node))
-        
+
         # add info about children pos
         self.indent()
 
@@ -962,27 +962,27 @@ class PrintSkipTree(PrintTree):
                     positions.extend(self.fill_pos(children))
         self.unindent()
         return positions
-    
+
     # MIPT: Block of main generating(printing) functions
-    
+
     # MIPT: main node print function
     def print_Node(self, node):
         if node is None: return None
         result = ""
-        
+
         # print StatNode via markers if there are no C functions in it
         if isinstance(node, Nodes.StatNode):
             if self.check_IfNotC(node):
                 result += self.print_StatByPos(node)
             else:
                 result += self.print_CNode(node)
-        
-        # print specific expressions, when StatListNode is empty - 
+
+        # print specific expressions, when StatListNode is empty -
         # for ex. comments or pass sections
         elif isinstance(node, Nodes.StatListNode) and not node.stats:
-            s_stat = "%s%s\n" % (self._indent, 
+            s_stat = "%s%s\n" % (self._indent,
                                  self.print_ExprByPos(node))
-            if s_stat.count("'''") % 2 == 0: 
+            if s_stat.count("'''") % 2 == 0:
                 result += s_stat
         # try the same for children nodes
         else:
@@ -993,8 +993,8 @@ class PrintSkipTree(PrintTree):
                         for child in children:
                             result += self.print_Node(child)
                     else:
-                        result += self.print_Node(children) 
-        
+                        result += self.print_Node(children)
+
         return result
 
     # MIPT: main function for printing node with C constructions
@@ -1025,10 +1025,10 @@ class PrintSkipTree(PrintTree):
         else:
             result += self.print_UnknownNode(node)
         return result
-    
+
     # MIPT: Block of print functions needed for extern statements via ctypes library
     #       (when importing direct C libraries is needed)
-    
+
     # MIPT: printing Extern node
     #       shared object created, then linked with ctypes
     def print_CDefExternNode(self, node):
@@ -1038,23 +1038,23 @@ class PrintSkipTree(PrintTree):
             return "# got blank extern"
         if "<" in c_name:
             c_name = c_name[1:-1]
-        
+
         call_path = os.getcwd()
         lib_path = node.pos[0].get_description()
         lib_path = os.path.dirname(lib_path)
         std_marker = "Cython/Includes/"
         if std_marker in lib_path:
             lib_path = lib_path[lib_path.find(std_marker) + len(std_marker):]
-        
+
         if lib_path:
             os.makedirs(lib_path, exist_ok=True)
             os.chdir(lib_path)
-        
+
         if ".h" in c_name:
             # include header file - create a .c file and compile it
             h_name = c_name
-            c_name = h_name.replace(".h", ".c") 
-            with open(c_name, 'a') as f:  
+            c_name = h_name.replace(".h", ".c")
+            with open(c_name, 'a') as f:
                 f.write("#include <%s>\n" % h_name)
                 f.write("#include <stdio.h>\n")
             so_name = c_name.replace(".c", ".so")
@@ -1065,7 +1065,7 @@ class PrintSkipTree(PrintTree):
         else:
             # regular file extern
             so_name = c_name.replace(".c", ".so")
-        
+
         inter_file = 0
         code = ""
         if ".h" in node.include_file:
@@ -1074,8 +1074,8 @@ class PrintSkipTree(PrintTree):
                     code += self.print_CTypes_Node(stat, inter_file)
         else:
             for stat in node.body.stats:
-                code += self.print_CTypes_Node(stat)        
-        
+                code += self.print_CTypes_Node(stat)
+
         os.system("g++ -fPIC -I%s -shared -o %s %s" % (self._python_dir, so_name, c_name))
         os.chdir(call_path)
 
@@ -1084,10 +1084,10 @@ class PrintSkipTree(PrintTree):
         result += "exported_lib = ctypes.CDLL('%s')\n" % \
                   ("/".join((lib_path, so_name)))
         result += code
-        
+
         return result
 
-    # MIPT: main function for printing nodes in extern statement 
+    # MIPT: main function for printing nodes in extern statement
     #       only CVarDefNode behave differently in extern -> different print
     #       also var and enum declarations are stubs for now because of
     #       no implementation in ctypes
@@ -1117,9 +1117,9 @@ class PrintSkipTree(PrintTree):
     # MIPT: prints struct or union constructions in extern statement
     def print_CTypes_StructOrUnionDefNode(self, node):
         arguments = []
-        
+
         result = "# cython.%s\n" % (node.kind)
-        result += "class %s(ctypes.Structure): pass\n" % (node.name)        
+        result += "class %s(ctypes.Structure): pass\n" % (node.name)
         self.indent()
         if node.attributes:
             for arg in node.attributes:
@@ -1130,8 +1130,8 @@ class PrintSkipTree(PrintTree):
 
         result += "%s._fields_ = [%s]\n\n" % (node.name,
                                              ", ".join(arguments))
-        self.unindent()       
-                                      
+        self.unindent()
+
         self._structs.append(node.name)
         return result
 
@@ -1141,14 +1141,14 @@ class PrintSkipTree(PrintTree):
         result = ""
         base = node.declarators[0]
         is_func = False
-        
+
         # check whether it is a function declaration
         while hasattr(base, "base"):
             if isinstance(base, Nodes.CFuncDeclaratorNode):
                 is_func = True
-                break    
+                break
             base = base.base
-        
+
         if is_func:
             # base has Nodes.CFuncDeclaratorNode type
             full_type = self.print_Ctypes_FullType(node)
@@ -1156,11 +1156,11 @@ class PrintSkipTree(PrintTree):
             arguments = []
             for arg in base.args:
                 arguments.append(self.print_Ctypes_FullType(arg))
-                
+
             # print ctypes shell
-            result += "exported_lib.%s.restype = %s\n" % (func_name, 
+            result += "exported_lib.%s.restype = %s\n" % (func_name,
                                                           full_type)
-            result += "exported_lib.%s.argtypes = [%s]\n" % (func_name, 
+            result += "exported_lib.%s.argtypes = [%s]\n" % (func_name,
                                                              ", ". join(arguments))
             result += "%s = exported_lib.%s\n\n" % (func_name, func_name)
         else:
@@ -1169,7 +1169,7 @@ class PrintSkipTree(PrintTree):
             name = name[:name.find(":")].strip()
             type = self.print_Ctypes_FullType(node)
             export_name = name
-            
+
             # add variables for compiling for change via define
             if c_file:
                 c_type = self._text[node.pos[1] - 1]
@@ -1190,7 +1190,7 @@ class PrintSkipTree(PrintTree):
                                                                       type,
                                                                       export_name)
         return result
-   
+
     # MIPT: function for correct variable type print in CTypes style
     def print_Ctypes_FullType(self, node):
         s_type = self.print_CBaseTypeNode(node.base_type, ctypes = True)
@@ -1202,14 +1202,14 @@ class PrintSkipTree(PrintTree):
         return full_type
 
     # MIPT: Block of print functions for other kinds of C nodes
-   
-    # MIPT: base function for printing different declarations 
+
+    # MIPT: base function for printing different declarations
     #       as CDeclarator nodes chains
     #       see print_CFuncDeclaratorNode() to understand from_cvardef
     def print_CDeclaratorNode(self, node, s_type = "", from_cvardef = False):
         result = ""
-        
-        # analise whether there are no more c expressions, print it if true 
+
+        # analise whether there are no more c expressions, print it if true
         if self.check_IfNotCChildren(node):
             s_expr = self.print_ExprByPos(node).strip()
             if "=" in s_expr: # initialisation
@@ -1233,35 +1233,35 @@ class PrintSkipTree(PrintTree):
                 elif "'" in s_expr:
                     s_expr = s_expr[:s_expr.find("'")]
                 result += "%s" % s_expr
-        
+
         # continue the chain otherwise
         elif isinstance(node, Nodes.CNameDeclaratorNode):
             result += "%s" % node.name
         elif isinstance(node, Nodes.CFuncDeclaratorNode):
-            result += "%s" % self.print_CFuncDeclaratorNode(node, from_cvardef)   
+            result += "%s" % self.print_CFuncDeclaratorNode(node, from_cvardef)
         else:
             # CPtrDeclaratorNode
             # CReferenceDeclaratorNode
             # CArrayDeclaratorNode
             # CConstDeclaratorNode
             result += "%s" % self.print_CDeclaratorNode(node.base, s_type, from_cvardef)
-                   
+
         return result
-    
+
     # MIPT: prints function declarator with cython decorator for functions
     #       note: only function call, without function body
     #
     #       can be called by 2 possible parents: (see from_funcdef var)
     #       1) CFuncDefNode - cdef func(arguments):\n <body from sibling>
     #       2) CVarDefNode  - cdef func(arguments) <no body, just declaration>
-    #       2nd version can be seen in 2.1) function/class declarations or in 
+    #       2nd version can be seen in 2.1) function/class declarations or in
     #       2.2) extern statements, see print_CTypes_VarDefNode()
     def print_CFuncDeclaratorNode(self, node, from_cvardef = False):
         # in declarator chain get function name
         base = node.base
         while not hasattr(base, "name"):
             base = base.base
-        
+
         if from_cvardef:
             # just declaration
             result = "%s : function" % (base.name)
@@ -1270,7 +1270,7 @@ class PrintSkipTree(PrintTree):
             arguments = []
             for arg in node.args:
                 arguments.append(self.print_CArgDeclNode(arg))
-            
+
             result = "@cython.cfunc\n"
             if node.exception_value:
                 result += "%s@cython.exceptval(%s)\n" % (self._indent,
@@ -1279,9 +1279,9 @@ class PrintSkipTree(PrintTree):
                                         base.name,
                                         ", ".join(arguments))
         return result
-    
-    # MIPT: prints basic argument declaration: type                                
-    def print_CArgDeclNode(self, node):  
+
+    # MIPT: prints basic argument declaration: type
+    def print_CArgDeclNode(self, node):
         s_type = self.print_CBaseTypeNode(node.base_type)
         full_type = self.print_TypeTree(node.declarator) % s_type
         result = "%s" % (self.print_CDeclaratorNode(node.declarator, full_type))
@@ -1294,7 +1294,7 @@ class PrintSkipTree(PrintTree):
         elif isinstance(node, Nodes.CConstTypeNode):
             result = self.print_CBaseTypeNode(node.base_type, ctypes)
         else:
-            result = self.print_UnknownNode(node)   
+            result = self.print_UnknownNode(node)
         return result
 
     # MIPT: prints type in a cython or ctypes way
@@ -1308,10 +1308,10 @@ class PrintSkipTree(PrintTree):
                 result += "cython."
         for path in node.module_path:
             result += "%s." % path
-            
+
         double_longness = ["double", "longdouble"]
         int_longness = ["int", "long", "longlong", "short"]
-            
+
         # finalise type for special cases - unsigned or long ones
         s_type = node.name
         if s_type == "int":
@@ -1320,10 +1320,10 @@ class PrintSkipTree(PrintTree):
             s_type = double_longness[node.longness]
         elif ctypes and s_type == "char":
             s_type = "byte"
-            
+
         if not node.signed and "size_t" not in s_type:
             s_type = "u" + s_type
-        
+
         result += "%s" % s_type
         return result
 
@@ -1332,7 +1332,7 @@ class PrintSkipTree(PrintTree):
     def print_CVarDefNode(self, node):
         # node.visibility: public, _protected, __private__ - not used
         s_type = self.print_CBaseTypeNode(node.base_type)
-        
+
         result = self.print_Decorators(node)
         for declarator in node.declarators:
             full_type = self.print_TypeTree(declarator) % s_type
@@ -1345,7 +1345,7 @@ class PrintSkipTree(PrintTree):
     # MIPT: prints struct or union constructions as python classes
     def print_CStructOrUnionDefNode(self, node):
         arguments = []
-        
+
         result = "# cython.%s\n" % (node.kind)
         result += "class %s():\n" % (node.name)
         self.indent()
@@ -1397,8 +1397,8 @@ class PrintSkipTree(PrintTree):
     #       def f() -> type:
     #           body
     def print_CFuncDefNode(self, node):
-        s_type = self.print_CBaseTypeNode(node.base_type) 
-        
+        s_type = self.print_CBaseTypeNode(node.base_type)
+
         result = self.print_Decorators(node)
         result += "%s%s" % (self._indent,
                             self.print_CDeclaratorNode(node.declarator, s_type))
@@ -1409,7 +1409,7 @@ class PrintSkipTree(PrintTree):
         self.indent()
         result += "%s\n" % (self.print_Node(node.body))
         self.unindent()
-        
+
         return result
 
     # MIPT: prints class with cython decorator for classes
@@ -1417,7 +1417,7 @@ class PrintSkipTree(PrintTree):
         arguments = []
         for base in node.bases.args:
             arguments.append(base.name)
-            
+
         result  = "%s@cython.cclass\n" % self._indent
         result += self.print_Decorators(node)
         result += "%sclass %s(%s):\n" % (self._indent,
@@ -1432,7 +1432,7 @@ class PrintSkipTree(PrintTree):
     def print_Decorators(self, node):
         if not hasattr(node, "decorators"):
             return ""
-        
+
         decorators = []
         if node.decorators:
             for decorator in node.decorators:
@@ -1450,7 +1450,7 @@ class PrintSkipTree(PrintTree):
         module = node.module_name
         module = module[:module.rfind(".") + 1] + "m_" + module[module.rfind(".") + 1:]
         if node.as_name:
-            result = "import %s as %s\n" % (module, 
+            result = "import %s as %s\n" % (module,
                                             node.as_name)
         else:
             result = "import %s\n" % (module)
@@ -1467,17 +1467,17 @@ class PrintSkipTree(PrintTree):
         result = ""
         for argument in node.imported_names:
             if argument[2]:
-                result += "from %s import %s as %s\n" % (module, 
+                result += "from %s import %s as %s\n" % (module,
                                                         argument[1],
                                                         argument[2])
             else:
-                result += "from %s import %s\n" % (module, 
+                result += "from %s import %s\n" % (module,
                                                   argument[1])
         return result
 
     # MIPT: debug printing of possible unprocessed node
     def print_UnknownNode(self, node):
-        result = "\n# in %s() found %s\n" % (inspect.stack()[1][3], 
+        result = "\n# in %s() found %s\n" % (inspect.stack()[1][3],
                                              type(node))
         return result
 
@@ -1486,12 +1486,12 @@ class PrintSkipTree(PrintTree):
     # MIPT: checks the node and its children for having C-like nodes
     def check_IfNotC(self, node):
         if node is None: return True
-        
+
         s_type = str(type(node))
         s_type = s_type[s_type.rfind(".") + 1:-2]
         if findall('C[A-Z]', s_type):
             return False
-            
+
         return self.check_IfNotCChildren(node)
 
     # MIPT: checks node children for having C-like nodes
@@ -1532,11 +1532,11 @@ class PrintSkipTree(PrintTree):
             for i in range(cur_pos.line + 1, next_pos.line):
                 result += self._text[i]
             result += self._text[next_pos.line][:next_pos.pos]
-        
+
         result = result.replace(";", "")
         result = self.improve_Expr(node, result)
         return result
-        
+
     # MIPT: transfers sourse code expression corresponded to given node
     #  def: expression is a part of code, which starts at a node pos or efore it,
     #       ends at the end of a line or ',', and has correct sequence of nested brackets
@@ -1545,7 +1545,7 @@ class PrintSkipTree(PrintTree):
         if is_improve:
             result = self.improve_Expr(node, result)
         return result
-        
+
     def print_ExprByPosCore(self, node):
         end_sym = [',', '\n']
         continue_sym = [',', '\\']
@@ -1553,10 +1553,10 @@ class PrintSkipTree(PrintTree):
         brackets_op_sym = ['[', '(', '<']
         brackets_cl_sym = [']', ')', '>']
         brackets_cnt = [0, 0, 0]
-        
+
         line = node.pos[1] - 1
-        pos = node.pos[2] 
-        
+        pos = node.pos[2]
+
         # check for incorrect (too late) pos, if so -> go to start of expr
         # neede because for ex. functions pos is set on its argument list starting
         # at (...) but not function name name(...)
@@ -1567,14 +1567,14 @@ class PrintSkipTree(PrintTree):
             while (self._text[line][pos] not in end_sym + brackets_sym):
                 pos -= 1
             pos += 1
-        
+
         str_line = self._text[line][pos:]
-        
+
         # for multiline expressions
         while str_line[-1] in continue_sym:
             line += 1
             str_line += self._text[line]
-        
+
         for (index, char) in enumerate(str_line):
             if   char in brackets_op_sym:
                 brackets_ind = brackets_op_sym.index(char)
@@ -1589,19 +1589,19 @@ class PrintSkipTree(PrintTree):
             elif char in end_sym and brackets_cnt.count(0) == len(brackets_cnt):
                 result = "%s" % (str_line[:index])
                 return result
-        
+
         result = "%s" % (str_line)
         return result
-        
+
     # MIPT: specific line construction for correct cython/stypes types chain print
     #       used like self.print_TypeTree(node.declarator) % s_type
-    #       where s_type is a base type node 
+    #       where s_type is a base type node
     def print_TypeTree(self, node, ctypes = False):
         result = ""
-        
+
         if isinstance(node, Nodes.CNameDeclaratorNode):
             return "%s"
-            
+
         next_step = self.print_TypeTree(node.base, ctypes)
         if isinstance(node, Nodes.CPtrDeclaratorNode):
             if ctypes:
@@ -1617,26 +1617,26 @@ class PrintSkipTree(PrintTree):
             result += "%s[%s]" % (next_step, node.dimension)
         else:
             result = "%s" % next_step
-        
+
         return result
-        
+
     # MIPT: changes C-like constructions in expressions, see classes in isinstance()
     #       these constructions dont have C-like node type, so changed with this func
     def improve_Expr(self, node, expr):
         if node is None: return True
         line = node.pos[1] - 1
         pos = node.pos[2]
-        
-        # for each inline c expression 
+
+        # for each inline c expression
         # fill line, expression position
         # expression pattern -> changed pattern
-        
+
         # static cast expression <type>(...)
         if isinstance(node, ExprNodes.TypecastNode):
             # get typecast start
             expr_str = self._text[line][pos:]
             operand = self.print_ExprByPos(node.operand, is_improve = False)
-            
+
             pattern = expr_str[:expr_str.find(operand) + len(operand)]
             s_type = self.print_CBaseTypeNode(node.base_type)
             changed = "cython.cast(%s, %s, typecheck= %s)" % \
@@ -1645,7 +1645,7 @@ class PrintSkipTree(PrintTree):
                        node.typecheck)
             #print(" expr: %s\n operand: %s\n %s -> %s" % (expr, operand, pattern, changed))
             expr = expr.replace(pattern, changed)
-       
+
         # regular &... expression
         elif isinstance(node, ExprNodes.AmpersandNode):
             expr_str = self._text[line][pos:]
@@ -1653,10 +1653,10 @@ class PrintSkipTree(PrintTree):
             pattern = "&" + findall("[\w|\[|\]]+", expr_str)[0]
             changed = "cython.address(%s)" % pattern[1:]
             expr = expr.replace(pattern, changed)
-        
+
         # regular sizeof(type) expression
         elif isinstance(node, ExprNodes.SizeofTypeNode):
-            # add borders of len 1 to replace sizeof() correctrly            
+            # add borders of len 1 to replace sizeof() correctrly
             expr_str = self._text[line][pos - 1:]
             start_pos = len("sizeof(") + 1
             # get operand till closing bracket
@@ -1667,32 +1667,32 @@ class PrintSkipTree(PrintTree):
                 if brackets_cnt == 0:
                     break
             end_pos += 1
-            
+
             pattern = expr_str[:end_pos]
             s_type = self.print_CBaseTypeNode(node.base_type)
             changed = "%scython.sizeof(%s)" % \
                       (expr_str[:1],
                        self.print_TypeTree(node.declarator) % s_type)
             expr = expr.replace(pattern, changed)
-        
+
         # regular sizeof(variable) expression
         elif isinstance(node, ExprNodes.SizeofVarNode):
-            # add borders of len 1 to replace sizeof() correctrly            
+            # add borders of len 1 to replace sizeof() correctrly
             expr_str = self._text[line][pos - 1:]
             start_pos = len("sizeof(") + 1
             # get operand till closing bracket
             brackets_cnt = 1
             for (end_pos, char) in enumerate(expr_str[start_pos:], start_pos):
                 if   char == "(": brackets_cnt += 1
-                elif char == ")": brackets_cnt -= 1  
+                elif char == ")": brackets_cnt -= 1
                 if brackets_cnt == 0:
                     break
             end_pos += 1
-                    
+
             pattern = expr_str[:end_pos]
             changed = expr_str[:1] + "cython." + pattern[1:]
             expr = expr.replace(pattern, changed)
-        
+
         # just NULL  - made a var for it
         #elif isinstance(node, ExprNodes.NullNode):
         #    # add borders of len 1 to replace NULL correctrly
@@ -1707,16 +1707,16 @@ class PrintSkipTree(PrintTree):
                 for exception in exception_expr:
                     new_expr = exception.replace(",", " as ")
                     expr = expr.replace(exception, new_expr)
-        
+
             for attr in node.child_attrs:
                 children = getattr(node, attr)
                 if children is not None:
                     if type(children) is list:
                         for child in children:
-                             expr = self.improve_Expr(child, expr)  
+                             expr = self.improve_Expr(child, expr)
                     else:
-                        expr = self.improve_Expr(children, expr)  
-        
+                        expr = self.improve_Expr(children, expr)
+
         return expr
 # MIPT: end of class and all of modifications in Visitor.py
 
