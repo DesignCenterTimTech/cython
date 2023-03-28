@@ -1,5 +1,5 @@
 __doc__ = """
-    >>> print f()
+    >>> print(f())
 """
 
 def f():

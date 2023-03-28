@@ -288,7 +288,7 @@ def iter_and_in():
     """
     for c in u'abcdefgh':
         if c in u'abCDefGh':
-            print c
+            print(c)
 
 
 @cython.test_fail_if_path_exists('//ForInStatNode')
@@ -304,7 +304,7 @@ def iter_inferred():
     uchars = list(u"abcde")
     uchars = u''.join(uchars)
     for c in uchars:
-        print c
+        print(c)
 
 
 @cython.test_assert_path_exists('//SwitchStatNode',
@@ -322,7 +322,7 @@ def index_and_in():
     cdef int i
     for i in range(1,9):
         if u'abcdefgh'[-i] in u'abCDefGh':
-            print i
+            print(i)
 
 # special test for narrow builds
 

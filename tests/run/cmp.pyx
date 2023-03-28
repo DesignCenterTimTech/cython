@@ -68,10 +68,10 @@ def typed_cmp(list L):
     False
     False
     """
-    print L is Ellipsis
-    print Ellipsis is L
-    print 1 == L
-    print L == 1.5
+    print(L is Ellipsis)
+    print(Ellipsis is L)
+    print(1 == L)
+    print(L == 1.5)
 
 def pointer_cmp():
     """
@@ -83,9 +83,9 @@ def pointer_cmp():
     cdef int* a = NULL
     cdef double* b = NULL
     cdef double** c = NULL
-    print a is NULL
-    print b is not NULL
-    print c == NULL
+    print(a is NULL)
+    print(b is not NULL)
+    print(c == NULL)
 
 def c_cmp(double a, int b, long c):
     """

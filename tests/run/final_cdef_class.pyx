@@ -37,7 +37,7 @@ cdef class FinalSubClass(NonFinalClass):
 
 
 def test_final_class(FinalClass c):
-    print u"Type tested"
+    print(u"Type tested")
 
 def test_non_final_class(NonFinalClass c):
-    print u"Type tested"
+    print(u"Type tested")

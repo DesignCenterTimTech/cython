@@ -76,12 +76,12 @@ cdef class BaseClass(object):
 
     @staticmethod
     def mystaticmethod(self, arg1):
-        print arg1
+        print(arg1)
 
     @staticmethod
     @cython.binding(True)
     def mystaticmethod2(a, b, c):
-        print a, b, c
+        print(a, b, c)
 
 
 cdef class SubClass(BaseClass):
@@ -97,7 +97,7 @@ cdef class SubClass(BaseClass):
 
     @staticmethod
     def mystaticmethod(self, arg1):
-        print arg1
+        print(arg1)
         super().mystaticmethod(self, arg1 + 1)
 
 
@@ -116,7 +116,7 @@ class SubSubClass(SubClass):
 
     @staticmethod
     def mystaticmethod(self, arg1):
-        print arg1
+        print(arg1)
         super().mystaticmethod(self, arg1 + 1)
 
 

@@ -14,9 +14,9 @@ def for_in():
             if i > 5:
                 break
         else:
-            print "CONTINUE", i
+            print("CONTINUE", i)
             continue
-        print "BREAK", i
+        print("BREAK", i)
         break
     return i
 
@@ -34,8 +34,8 @@ def for_from():
             if i > 5:
                 break
         else:
-            print "CONTINUE", i
+            print("CONTINUE", i)
             continue
-        print "BREAK", i
+        print("BREAK", i)
         break
     return i

@@ -10,7 +10,7 @@ def test(x, int y):
     cdef int a = 4, b = x, c = y
     cdef int *p = &y
     cdef object o = int(8)
-    print a, b, c, p[0], before, g, o
+    print(a, b, c, p[0], before, g, o)
 
 # Also test that pruning cdefs doesn't hurt
 def empty():

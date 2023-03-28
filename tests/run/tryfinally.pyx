@@ -307,7 +307,7 @@ def try_return_temp(a):
         c = a+b
         return c
     finally:
-        print b-a
+        print(b-a)
 
 def try_continue(a):
     """

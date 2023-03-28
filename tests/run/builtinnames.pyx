@@ -44,9 +44,9 @@ def test_c(arg):
     >>> print(len('abc'))
     lenabc
     """
-    print test_file_c(arg)
-    print len(arg)
-    print type(arg)
+    print(test_file_c(arg))
+    print(len(arg))
+    print(type(arg))
 
 def test_for_in_range(arg):
     """

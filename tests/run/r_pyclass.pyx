@@ -4,7 +4,7 @@ class Spam:
         self.weight = w
 
     def serve(self):
-        print self.weight, u"tons of spam!"
+        print(self.weight, u"tons of spam!")
 
 def order():
     """

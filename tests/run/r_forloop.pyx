@@ -7,7 +7,7 @@ def go_py():
     Spam!
     """
     for i in range(4):
-        print u"Spam!"
+        print(u"Spam!")
 
 def go_py_ret():
     """
@@ -28,7 +28,7 @@ def go_c():
     """
     cdef int i
     for i in range(4):
-        print u"Spam!"
+        print(u"Spam!")
 
 def go_c_enumerate():
     """
@@ -40,7 +40,7 @@ def go_c_enumerate():
     """
     cdef int i,k
     for i,k in enumerate(range(4)):
-        print i == k
+        print(i == k)
 
 def go_c_int(int a, int b):
     """
@@ -50,7 +50,7 @@ def go_c_int(int a, int b):
     """
     cdef int i
     for i in range(a,b,2):
-        print u"Spam!"
+        print(u"Spam!")
 
 def go_c_all():
     """
@@ -61,7 +61,7 @@ def go_c_all():
     """
     cdef int i
     for i in range(8,2,-2):
-        print u"Spam!"
+        print(u"Spam!")
 
 def go_c_all_exprs(x):
     """
@@ -73,7 +73,7 @@ def go_c_all_exprs(x):
     """
     cdef long i
     for i in range(4*x,2*x,-3):
-        print u"Spam!"
+        print(u"Spam!")
 
 def go_c_const_exprs():
     """
@@ -83,7 +83,7 @@ def go_c_const_exprs():
     """
     cdef int i
     for i in range(4*2+1,2*2,-2-1):
-        print u"Spam!"
+        print(u"Spam!")
 
 def f(x):
     return 2*x
@@ -96,7 +96,7 @@ def go_c_calc(x):
     """
     cdef long i
     for i in range(2*f(x),f(x), -2):
-        print u"Spam!"
+        print(u"Spam!")
 
 def go_c_calc_ret(x):
     """
@@ -128,7 +128,7 @@ def go_list():
     """
     cdef list l = list(range(4))
     for i in l:
-        print u"Spam!"
+        print(u"Spam!")
 
 def go_list_ret():
     """
@@ -150,7 +150,7 @@ def go_tuple():
     """
     cdef tuple t = tuple(range(4))
     for i in t:
-        print u"Spam!"
+        print(u"Spam!")
 
 def go_tuple_ret():
     """
@@ -172,7 +172,7 @@ def go_dict():
     """
     cdef dict d = dict(zip(range(4), range(4)))
     for i in d:
-        print u"Spam!"
+        print(u"Spam!")
 
 def go_dict_ret():
     """

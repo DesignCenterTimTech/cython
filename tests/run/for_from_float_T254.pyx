@@ -11,7 +11,7 @@ def double_target(a, b):
     """
     cdef double x
     for x from a <= x < b:
-        print u"at", x
+        print(u"at", x)
     return x
 
 def double_step(a, b, dx):
@@ -25,7 +25,7 @@ def double_step(a, b, dx):
     """
     cdef double x
     for x from a <= x < b by dx:
-        print u"at", x
+        print(u"at", x)
     return x
 
 def double_step_typed(a, b, double dx):
@@ -39,7 +39,7 @@ def double_step_typed(a, b, double dx):
     """
     cdef double x
     for x from a <= x < b by dx:
-        print u"at", x
+        print(u"at", x)
     return x
 
 def double_step_py_target(a, b, double dx):
@@ -53,7 +53,7 @@ def double_step_py_target(a, b, double dx):
     """
     cdef object x
     for x from a <= x < b by dx:
-        print u"at", x
+        print(u"at", x)
     return x
 
 def int_step_py_target(a, b, int dx):
@@ -65,5 +65,5 @@ def int_step_py_target(a, b, int dx):
     """
     cdef object x
     for x from a <= x < b by dx:
-        print u"at", x
+        print(u"at", x)
     return x

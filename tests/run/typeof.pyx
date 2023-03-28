@@ -31,15 +31,15 @@ def simple():
     cdef A a = None
     cdef B b = None
     cdef X x = X(a=1, b=2)
-    print typeof(i)
-    print typeof(l)
-    print typeof(ll)
-    print typeof(iptr)
-    print typeof(iptrptr)
-    print typeof(a)
-    print typeof(b)
-    print typeof(x)
-    print typeof(None)
+    print(typeof(i))
+    print(typeof(l))
+    print(typeof(ll))
+    print(typeof(iptr))
+    print(typeof(iptrptr))
+    print(typeof(a))
+    print(typeof(b))
+    print(typeof(x))
+    print(typeof(None))
     used = i, l, ll, <long>iptr, <long>iptrptr, a, b, x
 
 def expression():
@@ -55,8 +55,8 @@ def expression():
     cdef short s = 0
     cdef int i = 0
     cdef unsigned int ui = 0
-    print typeof(x.a)
-    print typeof(xptr.b)
-    print typeof(s + i)
-    print typeof(i + ui)
+    print(typeof(x.a))
+    print(typeof(xptr.b))
+    print(typeof(s + i))
+    print(typeof(i + ui))
     used = x, <long>xptr, s, i, ui

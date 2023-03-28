@@ -11,10 +11,10 @@ def test_add():
     6
     12
     """
-    print i + l
-    print i + ul
-    print ui + l
-    print ui + ul
+    print(i + l)
+    print(i + ul)
+    print(ui + l)
+    print(ui + ul)
 
 def test_add_sshort_ulong(signed short a, unsigned long b):
     """

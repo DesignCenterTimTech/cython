@@ -21,4 +21,4 @@ def f(a):
     x = a
 
 def what():
-    print i,x
+    print(i,x)

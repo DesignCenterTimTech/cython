@@ -19,7 +19,7 @@ with nogil, cython.parallel.parallel():
         pass
 
 with cython.parallel.parallel():
-    print "hello world!"
+    print("hello world!")
 
 cdef int *x = NULL
 
@@ -107,16 +107,16 @@ with nogil, cython.parallel.parallel():
 with nogil, cython.parallel.parallel():
     i = 1
 
-print i
+print(i)
 i = 2
-print i
+print(i)
 
 # Reading of reduction variables in the prange block
 cdef int sum = 0
 for i in prange(10, nogil=True):
     sum += i
     with gil:
-        print sum
+        print(sum)
 
 for pyobj in prange("hello"):
     pass

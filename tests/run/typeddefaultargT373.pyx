@@ -8,7 +8,7 @@ cdef class MyClass:
     4
     """
     def __cinit__(self, int arg=2*2):
-        print arg
+        print(arg)
 
 cdef class MyOtherClass:
     """
@@ -16,4 +16,4 @@ cdef class MyOtherClass:
     8
     """
     def __cinit__(self, int arg=4*int(math.sqrt(4))):
-        print arg
+        print(arg)

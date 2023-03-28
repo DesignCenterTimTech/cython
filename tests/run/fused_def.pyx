@@ -128,8 +128,8 @@ def opt_func(fused_t obj, cython.floating myf = 1.2, cython.integral myi = 7):
     Traceback (most recent call last):
     TypeError: Argument 'obj' has incorrect type (expected fused_def.ExtClassA, got object)
     """
-    print cython.typeof(obj), cython.typeof(myf), cython.typeof(myi)
-    print obj, "%.2f" % myf, myi, "%.2f" % f, i
+    print(cython.typeof(obj), cython.typeof(myf), cython.typeof(myi))
+    print(obj, "%.2f" % myf, myi, "%.2f" % f, i)
 
 def run_cyfunction_check():
     """
@@ -203,8 +203,8 @@ def func_with_object(fused_with_object obj, cython.integral myi = 7):
     Python object long
     ExtClassB 3
     """
-    print cython.typeof(obj), cython.typeof(myi)
-    print obj, myi
+    print(cython.typeof(obj), cython.typeof(myi))
+    print(obj, myi)
 
 
 
@@ -223,8 +223,8 @@ def args_kwargs(fused_t obj, cython.floating myf = 1.2, *args, **kwargs):
     eggs 5.60 5.60 (1, 2, []) {'d': {}}
 
     """
-    print cython.typeof(obj), cython.typeof(myf)
-    print obj, "%.2f" % myf, "%.2f" % f, args, kwargs
+    print(cython.typeof(obj), cython.typeof(myf))
+    print(obj, "%.2f" % myf, "%.2f" % f, args, kwargs)
 
 
 class BaseClass(object):
@@ -234,14 +234,14 @@ class BaseClass(object):
 
     @staticmethod
     def mystaticmethod(cython.integral arg1):
-        print cython.typeof(arg1), arg1
+        print(cython.typeof(arg1), arg1)
 
     @classmethod
     def myclassmethod(cls, cython.integral arg1):
-        print cls, cython.typeof(arg1), arg1
+        print(cls, cython.typeof(arg1), arg1)
 
     def normalmethod(self, cython.integral arg1):
-        print self, cython.typeof(arg1), arg1
+        print(self, cython.typeof(arg1), arg1)
 
     def __repr__(self):
         return "<%s.%s object>" % (__name__, type(self).__name__)
@@ -250,16 +250,16 @@ class SubClass(BaseClass):
 
     @staticmethod
     def mystaticmethod(self, cython.integral arg1):
-        print cython.typeof(arg1), arg1
+        print(cython.typeof(arg1), arg1)
         super().mystaticmethod(arg1 + 1)
 
     @classmethod
     def myclassmethod(cls, cython.integral arg1):
-        print cls, cython.typeof(arg1), arg1
+        print(cls, cython.typeof(arg1), arg1)
         super().myclassmethod(arg1 + 1)
 
     def normalmethod(self, cython.integral arg1):
-        print self, cython.typeof(arg1), arg1
+        print(self, cython.typeof(arg1), arg1)
         super().normalmethod(arg1 + 1)
 
 class SubSubClass(SubClass):
@@ -376,17 +376,17 @@ cdef class CBaseClass(object):
 
     @staticmethod
     def mystaticmethod(cython.integral arg1):
-        print cython.typeof(arg1), arg1
+        print(cython.typeof(arg1), arg1)
 
     @classmethod
     def myclassmethod(cls, cython.integral arg1):
-        print cls.__name__, cython.typeof(arg1), arg1
+        print(cls.__name__, cython.typeof(arg1), arg1)
 
     def normalmethod(self, cython.integral arg1, arg2, arg3):
-        print self, cython.typeof(arg1), arg1, arg2, arg3
+        print(self, cython.typeof(arg1), arg1, arg2, arg3)
 
     cpdef cpdefmethod(self, cython.integral arg1):
-        print self, cython.typeof(arg1), arg1
+        print(self, cython.typeof(arg1), arg1)
 
     def __repr__(self):
         return "<%s.%s object>" % (__name__, type(self).__name__)

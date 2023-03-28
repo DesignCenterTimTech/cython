@@ -1,6 +1,6 @@
 
 cdef gobble(a, b):
-    print a, b
+    print(a, b)
 
 cdef class Spam:
     """

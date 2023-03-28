@@ -13,7 +13,7 @@ def c(a=10, b=20, **kwds):
     >>> c(1,2, key=None)
     1 2 1
     """
-    print a, b, len(kwds)
+    print(a, b, len(kwds))
 
 def d(a, b=1, *args, **kwds):
     """
@@ -36,10 +36,10 @@ def d(a, b=1, *args, **kwds):
     >>> d(1,2,3, key=None)
     1 2 1 1
     """
-    print a, b, len(args), len(kwds)
+    print(a, b, len(args), len(kwds))
 
 def e(*args, **kwargs):
-    print len(args), len(kwargs)
+    print(len(args), len(kwargs))
 
 def f(*args):
     """
@@ -53,7 +53,7 @@ def f(*args):
     Traceback (most recent call last):
     TypeError: f() got an unexpected keyword argument 'd'
     """
-    print len(args)
+    print(len(args))
 
 def g(**kwargs):
     """
@@ -67,7 +67,7 @@ def g(**kwargs):
     Traceback (most recent call last):
     TypeError: g() takes exactly 0 positional arguments (1 given)
     """
-    print len(kwargs)
+    print(len(kwargs))
 
 def h(a, b, c, *args, **kwargs):
     """
@@ -75,7 +75,7 @@ def h(a, b, c, *args, **kwargs):
     Traceback (most recent call last):
     TypeError: h() takes at least 3 positional arguments (2 given)
     """
-    print a, b, c, u'*', len(args), len(kwargs)
+    print(a, b, c, u'*', len(args), len(kwargs))
 
 args = (9,8,7)
 

@@ -86,47 +86,47 @@ cdef class VerySpecial:
 
     def __init__(self, v):
         self.value = v
-        print "VS __init__ %d" % self.value
+        print("VS __init__ %d" % self.value)
 
     def __getslice__(self, a, b):
-        print "VS __getslice__ %d %d %d" % (self.value, a, b)
+        print("VS __getslice__ %d %d %d" % (self.value, a, b))
 
     def __next__(self):
-        print "VS next/__next__ %d" % self.value
+        print("VS next/__next__ %d" % self.value)
 
     def __nonzero__(self):
-        print "VS __nonzero__ %d" % self.value
+        print("VS __nonzero__ %d" % self.value)
 
     def __oct__(self):
-        print "VS __oct__ %d" % self.value
+        print("VS __oct__ %d" % self.value)
 
     def __hex__(self):
-        print "VS __hex__ %d" % self.value
+        print("VS __hex__ %d" % self.value)
 
     def __cmp__(self, other):
-        print "VS __cmp__ %d %d" % (self.value, other.value)
+        print("VS __cmp__ %d %d" % (self.value, other.value))
 
     def __div__(self, other):
-        print "VS __div__ %d %d" % (self.value, other.value)
+        print("VS __div__ %d %d" % (self.value, other.value))
 
     def __idiv__(self, other):
-        print "VS __idiv__ %d /= %d" % (self.value, other.value)
+        print("VS __idiv__ %d /= %d" % (self.value, other.value))
 
 cdef class SetSlice:
     def __setslice__(self, a, b, value):
-        print "SetSlice setslice %d %d %r" % (a, b, value)
+        print("SetSlice setslice %d %d %r" % (a, b, value))
 
 cdef class DelSlice:
     def __delslice__(self, a, b):
-        print "DelSlice delslice %d %d" % (a, b)
+        print("DelSlice delslice %d %d" % (a, b))
 
 cdef class SetDelSlice:
     def __setslice__(self, a, b, value):
-        print "SetDelSlice setslice %d %d %r" % (a, b, value)
+        print("SetDelSlice setslice %d %d %r" % (a, b, value))
 
     def __delslice__(self, a, b):
-        print "SetDelSlice delslice %d %d" % (a, b)
+        print("SetDelSlice delslice %d %d" % (a, b))
 
 cdef class Long:
     def __long__(self):
-        print "Long __long__"
+        print("Long __long__")

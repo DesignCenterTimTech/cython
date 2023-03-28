@@ -19,4 +19,4 @@ swallow = True
 class Swallow:
 
     def spam(w, int x = 42, y = "grail", z = swallow):
-        print w, x, y, z
+        print(w, x, y, z)

@@ -15,7 +15,7 @@ def f(a):
 
 def outer(a):
     def inner():
-        print a
+        print(a)
     del a
     return inner()
 

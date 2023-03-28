@@ -33,7 +33,7 @@ cdef class MyList(list):
         self.append(x)
 
     def __contains__(self, value):
-        print "MyList.__contains__"
+        print("MyList.__contains__")
         return list.__contains__(self, value)  # probably optimized
 
 cdef class MyDict(dict):
@@ -61,7 +61,7 @@ cdef class MyDict(dict):
         return l
 
     def __contains__(self, key):
-        print "MyDict.__contains__"
+        print("MyDict.__contains__")
         return dict.__contains__(self, key)
 
 import sys
@@ -200,5 +200,5 @@ class MyBytes(bytes):
     False
     """
     def __contains__(self, value):
-        print "MyBytes.__contains__"
+        print("MyBytes.__contains__")
         return bytes.__contains__(self, value)

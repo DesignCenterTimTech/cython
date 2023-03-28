@@ -26,7 +26,7 @@ def swallow(name, airspeed, *args, **kwds):
     Extra args: ('African',)
     Extra keywords: [('coconuts', 3)]
     """
-    print u"Name:", name
-    print u"Airspeed:", airspeed
-    print u"Extra args:", args
-    print u"Extra keywords:", sorted(kwds.items())
+    print(u"Name:", name)
+    print(u"Airspeed:", airspeed)
+    print(u"Extra args:", args)
+    print(u"Extra keywords:", sorted(kwds.items()))

@@ -94,12 +94,12 @@ def test_Static(x):
 cdef cppclass InitDealloc:
     __init__():
         try:
-            print "Init"
+            print("Init")
         finally:
             return  # swallow any exceptions
     __dealloc__():
         try:
-            print "Dealloc"
+            print("Dealloc")
         finally:
             return  # swallow any exceptions
 
@@ -112,11 +112,11 @@ def test_init_dealloc():
     Dealloc
     end
     """
-    print "start"
+    print("start")
     cdef InitDealloc *ptr = new InitDealloc()
-    print "live"
+    print("live")
     del ptr
-    print "end"
+    print("end")
 
 
 cdef cppclass WithTemplate[T]:
@@ -159,11 +159,11 @@ def test_default_init_no_gil():
 cdef class NoisyAlloc(object):
     cdef public name
     def __init__(self, name):
-        print "NoisyAlloc.__init__", name
+        print("NoisyAlloc.__init__", name)
         self.name = name
     def __dealloc__(self):
         try:
-            print "NoisyAlloc.__dealloc__", self.name
+            print("NoisyAlloc.__dealloc__", self.name)
         except:
             pass  # Suppress unraisable exception warning.
     def __repr__(self):
@@ -173,13 +173,13 @@ cdef cppclass CppClassWithObjectMember:
     NoisyAlloc o
     __init__(name):
         try:
-            print "CppClassWithObjectMember.__init__", name
+            print("CppClassWithObjectMember.__init__", name)
             this.o = NoisyAlloc(name)
         except:
             pass  # Suppress unraisable exception warning.
     __dealloc__():
         try:
-            print "CppClassWithObjectMember.__dealloc__", this.o.name
+            print("CppClassWithObjectMember.__dealloc__", this.o.name)
         except:
             pass  # Suppress unraisable exception warning.
 
@@ -215,14 +215,14 @@ def test_CppClassWithObjectMemberCopyAssign(name):
     # Invokes copy constructor.
     v.push_back(deref(x))
     del x
-    print "Alive in vector", v[0].o
+    print("Alive in vector", v[0].o)
     y = new CppClassWithObjectMember(name[::-1])
     # Invokes copy assignment.
     v[0] = deref(y)
     del y
-    print "Alive in vector", v[0].o
+    print("Alive in vector", v[0].o)
     v.clear()
-    print "Nothing alive."
+    print("Nothing alive.")
 
 
 # Github issue #1886.

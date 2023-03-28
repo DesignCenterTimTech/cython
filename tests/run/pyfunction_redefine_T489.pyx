@@ -51,7 +51,7 @@ class ClassScope(object):
                 r.append(x)
             else:
                 r.append(x(self))
-        print r
+        print(r)
     foo = 0
     x.append(foo)
     def foo(self):

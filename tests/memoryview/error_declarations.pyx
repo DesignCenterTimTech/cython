@@ -61,7 +61,7 @@ four_D[None, None, None, None, None]
 cdef int[:, :, :, :, :, :, :, :] eight_D = object()
 
 cdef double[:] m
-print <long> &m
+print(<long> &m)
 
 # These are VALID
 cdef int[::view.indirect_contiguous, ::view.contiguous] a9

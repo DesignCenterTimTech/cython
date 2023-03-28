@@ -177,11 +177,11 @@ class ExceptionTests(unittest.TestCase):
             else:
                 self.fail("failed to get expected SyntaxError")
 
-        s = '''print "old style"'''
+        s = '''print("old style"''')
         ckmsg(s, "Missing parentheses in call to 'print'. "
                  "Did you mean print(\"old style\")?")
 
-        s = '''print "old style",'''
+        s = '''print("old style",''')
         ckmsg(s, "Missing parentheses in call to 'print'. "
                  "Did you mean print(\"old style\", end=\" \")?")
 
@@ -189,7 +189,7 @@ class ExceptionTests(unittest.TestCase):
         ckmsg(s, "Missing parentheses in call to 'exec'")
 
         # should not apply to subclasses, see issue #31161
-        s = '''if True:\nprint "No indent"'''
+        s = '''if True:\nprint("No indent"''')
         ckmsg(s, "expected an indented block", IndentationError)
 
         s = '''if True:\n        print()\n\texec "mixed tabs and spaces"'''

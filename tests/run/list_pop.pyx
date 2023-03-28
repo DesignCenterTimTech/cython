@@ -4,7 +4,7 @@ from libc.stdint cimport uint64_t
 
 class A:
     def pop(self, *args):
-        print args
+        print(args)
         return None
 
 cdef class B:

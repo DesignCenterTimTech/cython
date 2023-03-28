@@ -50,25 +50,25 @@ class class1:
     a = 5
     plus = classmethod(f_plus)
     def view(cls):
-        print cls.__name__
+        print(cls.__name__)
     view = classmethod(view)
 
     @classmethod
     @cython.binding(True)
     def bview(cls):
-        print cls.__name__
+        print(cls.__name__)
 
     @classmethod
     @second_decorator
     def cview(cls, s=""):
-        print cls.__name__+s
+        print(cls.__name__+s)
 
 
 class class2(object):
     a = 6
     plus = classmethod(f_plus)
     def view(cls):
-        print cls.__name__
+        print(cls.__name__)
     view = classmethod(view)
 
 
@@ -76,19 +76,19 @@ cdef class class3:
     a = 7
     plus = classmethod(f_plus)
     def view(cls):
-        print cls.__name__
+        print(cls.__name__)
     view = classmethod(view)
 
     @classmethod
     @cython.binding(True)
     def bview(cls):
-        print cls.__name__
+        print(cls.__name__)
 
 
 class class4:
     @classmethod
     def view(cls):
-        print cls.__name__
+        print(cls.__name__)
 
 
 class class5(class4):

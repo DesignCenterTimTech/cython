@@ -9,7 +9,7 @@ class IPOW:
     z
     """
     def __ipow__(self, other):
-        print ("%s" % other)
+        print(("%s" % other))
 
 cdef class CrashIPOW:
     """
@@ -20,4 +20,4 @@ cdef class CrashIPOW:
     z
     """
     def __ipow__(self, other):
-        print ("%s" % other)
+        print(("%s" % other))

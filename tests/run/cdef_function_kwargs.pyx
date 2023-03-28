@@ -13,7 +13,7 @@ cdef optargs(a, b=2, c=3):
 
 ctypedef int (*cfuncptr_type)(int a, int b)
 cdef int cfuncptr(int a, int b):
-    print a, b
+    print(a, b)
 
 cdef cfuncptr_type get_cfuncptr():
     return cfuncptr
@@ -221,13 +221,13 @@ cdef class ExtType:
         (1, 2, 3, 4)
         (1, 2, 3, 4)
         """
-        print self.cmeth(1,2,3,4)
-        print self.cmeth(1,2,c=3,d=4)
-        print self.cmeth(a=1,b=2,c=3,d=4)
-        print "EXT"
-        print ext.cmeth(1,2,3,4)
-        print ext.cmeth(1,2,c=3,d=4)
-        print ext.cmeth(a=1,b=2,c=3,d=4)
+        print(self.cmeth(1,2,3,4))
+        print(self.cmeth(1,2,c=3,d=4))
+        print(self.cmeth(a=1,b=2,c=3,d=4))
+        print("EXT")
+        print(ext.cmeth(1,2,3,4))
+        print(ext.cmeth(1,2,c=3,d=4))
+        print(ext.cmeth(a=1,b=2,c=3,d=4))
 
     cpdef cpmeth(self, a, b, c, d):
         return (a,b,c,d)
@@ -246,13 +246,13 @@ cdef class ExtType:
         (1, 2, 3, 4)
         (1, 2, 3, 4)
         """
-        print self.cpmeth(1,2,3,4)
-        print self.cpmeth(1,2,c=3,d=4)
-        print self.cpmeth(a=1,b=2,c=3,d=4)
-        print "EXT"
-        print ext.cpmeth(1,2,3,4)
-        print ext.cpmeth(1,2,c=3,d=4)
-        print ext.cpmeth(a=1,b=2,c=3,d=4)
+        print(self.cpmeth(1,2,3,4))
+        print(self.cpmeth(1,2,c=3,d=4))
+        print(self.cpmeth(a=1,b=2,c=3,d=4))
+        print("EXT")
+        print(ext.cpmeth(1,2,3,4))
+        print(ext.cpmeth(1,2,c=3,d=4))
+        print(ext.cpmeth(a=1,b=2,c=3,d=4))
 
     cdef optargs(self, a=1, b=2):
         return (a,b)
@@ -277,21 +277,21 @@ cdef class ExtType:
         (3, 2)
         (3, 2)
         """
-        print self.optargs(3,4)
-        print self.optargs(3,b=4)
-        print self.optargs(a=3,b=4)
-        print self.optargs()
-        print self.optargs(3)
-        print self.optargs(a=3)
-        #print self.optargs(b=4)
-        print "EXT"
-        print ext.optargs(3,4)
-        print ext.optargs(3,b=4)
-        print ext.optargs(a=3,b=4)
-        print ext.optargs()
-        print ext.optargs(3)
-        print ext.optargs(a=3)
-        #print ext.optargs(b=4)
+        print(self.optargs(3,4))
+        print(self.optargs(3,b=4))
+        print(self.optargs(a=3,b=4))
+        print(self.optargs())
+        print(self.optargs(3))
+        print(self.optargs(a=3))
+        #print(self.optargs(b=4))
+        print("EXT")
+        print(ext.optargs(3,4))
+        print(ext.optargs(3,b=4))
+        print(ext.optargs(a=3,b=4))
+        print(ext.optargs())
+        print(ext.optargs(3))
+        print(ext.optargs(a=3))
+        #print(ext.optargs(b=4))
 
     cpdef cpmeth_optargs(self, a=1, b=2):
         return (a,b)
@@ -316,21 +316,21 @@ cdef class ExtType:
         (3, 2)
         (3, 2)
         """
-        print self.cpmeth_optargs(3,4)
-        print self.cpmeth_optargs(3,b=4)
-        print self.cpmeth_optargs(a=3,b=4)
-        print self.cpmeth_optargs()
-        print self.cpmeth_optargs(3)
-        print self.cpmeth_optargs(a=3)
-        #print self.cpmeth_optargs(b=4)
-        print "EXT"
-        print ext.cpmeth_optargs(3,4)
-        print ext.cpmeth_optargs(3,b=4)
-        print ext.cpmeth_optargs(a=3,b=4)
-        print ext.cpmeth_optargs()
-        print ext.cpmeth_optargs(3)
-        print ext.cpmeth_optargs(a=3)
-        #print ext.cpmeth_optargs(b=4)
+        print(self.cpmeth_optargs(3,4))
+        print(self.cpmeth_optargs(3,b=4))
+        print(self.cpmeth_optargs(a=3,b=4))
+        print(self.cpmeth_optargs())
+        print(self.cpmeth_optargs(3))
+        print(self.cpmeth_optargs(a=3))
+        #print(self.cpmeth_optargs(b=4))
+        print("EXT")
+        print(ext.cpmeth_optargs(3,4))
+        print(ext.cpmeth_optargs(3,b=4))
+        print(ext.cpmeth_optargs(a=3,b=4))
+        print(ext.cpmeth_optargs())
+        print(ext.cpmeth_optargs(3))
+        print(ext.cpmeth_optargs(a=3))
+        #print(ext.cpmeth_optargs(b=4))
 
     cpdef cpmeth_optargs1(self, a=1):
         return a
@@ -349,10 +349,10 @@ cdef class ExtType:
         3
         3
         """
-        print self.cpmeth_optargs1()
-        print self.cpmeth_optargs1(3)
-        print self.cpmeth_optargs1(a=3)
-        print "EXT"
-        print ext.cpmeth_optargs1()
-        print ext.cpmeth_optargs1(3)
-        print ext.cpmeth_optargs1(a=3)
+        print(self.cpmeth_optargs1())
+        print(self.cpmeth_optargs1(3))
+        print(self.cpmeth_optargs1(a=3))
+        print("EXT")
+        print(ext.cpmeth_optargs1())
+        print(ext.cpmeth_optargs1(3))
+        print(ext.cpmeth_optargs1(a=3))

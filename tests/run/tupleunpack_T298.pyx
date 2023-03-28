@@ -22,6 +22,6 @@ def func2():
 
 def func():
     for (a, b),c ,d in zip(zip(range(3), range(3)), range(3), range(3)):
-        print a, b
-        print c
-        print d
+        print(a, b)
+        print(c)
+        print(d)

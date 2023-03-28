@@ -6,9 +6,9 @@ def uf():
     It works!
     """
     IF USTUFF == u"Spam":
-        print "It works!"
+        print("It works!")
     ELSE:
-        print "Doesn't work"
+        print("Doesn't work")
 
 DEF BSTUFF = b"Spam"
 
@@ -18,6 +18,6 @@ def bf():
     It works!
     """
     IF BSTUFF == b"Spam":
-        print "It works!"
+        print("It works!")
     ELSE:
-        print "Doesn't work"
+        print("Doesn't work")

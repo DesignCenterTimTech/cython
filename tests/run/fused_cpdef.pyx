@@ -3,11 +3,11 @@ cimport cython
 cy = __import__("cython")
 
 cpdef func1(self, cython.integral x):
-    print "%s," % (self,),
+    print("%s," % (self,),)
     if cython.integral is int:
-        print 'x is int', x, cython.typeof(x)
+        print('x is int', x, cython.typeof(x))
     else:
-        print 'x is long', x, cython.typeof(x)
+        print('x is long', x, cython.typeof(x))
 
 
 class A(object):
@@ -75,18 +75,18 @@ ctypedef long double long_double
 
 cpdef multiarg(cython.integral x, cython.floating y):
     if cython.integral is int:
-        print "x is an int,",
+        print("x is an int,",)
     else:
-        print "x is a long,",
+        print("x is a long,",)
 
     if cython.floating is long_double:
-        print "y is a long double:",
+        print("y is a long double:",)
     elif float is cython.floating:
-        print "y is a float:",
+        print("y is a float:",)
     else:
-        print "y is a double:",
+        print("y is a double:",)
 
-    print x, y
+    print(x, y)
 
 def test_multiarg():
     """

@@ -2,8 +2,8 @@
 # mode: error
 
 def mult_decl_test():
-    print "%s" % vv
-    print "%s" % s
+    print("%s" % vv)
+    print("%s" % s)
     cdef str s, vv = "Test"
 
 def def_test():
@@ -14,13 +14,13 @@ def def_test():
 cdef cdef_test():
     cdef int j = 10
     i[0] = j
-    print "%d" % i[0]
+    print("%d" % i[0])
     cdef int *i = NULL
 
 cpdef cpdef_test():
     cdef int j = 10
     i[0] = j
-    print "%d" % i[0]
+    print("%d" % i[0])
     cdef int *i = NULL
 
 s.upper()
@@ -33,12 +33,12 @@ class Foo(object):
         cdef int t = 10
 
 cdef class Foo2(object):
-    print '%s' % r # check error inside class scope
+    print('%s' % r) # check error inside class scope
     cdef str r
     def bar(self, x, y):
         cdef unsigned long w = 20
         self.r = c'r'
-        print self.r
+        print(self.r)
         z = w + g(t)
         cdef int t = 10
 
@@ -49,7 +49,7 @@ cdef int d = 20
 baz[0] = d
 cdef int *baz
 
-print var[0][0]
+print(var[0][0])
 cdef unsigned long long[100][100] var
 
 # in 0.11.1 these are warnings

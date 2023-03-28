@@ -20,4 +20,4 @@ with nogil:
 # We can override nogil methods as with gil methods.
 cdef cppclass WithGilSubclass(NoGilTest1):
   void doSomething() with gil:
-    print "have the gil"
+    print("have the gil")
