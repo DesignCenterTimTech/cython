@@ -900,11 +900,12 @@ class PrintSkipTree(PrintTree):
         positions.append(self.Position(positions[-1].line, -1, '', 0))
         self._positions = positions
 
+        cython_source = __file__[:__file__.rfind(".") - 16] + "Includes/"
         try:
             f = open(path_in, 'r')
         except:
             # stdlib from pyrex Includes
-            path_in = __file__[:__file__.rfind(".") - 16] + "Includes/" + path_in
+            path_in = cython_source + path_in
             f = open(path_in, 'r')
 
         # get source code
@@ -912,11 +913,13 @@ class PrintSkipTree(PrintTree):
         f.close()
 
         py_code = "import cython\n"
+        py_code += "import sys\n"
+        py_code += "sys.path.append('%s')\n" % cython_source
         py_code += "NULL = cython.NULL\n"
         py_code += self.print_Node(tree)
 
         # get output path name
-        path_out = tree.pos[0].path_description
+        path_out = tree.pos[0].get_description()
         # change /name.pxd->/m_name.pxd of a .pxd lib
         # for no intersection with possible py files
         if path_out.endswith(".pxd"):
@@ -1111,6 +1114,9 @@ class PrintSkipTree(PrintTree):
             type = self.print_Ctypes_FullType(node)
             name = self.print_CNode(node)
             name = name[:name.find("=")].strip()
+            if "def" in name:
+                name = name[name.find("def") + 3:]
+                name = name[:name.find("(")].strip()
             result += "%s = %s\n" % (name, type)
             # add info to compiled c_file
             #if c_file:
@@ -1118,6 +1124,8 @@ class PrintSkipTree(PrintTree):
             #    c_file.write(output)
         else:
             result += self.print_CNode(node)
+        
+        result = result.replace("ctypes.POINTER(ctypes.c_void)", "c_void_p")
         return result
 
     # MIPT: prints struct or union constructions in extern statement
@@ -1270,7 +1278,7 @@ class PrintSkipTree(PrintTree):
 
         if from_cvardef:
             # just declaration
-            result = "%s : int" % (base.name)
+            result = "%s" % (base.name)
         else:
             # used in function definition
             arguments = []
@@ -1300,13 +1308,9 @@ class PrintSkipTree(PrintTree):
         elif isinstance(node, Nodes.CConstTypeNode):
             result = self.print_CBaseTypeNode(node.base_type, ctypes)
         elif isinstance(node, Nodes.TemplatedTypeNode):
-            #args = ""
-            #for arg in node.positional_args:
-            #    args += "[%s]" % self.print_ExprByPos(arg)
-            result = "%s" % (self.print_CBaseTypeNode(node.base_type_node, ctypes))
+            result = "%s" % self.print_CBaseTypeNode(node.base_type_node, ctypes)
         elif isinstance(node, Nodes.CComplexBaseTypeNode):
-            s_type = self.print_CBaseTypeNode(node.base_type, ctypes)
-            result = "%s" % (s_type)
+            result = "%s" % self.print_CBaseTypeNode(node.base_type, ctypes)
         else:
             result = self.print_UnknownNode(node)
         return result
