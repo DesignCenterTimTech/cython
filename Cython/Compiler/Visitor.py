@@ -1040,59 +1040,51 @@ class PrintSkipTree(PrintTree):
     #       shared object created, then linked with ctypes
     def print_CDefExternNode(self, node):
         result = ""
-        c_name = node.include_file
-        if not c_name:
+        include_name = node.include_file
+        
+        is_std = False
+        if not include_name:
             if int(os.getenv("CYTHON2PYTHON_DEBUG", "1")) >= 2:
-                return "# got blank extern\n"
-            return ""
-        if "<" in c_name:
-            c_name = c_name[1:-1]
+                print("# got blank extern in %s" % include_name)
+            return self.print_Node(node.body)
+        if "<" in include_name:
+            is_std = True
+            include_name = include_name[1:-1]
 
-        call_path = os.getcwd()
-        lib_path = node.pos[0].get_description()
-        lib_path = os.path.dirname(lib_path)
-        std_marker = "Cython/Includes/"
-        if std_marker in lib_path:
-            lib_path = lib_path[lib_path.find(std_marker) + len(std_marker):]
+        dir_path = os.path.dirname(node.pos[0].get_description())
+        c_name  = "/".join((dir_path, include_name))
+        so_name = c_name[:-2] + ".so"
 
-        if lib_path:
-            os.makedirs(lib_path, exist_ok=True)
-            os.chdir(lib_path)
-
-        if ".h" in c_name:
+        if c_name.endswith(".h"):
             # include header file - create a .c file and compile it
-            h_name = c_name
-            c_name = h_name.replace(".h", ".c")
+            h_name = include_name
+            c_name = c_name[:-2] + ".c"
             with open(c_name, 'a') as f:
-                f.write("#include <%s>\n" % h_name)
+                if is_std:
+                    f.write("#include <%s>\n" % h_name)
+                else:
+                    f.write('#include "%s"\n' % h_name)
                 f.write("#include <stdio.h>\n")
-            so_name = c_name.replace(".c", ".so")
         elif not c_name:
             # cdef extern from *:
             result += "%s\n" % self.print_Node(node.body)
             return result
-        else:
-            # regular file extern
-            so_name = c_name.replace(".c", ".so")
 
-        inter_file = 0
-        code = ""
+        c_name  = os.path.abspath(c_name)
+        so_name = os.path.abspath(so_name)
+        
+        result += "import ctypes\n"
+        result += "exported_lib = ctypes.CDLL('%s')\n" % so_name
+        
         if ".h" in node.include_file:
-            with open(c_name, 'a') as inter_file:
+            with open(c_name, 'a') as f:
                 for stat in node.body.stats:
-                    code += self.print_CTypes_Node(stat, inter_file)
+                    result += self.print_CTypes_Node(stat, f)
         else:
             for stat in node.body.stats:
-                code += self.print_CTypes_Node(stat)
+                result += self.print_CTypes_Node(stat)
 
         os.system("g++ -fPIC -I%s -shared -o %s %s" % (self._python_dir, so_name, c_name))
-        os.chdir(call_path)
-
-        so_name = os.path.relpath(so_name)
-        result += "import ctypes\n"
-        result += "exported_lib = ctypes.CDLL('%s')\n" % \
-                  ("/".join((lib_path, so_name)))
-        result += code
 
         return result
 
@@ -1125,7 +1117,7 @@ class PrintSkipTree(PrintTree):
         else:
             result += self.print_CNode(node)
         
-        result = result.replace("ctypes.POINTER(ctypes.c_void)", "c_void_p")
+        result = result.replace("ctypes.POINTER(ctypes.c_void)", "ctypes.c_void_p")
         return result
 
     # MIPT: prints struct or union constructions in extern statement
@@ -1172,11 +1164,13 @@ class PrintSkipTree(PrintTree):
                 arguments.append(self.print_Ctypes_FullType(arg))
 
             # print ctypes shell
-            result += "exported_lib.%s.restype = %s\n" % (func_name,
+            result += "try:\n"
+            result += "    exported_lib.%s.restype = %s\n" % (func_name,
                                                           full_type)
-            result += "exported_lib.%s.argtypes = [%s]\n" % (func_name,
+            result += "    exported_lib.%s.argtypes = [%s]\n" % (func_name,
                                                              ", ". join(arguments))
-            result += "%s = exported_lib.%s\n\n" % (func_name, func_name)
+            result += "    %s = exported_lib.%s\n" % (func_name, func_name)
+            result += "except Exception:\n    %s = 'NOT IMPORTED'\n\n" % func_name
         else:
             # variable definition
             name = self.print_CVarDefNode(node)
@@ -1332,6 +1326,7 @@ class PrintSkipTree(PrintTree):
 
         # finalise type for special cases - unsigned or long ones
         s_type = node.name
+        if s_type == "bint": s_type = "int"
         if s_type == "int":
             s_type = int_longness[node.longness]
         elif s_type == "double":
