@@ -1270,7 +1270,7 @@ class PrintSkipTree(PrintTree):
 
         if from_cvardef:
             # just declaration
-            result = "%s : function" % (base.name)
+            result = "%s : int" % (base.name)
         else:
             # used in function definition
             arguments = []
@@ -1299,6 +1299,14 @@ class PrintSkipTree(PrintTree):
             result = self.print_CSimpleBaseTypeNode(node, ctypes)
         elif isinstance(node, Nodes.CConstTypeNode):
             result = self.print_CBaseTypeNode(node.base_type, ctypes)
+        elif isinstance(node, Nodes.TemplatedTypeNode):
+            #args = ""
+            #for arg in node.positional_args:
+            #    args += "[%s]" % self.print_ExprByPos(arg)
+            result = "%s" % (self.print_CBaseTypeNode(node.base_type_node, ctypes))
+        elif isinstance(node, Nodes.CComplexBaseTypeNode):
+            s_type = self.print_CBaseTypeNode(node.base_type, ctypes)
+            result = "%s" % (s_type)
         else:
             result = self.print_UnknownNode(node)
         return result
