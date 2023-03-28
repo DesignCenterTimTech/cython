@@ -1018,6 +1018,8 @@ class PrintSkipTree(PrintTree):
             result += self.print_CTypeDefNode(node)
         elif isinstance(node, Nodes.CFuncDefNode):
             result += self.print_CFuncDefNode(node)
+        elif isinstance(node, Nodes.DefNode):
+            result += self.print_DefNode(node)
         elif isinstance(node, Nodes.CClassDefNode):
             result += self.print_CClassDefNode(node)
         elif isinstance(node, Nodes.CImportStatNode):
@@ -1225,7 +1227,7 @@ class PrintSkipTree(PrintTree):
                 else:
                     result += "%s" % name
             elif s_type: # declaration with annotation
-                if s_type == s_expr:
+                if s_type == s_expr or s_type == "None":
                     result += "%s" % (s_expr)
                 elif s_type in self._structs:
                     result += "%s = %s()" % (s_expr, s_type)
@@ -1410,6 +1412,27 @@ class PrintSkipTree(PrintTree):
             result += "-> %s:\n" % self.print_TypeTree(node.declarator) % s_type
         else:
             result += ":\n"
+        self.indent()
+        result += "%s\n" % (self.print_Node(node.body))
+        self.unindent()
+
+        return result
+
+    # MIPT: prints full function definition, if was in python style:
+    #       def f() -> type:
+    #           body
+    def print_DefNode(self, node):
+        result = self.print_Decorators(node)
+
+        name = node.name
+        arguments = []
+        for arg in node.args:
+            arguments.append(self.print_CArgDeclNode(arg))
+
+        result += "%sdef %s(%s):\n" % (self._indent,
+                                       name,
+                                       ", ".join(arguments))
+
         self.indent()
         result += "%s\n" % (self.print_Node(node.body))
         self.unindent()
