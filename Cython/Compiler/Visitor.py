@@ -1588,7 +1588,7 @@ class PrintSkipTree(PrintTree):
         # neede because for ex. functions pos is set on its argument list starting
         # at (...) but not function name name(...)
         first_char = self._text[line][pos]
-        if first_char in  (brackets_sym + end_sym + ["="]):
+        if first_char in  (brackets_sym + end_sym + ["=", "."]):
             # go left till start of expr
             pos -= 1
             while (self._text[line][pos] not in end_sym + brackets_sym):
