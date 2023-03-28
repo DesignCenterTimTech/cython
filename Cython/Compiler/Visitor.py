@@ -844,10 +844,12 @@ class PrintSkipTree(PrintTree):
     # MIPT: _positions - code markers,
     #       _text - original pyrex code
     #       _structs - list of struct names from code
+    #       _cimport_names - list to change after cimport
     #       _python_dir - python3-dev dir path
     _positions = []
     _text = []
     _structs = ["list", "dict", "tuple"]
+    _cimport_names = []
     _python_dir = ""
     _source_root = "/usr/include"
 
@@ -917,6 +919,8 @@ class PrintSkipTree(PrintTree):
         py_code += "sys.path.append('%s')\n" % cython_source
         py_code += "NULL = cython.NULL\n"
         py_code += self.print_Node(tree)
+        for name in self._cimport_names:
+            py_code = py_code.replace(name[0], name[1])
 
         # get output path name
         path_out = tree.pos[0].get_description()
@@ -937,6 +941,7 @@ class PrintSkipTree(PrintTree):
         if os.getenv("CYTHON2PYTHON_DEBUG"):
             print("# Code written in file %s\n" % path_out)
             print(py_code)
+
         return tree
 
     # MIPT: fill code markers
@@ -1482,12 +1487,14 @@ class PrintSkipTree(PrintTree):
         # change name(.pxd) to m_name(.pxd)
         # to call correct files (because .pxd are changed in __call__)
         module = node.module_name
+        initial_name = module
         module = module[:module.rfind(".") + 1] + "m_" + module[module.rfind(".") + 1:]
         if node.as_name:
             result = "import %s as %s\n" % (module,
                                             node.as_name)
         else:
             result = "import %s\n" % (module)
+            self._cimport_names.append([initial_name, module])
         return result
 
     # MIPT: prints from cimport constructions as followed:
@@ -1495,6 +1502,7 @@ class PrintSkipTree(PrintTree):
     def print_FromCImportStatNode(self, node):
         # change name(.pxd) to m_name(.pxd)
         module = node.module_name
+        initial_name = "." * node.relative_level + module
         module = "." * node.relative_level + \
                  module[:module.rfind(".") + 1] + "m_" + \
                  module[module.rfind(".") + 1:]
@@ -1507,6 +1515,7 @@ class PrintSkipTree(PrintTree):
             else:
                 result += "from %s import %s\n" % (module,
                                                   argument[1])
+                self._cimport_names.append([initial_name, module])
         return result
 
     # MIPT: debug printing of possible unprocessed node
