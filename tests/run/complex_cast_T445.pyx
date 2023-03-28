@@ -33,7 +33,7 @@ cdef int side_effect_counter = 0
 cdef double complex side_effect(double complex z):
     global side_effect_counter
     side_effect_counter += 1
-    print "side effect", side_effect_counter, z
+    print("side effect", side_effect_counter, z)
     return z
 
 def test_side_effect(int complex z):

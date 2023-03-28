@@ -140,7 +140,7 @@ def complex_expression(int a, int b, int c, int d):
     return (a // verbose_call(b)) % (verbose_call(c) // d)
 
 cdef int verbose_call(int x):
-    print u"verbose_call(%s)" % x
+    print(u"verbose_call(%s)" % x)
     return x
 
 

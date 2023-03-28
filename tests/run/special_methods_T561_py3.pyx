@@ -59,26 +59,26 @@ cdef class VerySpecial:
 
     def __init__(self, v):
         self.value = v
-        print "VS __init__ %d" % self.value
+        print("VS __init__ %d" % self.value)
 
     def __nonzero__(self):
-        print "VS __nonzero__ %d" % self.value
+        print("VS __nonzero__ %d" % self.value)
 
     def __oct__(self):
-        print "VS __oct__ %d" % self.value
+        print("VS __oct__ %d" % self.value)
 
     def __hex__(self):
-        print "VS __hex__ %d" % self.value
+        print("VS __hex__ %d" % self.value)
 
     def __cmp__(self, other):
-        print "VS __cmp__ %d %d" % (self.value, other.value)
+        print("VS __cmp__ %d %d" % (self.value, other.value))
 
     def __div__(self, other):
-        print "VS __div__ %d %d" % (self.value, other.value)
+        print("VS __div__ %d %d" % (self.value, other.value))
 
     def __idiv__(self, other):
-        print "VS __idiv__ %d /= %d" % (self.value, other.value)
+        print("VS __idiv__ %d /= %d" % (self.value, other.value))
 
 cdef class Long:
     def __long__(self):
-        print "Long __long__"
+        print("Long __long__")

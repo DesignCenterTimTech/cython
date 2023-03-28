@@ -9,4 +9,4 @@ __doc__ = u"""
 class Bicycle:
 
     def fall_off(self, how_hard = u"extremely"):
-        print u"Falling off", how_hard, u"hard"
+        print(u"Falling off", how_hard, u"hard")

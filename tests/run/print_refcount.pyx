@@ -12,7 +12,7 @@ def test_print_refcount():
             raise RuntimeError
     sys.stdout = StdoutGuard()
     try:
-        print "Hello", "world!"
+        print("Hello", "world!")
     except RuntimeError:
         pass
     finally:
@@ -31,7 +31,7 @@ def test_printone_refcount():
             raise RuntimeError
     sys.stdout = StdoutGuard()
     try:
-        print "Oops!"
+        print("Oops!")
     except RuntimeError:
         pass
     finally:

@@ -196,8 +196,8 @@ import a as a_mod
 def ae(result, expected):
     "assert equals"
     if result != expected:
-        print 'result  :', result
-        print 'expected:', expected
+        print('result  :', result)
+        print('expected:', expected)
 
     assert result == expected
 

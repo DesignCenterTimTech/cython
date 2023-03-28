@@ -167,10 +167,10 @@ def test_with_statement():
     def make_context_manager():
         class CM(object):
             def __enter__(self):
-                print "enter"
+                print("enter")
             def __exit__(self, *args):
-                print "exit"
+                print("exit")
         return CM()
 
     with make_context_manager():
-        print "running"
+        print("running")

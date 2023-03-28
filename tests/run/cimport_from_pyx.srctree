@@ -25,7 +25,7 @@ cdef int tmp = Py_EQ
 
 #from c cimport ClassC
 #cdef ClassC c = ClassC()
-#print c.value
+#print(c.value)
 
 ######## b.pyx ########
 

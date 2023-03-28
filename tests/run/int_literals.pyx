@@ -117,12 +117,12 @@ def c_long_types():
     unsigned long
     unsigned long long
     """
-    print typeof(1)
-    print typeof(1L)
-    print typeof(1LL)
-    print typeof(1U)
-    print typeof(1UL)
-    print typeof(1ULL)
+    print(typeof(1))
+    print(typeof(1L))
+    print(typeof(1LL))
+    print(typeof(1U))
+    print(typeof(1UL))
+    print(typeof(1ULL))
 
 # different ways to write an integer in Python
 

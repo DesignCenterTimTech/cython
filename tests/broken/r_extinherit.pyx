@@ -6,7 +6,7 @@ cdef class Parrot:
         self.plumage = "yellow"
 
     def describe(self):
-        print "This bird has lovely", self.plumage, "plumage."
+        print("This bird has lovely", self.plumage, "plumage.")
 
 
 cdef class Norwegian(Parrot):

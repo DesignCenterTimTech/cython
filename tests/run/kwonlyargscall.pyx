@@ -223,36 +223,36 @@ def call6dfexy(f):
 # the called functions:
 
 def b(a, b, c):
-    print a,b,c
+    print(a,b,c)
 
 def c(a, b, c=1):
-    print a,b,c
+    print(a,b,c)
 
 def d(a, b, *, c = 88):
-    print a,b,c
+    print(a,b,c)
 
 def e(a, b, c = 88, **kwds):
     kwlist = list(kwds.items())
     kwlist.sort()
-    print a,b,c, kwlist
+    print(a,b,c, kwlist)
 
 def f(a, b, *, c, d = 42):
-    print a,b,c,d
+    print(a,b,c,d)
 
 def g(a, b, *, c, d = 42, e = 17, f, **kwds):
     kwlist = list(kwds.items())
     kwlist.sort()
-    print a,b,c,d,e,f, kwlist
+    print(a,b,c,d,e,f, kwlist)
 
 def h(a, b, *args, c, d = 42, e = 17, f, **kwds):
     kwlist = list(kwds.items())
     kwlist.sort()
-    print a,b,c,d,e,f, args, kwlist
+    print(a,b,c,d,e,f, args, kwlist)
 
 def k(a, b, c=1, *args, d = 42, e = 17, f, **kwds):
     kwlist = list(kwds.items())
     kwlist.sort()
-    print a,b,c,d,e,f, args, kwlist
+    print(a,b,c,d,e,f, args, kwlist)
 
 def m(a, b=1, *, c):
-    print a,b,c
+    print(a,b,c)

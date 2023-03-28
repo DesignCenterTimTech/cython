@@ -24,7 +24,7 @@ def getattr_(MyClass var):
     >>> getattr_(obj)
     10
     """
-    print var.a
+    print(var.a)
 
 @cython.nonecheck(True)
 def setattr_(MyClass var):
@@ -72,11 +72,11 @@ def checking(MyClass var):
     """
     state = (var is None)
     if not state:
-        print var.a
+        print(var.a)
     if var is not None:
-        print var.a
+        print(var.a)
     else:
-        print u"var is None"
+        print(u"var is None")
 
 @cython.nonecheck(True)
 def check_and_assign(MyClass var):
@@ -87,9 +87,9 @@ def check_and_assign(MyClass var):
     AttributeError: 'NoneType' object has no attribute 'a'
     """
     if var is not None:
-        print var.a
+        print(var.a)
         var = None
-        print var.a
+        print(var.a)
 
 @cython.nonecheck(True)
 def check_buffer_get(object[int] buf):

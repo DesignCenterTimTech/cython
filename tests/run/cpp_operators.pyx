@@ -13,11 +13,11 @@ from libcpp cimport bool
 
 
 cdef out(s, result_type=None):
-    print '%s [%s]' % (s.decode('ascii'), result_type)
+    print('%s [%s]' % (s.decode('ascii'), result_type))
 
 
 cdef iout(int s, result_type=None):
-    print '%s [%s]' % (s, result_type)
+    print('%s [%s]' % (s, result_type))
 
 
 cdef extern from "cpp_operators_helper.h" nogil:

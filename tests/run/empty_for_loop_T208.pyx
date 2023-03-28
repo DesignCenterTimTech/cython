@@ -7,7 +7,7 @@ def go_py_empty():
     """
     i = 20
     for i in range(4,0):
-        print u"Spam!"
+        print(u"Spam!")
     return i
 
 def go_c_empty():
@@ -17,5 +17,5 @@ def go_c_empty():
     """
     cdef int i = 20
     for i in range(4,0):
-        print u"Spam!"
+        print(u"Spam!")
     return i

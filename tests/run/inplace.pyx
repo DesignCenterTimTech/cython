@@ -44,7 +44,7 @@ def arrays():
     buf[i] += 2
     buf[2] *= 10
     buf[j] -= 1
-    print buf[2]
+    print(buf[2])
     stdlib.free(buf)
 
 cdef class A:
@@ -71,7 +71,7 @@ def attributes():
     a.attr2 *= 2
     b.attr += 10
     b.attr *= 2
-    print a.attr, a.attr2, b.attr
+    print(a.attr, a.attr2, b.attr)
 
 def get_2(): return 2
 cdef int identity(int value): return value
@@ -86,16 +86,16 @@ def smoketest():
     a.buf = buf
     a.buf[identity(1)] = 0
     (a.buf + identity(4) - <int>(2*get_2() - 1))[get_2() - 2*identity(1)] += 10
-    print a.buf[1]
+    print(a.buf[1])
     stdlib.free(buf)
 
 
 def side_effect(x):
-    print u"side effect", x
+    print(u"side effect", x)
     return x
 
 cdef int c_side_effect(int x):
-    print u"c side effect", x
+    print(u"c side effect", x)
     return x
 
 def test_side_effects():
@@ -212,10 +212,10 @@ cdef class VerboseDict(object):
         self.name = name
         self.dict = kwds
     def __getitem__(self, key):
-        print self.name, "__getitem__", key
+        print(self.name, "__getitem__", key)
         return self.dict[key]
     def __setitem__(self, key, value):
-        print self.name, "__setitem__", key, value
+        print(self.name, "__setitem__", key, value)
         self.dict[key] = value
     def __repr__(self):
         return repr(self.name)

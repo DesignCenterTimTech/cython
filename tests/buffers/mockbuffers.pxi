@@ -153,7 +153,7 @@ cdef class MockBuffer:
         buffer.internal = NULL
         if self.label:
             msg = "acquired %s" % self.label
-            print msg
+            print(msg)
             self.log += msg + "\n"
 
     def __releasebuffer__(MockBuffer self, Py_buffer* buffer):
@@ -161,20 +161,20 @@ cdef class MockBuffer:
             self.release_ok = False
         if self.label:
             msg = "released %s" % self.label
-            print msg
+            print(msg)
             self.log += msg + "\n"
 
     def printlog(self):
-        print self.log[:-1]
+        print(self.log[:-1])
 
     def resetlog(self):
         self.log = ""
 
     cdef int write(self, char* buf, object value) except -1: raise Exception()
     cdef get_itemsize(self):
-        print "ERROR, not subclassed", self.__class__
+        print("ERROR, not subclassed", self.__class__)
     cdef get_default_format(self):
-        print "ERROR, not subclassed", self.__class__
+        print("ERROR, not subclassed", self.__class__)
 
 cdef class CharMockBuffer(MockBuffer):
     cdef int write(self, char* buf, object value) except -1:

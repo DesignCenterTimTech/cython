@@ -2,7 +2,7 @@
 # ticket: 693
 
 cdef double complex func(double complex x):                                                  
-    print "hello"
+    print("hello")
     return x
 
 def test_coercion():

@@ -19,6 +19,6 @@ def increment_decrement(int x):
     11 11 10
     10
     """
-    print cython.operator.preincrement(x), cython.operator.postincrement(x), x
-    print cython.operator.predecrement(x), cython.operator.postdecrement(x), x
+    print(cython.operator.preincrement(x), cython.operator.postincrement(x), x)
+    print(cython.operator.predecrement(x), cython.operator.postdecrement(x), x)
     return x

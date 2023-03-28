@@ -2,7 +2,7 @@
 # mode: compile
 #from ... import foo
 
-print ...
+print(...)
 def test():
     x = ...
     assert x is Ellipsis

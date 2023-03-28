@@ -13,10 +13,10 @@ cdef extern from "numeric.h":
         cdef int flags
 
 def ogle(ArrayType a):
-    print "No. of dimensions:", a.nd
-    print "  Dim Value"
+    print("No. of dimensions:", a.nd)
+    print("  Dim Value")
     for i in range(a.nd):
-        print "%5d %5d" % (i, a.dimensions[i])
-    print "flags:", a.flags
-    print "Type no.", a.descr.type_num
-    print "Element size:", a.descr.elsize
+        print("%5d %5d" % (i, a.dimensions[i]))
+    print("flags:", a.flags)
+    print("Type no.", a.descr.type_num)
+    print("Element size:", a.descr.elsize)

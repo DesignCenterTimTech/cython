@@ -6,35 +6,35 @@ def try_finally():
         return
     finally:
         return
-    print 'oops'
+    print('oops')
 
 def try_return():
     try:
         return
     except:
         return
-    print 'oops'
+    print('oops')
 
 def for_return(a):
     for i in a:
         return
     else:
         return
-    print 'oops'
+    print('oops')
 
 def while_return(a):
     while a:
         return
     else:
         return
-    print 'oops'
+    print('oops')
 
 def forfrom_return(a):
     for i from 0 <= i <= a:
         return
     else:
         return
-    print 'oops'
+    print('oops')
 
 _ERRORS = """
 9:4: Unreachable code

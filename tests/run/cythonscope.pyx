@@ -39,10 +39,10 @@ def test_cdef_cython_utility():
     hello from cython scope, value=3
     hello from cython.view scope, value=3
     """
-    print cython._testscope(4)
-    print cython.view._testscope(4)
-    print tester(3)
-    print viewtester(3)
+    print(cython._testscope(4))
+    print(cython.view._testscope(4))
+    print(tester(3))
+    print(viewtester(3))
 
 def test_cdef_class_cython_utility():
     """
@@ -56,14 +56,14 @@ def test_cdef_class_cython_utility():
 
     obj =  TestClass_New(7)
     objstruct = <__pyx_TestClass_obj *> obj
-    print objstruct.value
+    print(objstruct.value)
 
     obj =  __pyx_TestClass_New(14)
     objstruct = <__pyx_TestClass_obj *> obj
-    print objstruct.value
+    print(objstruct.value)
 
-    print (<object> TestClassType)(20)
-    print TestClass(50)
+    print((<object> TestClassType)(20))
+    print(TestClass(50))
 
 def test_extclass_c_methods():
     """
@@ -157,9 +157,9 @@ def viewobjs():
     <contiguous and direct>
     <contiguous and indirect>
     """
-    print cython.view.generic
-    print cython.view.strided
-    print cython.view.indirect
-    #print cython.view.generic_contiguous
-    print cython.view.contiguous
-    print cython.view.indirect_contiguous
+    print(cython.view.generic)
+    print(cython.view.strided)
+    print(cython.view.indirect)
+    #print(cython.view.generic_contiguous)
+    print(cython.view.contiguous)
+    print(cython.view.indirect_contiguous)

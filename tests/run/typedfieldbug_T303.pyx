@@ -33,7 +33,7 @@ def global_vars(x):
     global global_tdef, global_double
     global_tdef = x
     global_double = x
-    print global_tdef, global_double
+    print(global_tdef, global_double)
 
 def f():
     """
@@ -42,8 +42,8 @@ def f():
     42.0
     """
     cdef object c = MyClass()
-    print c.actual_double
-    print c.float_isreally_double
+    print(c.actual_double)
+    print(c.float_isreally_double)
 
 def longdouble_access():
     """
@@ -51,7 +51,7 @@ def longdouble_access():
     42.0
     """
     cdef object c = MyClass()
-    print c.float_isreally_longdouble
+    print(c.float_isreally_longdouble)
 
 
 def readonly():

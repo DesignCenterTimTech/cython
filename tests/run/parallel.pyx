@@ -33,7 +33,7 @@ def test_parallel():
     free(buf)
 
 cdef int get_num_threads() with gil:
-    print "get_num_threads called"
+    print("get_num_threads called")
     return 3
 
 def test_num_threads():
@@ -54,12 +54,12 @@ def test_num_threads():
     with nogil, cython.parallel.parallel(num_threads=1):
         p[0] = openmp.omp_get_num_threads()
 
-    print num_threads
+    print(num_threads)
 
     with nogil, cython.parallel.parallel(num_threads=get_num_threads()):
         p[0] = openmp.omp_get_num_threads()
 
-    print num_threads
+    print(num_threads)
 
     cdef int i
     num_threads = 0xbad
@@ -93,7 +93,7 @@ def test_parallel_catch():
                 exceptions.append(e)
                 break
 
-    print len(exceptions) == num_threads
+    print(len(exceptions) == num_threads)
     assert len(exceptions) == num_threads, (len(exceptions), num_threads)
 '''
 

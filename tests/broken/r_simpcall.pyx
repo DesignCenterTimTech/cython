@@ -1,4 +1,4 @@
 def f():
-    print "Spam!"
+    print("Spam!")
 
 f()

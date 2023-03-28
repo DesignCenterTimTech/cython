@@ -13,4 +13,4 @@ def test_cpp_specialization(cython.floating element):
     """
     cdef vector[cython.floating] *v = new vector[cython.floating]()
     v.push_back(element)
-    print cython.typeof(v), cython.typeof(element), v.at(0)
+    print(cython.typeof(v), cython.typeof(element), v.at(0))

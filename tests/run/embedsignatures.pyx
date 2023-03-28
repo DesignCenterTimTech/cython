@@ -22,81 +22,81 @@ else:
 
 # note the r, we use \n below
 __doc__ = ur"""
-    >>> print (Ext.__doc__)
+    >>> print((Ext.__doc__))
     Ext(a, b, c=None)
 
-    >>> print (Ext.attr0.__doc__)
+    >>> print((Ext.attr0.__doc__))
     attr0: 'int'
     attr0 docstring
-    >>> print (Ext.attr1.__doc__)
+    >>> print((Ext.attr1.__doc__))
     attr1: object
     attr1 docstring
-    >>> print (Ext.attr2.__doc__)
+    >>> print((Ext.attr2.__doc__))
     attr2: list
-    >>> print (Ext.attr3.__doc__)
+    >>> print((Ext.attr3.__doc__))
     attr3: embedsignatures.Ext
 
-    >>> print (Ext.prop0.__doc__)
+    >>> print((Ext.prop0.__doc__))
     prop0 docstring
-    >>> print (Ext.prop1.__doc__)
+    >>> print((Ext.prop1.__doc__))
     None
-    >>> print (Ext.attr4.__doc__)
+    >>> print((Ext.attr4.__doc__))
     attr4 docstring
-    >>> print (Ext.attr5.__doc__)
+    >>> print((Ext.attr5.__doc__))
     attr5: 'int'
     attr5 docstring
 
-    >>> print (Ext.a.__doc__)
+    >>> print((Ext.a.__doc__))
     Ext.a(self)
 
-    >>> print (Ext.b.__doc__)
+    >>> print((Ext.b.__doc__))
     Ext.b(self, a, b, c)
 
-    >>> print (Ext.c.__doc__)
+    >>> print((Ext.c.__doc__))
     Ext.c(self, a, b, c=1)
 
-    >>> print (Ext.d.__doc__)
+    >>> print((Ext.d.__doc__))
     Ext.d(self, a, b, *, c=88)
 
-    >>> print (Ext.e.__doc__)
+    >>> print((Ext.e.__doc__))
     Ext.e(self, a, b, c=88, **kwds)
 
-    >>> print (Ext.f.__doc__)
+    >>> print((Ext.f.__doc__))
     Ext.f(self, a, b, *, c, d=42)
 
-    >>> print (Ext.g.__doc__)
+    >>> print((Ext.g.__doc__))
     Ext.g(self, a, b, *, c, d=42, e=17, f, **kwds)
 
-    >>> print (Ext.h.__doc__)
+    >>> print((Ext.h.__doc__))
     Ext.h(self, a, b, *args, c, d=42, e=17, f, **kwds)
 
-    >>> print (Ext.k.__doc__)
+    >>> print((Ext.k.__doc__))
     Ext.k(self, a, b, c=1, *args, d=42, e=17, f, **kwds)
 
-    >>> print (Ext.l.__doc__)
+    >>> print((Ext.l.__doc__))
     Ext.l(self, a, b, c=1, *args, d=42, e=17, f, **kwds)
     Existing string
 
-    >>> print (Ext.m.__doc__)
+    >>> print((Ext.m.__doc__))
     Ext.m(self, a=u'spam')
 
-    >>> print (Ext.n.__doc__)
+    >>> print((Ext.n.__doc__))
     Ext.n(self, a: int, b: float = 1.0, *args: tuple, **kwargs: dict) -> (None, True)
 
-    >>> print (Ext.get_int.__doc__)
+    >>> print((Ext.get_int.__doc__))
     Ext.get_int(self) -> int
 
-    >>> print (Ext.get_float.__doc__)
+    >>> print((Ext.get_float.__doc__))
     Ext.get_float(self) -> float
 
-    >>> print (Ext.get_str.__doc__)
+    >>> print((Ext.get_str.__doc__))
     Ext.get_str(self) -> str
     Existing string
 
-    >>> print (Ext.clone.__doc__)
+    >>> print((Ext.clone.__doc__))
     Ext.clone(self) -> Ext
 
-    >>> print (funcdoc(foo))
+    >>> print((funcdoc(foo)))
     foo()
 
     >>> funcdoc(with_doc_1)

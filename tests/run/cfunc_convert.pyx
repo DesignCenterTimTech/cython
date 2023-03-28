@@ -6,11 +6,11 @@ cimport cython
 from libc.math cimport sqrt
 
 cdef void empty_cfunc():
-    print "here"
+    print("here")
 
 # same signature
 cdef void another_empty_cfunc():
-    print "there"
+    print("there")
 
 def call_empty_cfunc():
     """
@@ -76,8 +76,8 @@ def test_global():
     double (double) nogil
     Python object
     """
-    print cython.typeof(sqrt)
-    print cython.typeof(global_csqrt)
+    print(cython.typeof(sqrt))
+    print(cython.typeof(global_csqrt))
 
 
 cdef long long rad(long long x):

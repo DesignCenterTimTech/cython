@@ -35,10 +35,10 @@ def test_foo():
     7
     26
     """
-    print foo(1)
-    print foo(1, 2)
-    print foo(1, 2, 3)
-    print foo(1, foo(2, 3), foo(4))
+    print(foo(1))
+    print(foo(1, 2))
+    print(foo(1, 2, 3))
+    print(foo(1, foo(2, 3), foo(4)))
 
 cdef class A:
     cpdef method(self):

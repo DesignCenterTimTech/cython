@@ -27,13 +27,13 @@ def test_xrange():
     r = xrange(3)
     assert type(r) is xrange
     for i in r:
-        print i
+        print(i)
 
 def test_range():
     r = range(3)
     assert (type(r) is range) if IS_PY3 else (type(r) is list)
     for i in r:
-        print i
+        print(i)
 
 def test_long():
     long_val = long(12)

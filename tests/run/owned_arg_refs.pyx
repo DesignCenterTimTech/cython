@@ -18,7 +18,7 @@ def test_ext_type_attr():
 
 cdef void call_me_without_gil(Owner owner, x) with gil:
     owner.x = "def" # overwrite external reference
-    print x         # crashes if x is not owned by function or caller
+    print(x         # crashes if x is not owned by function or caller)
 
 def test_ext_type_attr_nogil():
     """

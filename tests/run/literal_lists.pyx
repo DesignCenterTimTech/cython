@@ -20,8 +20,8 @@ def repeated_literals():
     cdef int* p1 = [4, 4]
     cdef int* p2 = [5, 5]
 
-    print "p1: %s" % [ p1[i] for i in range(2) ]
-    print "p2: %s" % [ p2[i] for i in range(2) ]
+    print("p1: %s" % [ p1[i] for i in range(2) ])
+    print("p2: %s" % [ p2[i] for i in range(2) ])
 
 def test_ints(int x):
     """
@@ -43,7 +43,7 @@ cdef struct MyStruct:
     double** data
 
 cdef print_struct(MyStruct a):
-    print a.x, a.y, a.data == NULL
+    print(a.x, a.y, a.data == NULL)
 
 def test_struct(int x, y):
     """
@@ -69,9 +69,9 @@ def test_module_level():
     True True
     1 0 True
     """
-    print m_iarray[0], m_iarray[1]
-    print m_piarray[0][0], m_piarray[1][0]
-    print m_carray[0] == b"a", m_carray[1] == b"bc"
+    print(m_iarray[0], m_iarray[1])
+    print(m_piarray[0][0], m_piarray[1][0])
+    print(m_carray[0] == b"a", m_carray[1] == b"bc")
     print_struct(m_structarray[1])
 
 

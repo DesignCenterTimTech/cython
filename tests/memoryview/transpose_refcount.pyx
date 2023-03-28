@@ -3,7 +3,7 @@
 from cython cimport view
 
 cdef bint print_upper_right(double[:, :] M):
-    print M[0, 1]
+    print(M[0, 1])
 
 cdef class MemViewContainer:
     cdef double[:, :] A

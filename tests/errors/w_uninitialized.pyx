@@ -3,7 +3,7 @@
 # tag: werror
 
 def simple():
-    print a
+    print(a)
     a = 0
 
 def simple2(arg):
@@ -32,11 +32,11 @@ def nowimpossible(a):
     if a:
         b = 1
     if a:
-        print b
+        print(b)
 
 def fromclosure():
     def bar():
-        print a
+        print(a)
     a = 1
     return bar
 
@@ -55,15 +55,15 @@ def generic_args_call(*args, **kwargs):
     return args, kwargs
 
 def cascaded(x):
-    print a, b
+    print(a, b)
     a = b = x
 
 def from_import():
-    print bar
+    print(bar)
     from foo import bar
 
 def regular_import():
-    print foo
+    print(foo)
     import foo
 
 def raise_stat():
@@ -114,7 +114,7 @@ def class_py3k_args():
 
 def uninitialized_in_sizeof():
     cdef int i
-    print sizeof(i)
+    print(sizeof(i))
 
 _ERRORS = """
 6:10: local variable 'a' referenced before assignment

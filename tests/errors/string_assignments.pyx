@@ -69,10 +69,10 @@ cdef list  l_f1 = s1
 cdef list  l_f2 = b1
 cdef list  l_f3 = u1
 
-print <str>c1
-print <str>c1[1:2]
-print <unicode>c1
-print <unicode>c1[1:2]
+print(<str>c1)
+print(<str>c1[1:2])
+print(<unicode>c1)
+print(<unicode>c1[1:2])
 
 _ERRORS = u"""
 36:20: Unicode literals do not support coercion to C types other than Py_UNICODE/Py_UCS4 (for characters) or Py_UNICODE* (for strings).

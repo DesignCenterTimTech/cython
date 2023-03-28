@@ -41,21 +41,21 @@ def for_continue(l):
         if i > 0:
             continue
         x = i
-    print x
+    print(x)
 
 def for_break(l):
     for i in l:
         if i > 0:
             break
         x = i
-    print x
+    print(x)
 
 def for_finally_continue(f):
     for i in f:
         try:
             x = i()
         finally:
-            print x
+            print(x)
             continue
 
 def for_finally_break(f):
@@ -63,14 +63,14 @@ def for_finally_break(f):
         try:
             x = i()
         finally:
-            print x
+            print(x)
             break
 
 def for_finally_outer(p, f):
     x = 1
     try:
         for i in f:
-            print x
+            print(x)
             x = i()
             if x > 0:
                 continue

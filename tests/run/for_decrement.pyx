@@ -11,7 +11,7 @@ cdef int get_step():
     """
     This should only be called once, when used in range().
     """
-    print u"** Calculating step **"
+    print(u"** Calculating step **")
     return 2
 
 def range_loop_indices():

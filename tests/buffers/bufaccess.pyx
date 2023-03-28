@@ -122,12 +122,12 @@ def acquire_failure1():
     """
     cdef object[int] buf
     buf = IntMockBuffer("working", range(4))
-    print buf[0], buf[3]
+    print(buf[0], buf[3])
     try:
         buf = ErrorBuffer()
         assert False
     except Exception:
-        print buf[0], buf[3]
+        print(buf[0], buf[3])
 
 @testcase
 def acquire_failure2():
@@ -139,12 +139,12 @@ def acquire_failure2():
     released working
     """
     cdef object[int] buf = IntMockBuffer("working", range(4))
-    print buf[0], buf[3]
+    print(buf[0], buf[3])
     try:
         buf = ErrorBuffer()
         assert False
     except Exception:
-        print buf[0], buf[3]
+        print(buf[0], buf[3])
 
 @testcase
 def acquire_failure3():
@@ -159,12 +159,12 @@ def acquire_failure3():
     """
     cdef object[int] buf
     buf = IntMockBuffer("working", range(4))
-    print buf[0], buf[3]
+    print(buf[0], buf[3])
     try:
         buf = 3
         assert False
     except Exception:
-        print buf[0], buf[3]
+        print(buf[0], buf[3])
 
 @testcase
 def acquire_failure4():
@@ -178,12 +178,12 @@ def acquire_failure4():
     released working
     """
     cdef object[int] buf = IntMockBuffer("working", range(4))
-    print buf[0], buf[3]
+    print(buf[0], buf[3])
     try:
         buf = 2
         assert False
     except Exception:
-        print buf[0], buf[3]
+        print(buf[0], buf[3])
 
 @testcase
 def acquire_failure5():
@@ -228,12 +228,12 @@ def acquire_nonbuffer2():
     released working
     """
     cdef object[int] buf = IntMockBuffer("working", range(4))
-    print buf[0], buf[3]
+    print(buf[0], buf[3])
     try:
         buf = ErrorBuffer
         assert False
     except Exception:
-        print buf[0], buf[3]
+        print(buf[0], buf[3])
 
 
 @testcase
@@ -247,8 +247,8 @@ def as_argument(object[int] bufarg, int n):
     """
     cdef int i
     for i in range(n):
-        print bufarg[i],
-    print 'END'
+        print(bufarg[i],)
+    print('END')
 
 @testcase
 def as_argument_not_none(object[int] bufarg not None):
@@ -262,7 +262,7 @@ def as_argument_not_none(object[int] bufarg not None):
     Traceback (most recent call last):
     TypeError: Argument 'bufarg' must not be None
     """
-    print 'ACCEPTED'
+    print('ACCEPTED')
 
 @testcase
 def as_argument_defval(object[int] bufarg=IntMockBuffer('default', range(6)), int n=6):
@@ -279,8 +279,8 @@ def as_argument_defval(object[int] bufarg=IntMockBuffer('default', range(6)), in
     """
     cdef int i
     for i in range(n):
-        print bufarg[i],
-    print 'END'
+        print(bufarg[i],)
+    print('END')
 
 @testcase
 def cdef_assignment(obj, n):
@@ -295,8 +295,8 @@ def cdef_assignment(obj, n):
     cdef object[int] buf = obj
     cdef int i
     for i in range(n):
-        print buf[i],
-    print 'END'
+        print(buf[i],)
+    print('END')
 
 @testcase
 def forin_assignment(objs, int pick):
@@ -319,7 +319,7 @@ def forin_assignment(objs, int pick):
     """
     cdef object[int] buf
     for buf in objs:
-        print buf[pick]
+        print(buf[pick])
 
 @testcase
 def cascaded_buffer_assignment(obj):
@@ -372,7 +372,7 @@ def explicitly_release_buffer():
     """
     cdef object[int] x = IntMockBuffer("A", range(10))
     x = None
-    print "After release"
+    print("After release")
 
 #
 # Getting items and index bounds checking
@@ -547,7 +547,7 @@ def list_comprehension(object[int] buf, len):
     1|2|3
     """
     cdef int i
-    print u"|".join([unicode(buf[i]) for i in range(len)])
+    print(u"|".join([unicode(buf[i]) for i in range(len)]))
 
 #
 # The negative_indices buffer option
@@ -603,7 +603,7 @@ def readonly(obj):
     ['FORMAT', 'INDIRECT', 'ND', 'STRIDES']
     """
     cdef object[unsigned short int, ndim=3] buf = obj
-    print buf[2, 2, 1]
+    print(buf[2, 2, 1])
 
 @testcase
 def writable(obj):
@@ -769,11 +769,11 @@ def mixed_get(object[int] buf, int unsafe_idx, int safe_idx):
 ##     """
 ## TODO
 ##     """
-##     print type(uc[0])
+##     print(type(uc[0]))
 ##     uc[0] = -1
-##     print uc[0]
+##     print(uc[0])
 ##     uc[0] = <int>3.14
-##     print uc[0]
+##     print(uc[0])
 
 ##     cdef char* ch = b"asfd"
 ##     cdef object[object] objbuf
@@ -789,8 +789,8 @@ def printbuf_int(object[int] buf, shape):
     # Utility func
     cdef int i
     for i in range(shape[0]):
-        print buf[i],
-    print 'END'
+        print(buf[i],)
+    print('END')
 
 
 @testcase
@@ -823,8 +823,8 @@ def printbuf_int_2d(o, shape):
     cdef int i, j
     for i in range(shape[0]):
         for j in range(shape[1]):
-            print buf[i, j],
-        print 'END'
+            print(buf[i, j],)
+        print('END')
 
 @testcase
 def printbuf_float(o, shape):
@@ -840,8 +840,8 @@ def printbuf_float(o, shape):
     buf = o
     cdef int i, j
     for i in range(shape[0]):
-        print buf[i],
-    print "END"
+        print(buf[i],)
+    print("END")
 
 
 #
@@ -887,8 +887,8 @@ def printbuf_td_cy_int(object[td_cy_int] buf, shape):
     """
     cdef int i
     for i in range(shape[0]):
-        print buf[i],
-    print 'END'
+        print(buf[i],)
+    print('END')
 
 @testcase
 def printbuf_td_h_short(object[td_h_short] buf, shape):
@@ -902,8 +902,8 @@ def printbuf_td_h_short(object[td_h_short] buf, shape):
     """
     cdef int i
     for i in range(shape[0]):
-        print buf[i],
-    print 'END'
+        print(buf[i],)
+    print('END')
 
 @testcase
 def printbuf_td_h_cy_short(object[td_h_cy_short] buf, shape):
@@ -917,8 +917,8 @@ def printbuf_td_h_cy_short(object[td_h_cy_short] buf, shape):
     """
     cdef int i
     for i in range(shape[0]):
-        print buf[i],
-    print 'END'
+        print(buf[i],)
+    print('END')
 
 @testcase
 def printbuf_td_h_ushort(object[td_h_ushort] buf, shape):
@@ -932,8 +932,8 @@ def printbuf_td_h_ushort(object[td_h_ushort] buf, shape):
     """
     cdef int i
     for i in range(shape[0]):
-        print buf[i],
-    print 'END'
+        print(buf[i],)
+    print('END')
 
 @testcase
 def printbuf_td_h_double(object[td_h_double] buf, shape):
@@ -947,8 +947,8 @@ def printbuf_td_h_double(object[td_h_double] buf, shape):
     """
     cdef int i
     for i in range(shape[0]):
-        print buf[i],
-    print 'END'
+        print(buf[i],)
+    print('END')
 
 
 #
@@ -983,7 +983,7 @@ def printbuf_object(object[object] buf, shape):
     """
     cdef int i
     for i in range(shape[0]):
-        print repr(buf[i]), (<PyObject*>buf[i]).ob_refcnt
+        print(repr(buf[i]), (<PyObject*>buf[i]).ob_refcnt)
 
 @testcase
 def assign_to_object(object[object] buf, int idx, obj):
@@ -1159,7 +1159,7 @@ def basic_struct(object[MyStruct] buf):
     >>> basic_struct(MyStructMockBuffer(None, [(1, 2, 3, 4, 5)], format="ccqii"))
     1 2 3 4 5
     """
-    print buf[0].a, buf[0].b, buf[0].c, buf[0].d, buf[0].e
+    print(buf[0].a, buf[0].b, buf[0].c, buf[0].d, buf[0].e)
 
 @testcase
 def nested_struct(object[NestedStruct] buf):
@@ -1171,7 +1171,7 @@ def nested_struct(object[NestedStruct] buf):
     >>> nested_struct(NestedStructMockBuffer(None, [(1, 2, 3, 4, 5)], format="T{ii}T{2i}i"))
     1 2 3 4 5
     """
-    print buf[0].x.a, buf[0].x.b, buf[0].y.a, buf[0].y.b, buf[0].z
+    print(buf[0].x.a, buf[0].x.b, buf[0].y.a, buf[0].y.b, buf[0].z)
 
 @testcase
 def packed_struct(object[PackedStruct] buf):
@@ -1186,7 +1186,7 @@ def packed_struct(object[PackedStruct] buf):
     1 2
 
     """
-    print buf[0].a, buf[0].b
+    print(buf[0].a, buf[0].b)
 
 @testcase
 def nested_packed_struct(object[NestedPackedStruct] buf):
@@ -1200,7 +1200,7 @@ def nested_packed_struct(object[NestedPackedStruct] buf):
     >>> nested_packed_struct(NestedPackedStructMockBuffer(None, [(1, 2, 3, 4, 5)], format="^c@i^ci@i"))
     1 2 3 4 5
     """
-    print buf[0].a, buf[0].b, buf[0].sub.a, buf[0].sub.b, buf[0].c
+    print(buf[0].a, buf[0].b, buf[0].sub.a, buf[0].sub.b, buf[0].c)
 
 
 @testcase
@@ -1209,7 +1209,7 @@ def complex_dtype(object[long double complex] buf):
     >>> complex_dtype(LongComplexMockBuffer(None, [(0, -1)]))
     -1j
     """
-    print buf[0]
+    print(buf[0])
 
 @testcase
 def complex_inplace(object[long double complex] buf):
@@ -1218,7 +1218,7 @@ def complex_inplace(object[long double complex] buf):
     (1+1j)
     """
     buf[0] = buf[0] + 1 + 2j
-    print buf[0]
+    print(buf[0])
 
 @testcase
 def complex_struct_dtype(object[LongComplex] buf):
@@ -1228,7 +1228,7 @@ def complex_struct_dtype(object[LongComplex] buf):
     >>> complex_struct_dtype(LongComplexMockBuffer(None, [(0, -1)]))
     0.0 -1.0
     """
-    print buf[0].real, buf[0].imag
+    print(buf[0].real, buf[0].imag)
 
 @testcase
 def complex_struct_inplace(object[LongComplex] buf):
@@ -1238,7 +1238,7 @@ def complex_struct_inplace(object[LongComplex] buf):
     """
     buf[0].real += 1
     buf[0].imag += 2
-    print buf[0].real, buf[0].imag
+    print(buf[0].real, buf[0].imag)
 
 #
 # Nogil
@@ -1280,7 +1280,7 @@ def test_inplace_assignment():
     cdef object[int, ndim=1] buf = IntMockBuffer(None, [1, 2, 3])
 
     buf[0] = get_int()
-    print buf[0]
+    print(buf[0])
 
 @testcase
 def test_nested_assignment():

@@ -32,7 +32,7 @@ def int_runvar():
     [0, 4, 8]
     """
     cdef int x
-    print [x*2 for x in range(5) if x % 2 == 0]
+    print([x*2 for x in range(5) if x % 2 == 0])
 
 
 cdef class A:
@@ -44,7 +44,7 @@ def typed():
     [A, A, A]
     """
     cdef A obj
-    print [obj for obj in [A(), A(), A()]]
+    print([obj for obj in [A(), A(), A()]])
 
 
 def inferred_type():
@@ -52,7 +52,7 @@ def inferred_type():
     >>> inferred_type()
     ['A', 'A', 'A']
     """
-    print [cython.typeof(obj) for obj in [A(), A(), A()]]
+    print([cython.typeof(obj) for obj in [A(), A(), A()]])
 
 
 def not_inferred_type():
@@ -60,7 +60,7 @@ def not_inferred_type():
     >>> not_inferred_type()
     ['Python object', 'Python object', 'Python object']
     """
-    print [cython.typeof(obj) for obj in [1, A(), 'abc']]
+    print([cython.typeof(obj) for obj in [1, A(), 'abc']])
 
 
 def iterdict():
@@ -71,7 +71,7 @@ def iterdict():
     cdef dict d = dict(a=1,b=2,c=3)
     l = [d[key] for key in d]
     l.sort()
-    print l
+    print(l)
 
 
 listcomp_result = [ i*i for i in range(5) ]

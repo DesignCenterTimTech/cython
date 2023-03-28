@@ -20,7 +20,7 @@ cdef void puts(char *string) with gil:
     """
     We need this for doctest, used from nogil sections.
     """
-    print string.decode('ascii')
+    print(string.decode('ascii'))
 
 class ExceptionWithMsg(Exception):
     """
@@ -41,7 +41,7 @@ def test_simple():
     """
     with nogil:
         with gil:
-            print ['spam', 'ham']
+            print(['spam', 'ham'])
 
 def test_nested_gil_blocks():
     """
@@ -60,16 +60,16 @@ def test_nested_gil_blocks():
         puts("entered outer nogil section")
 
         with gil:
-            print 'entered outer gil section'
+            print('entered outer gil section')
 
             with nogil:
                 puts("entered inner nogil section")
                 with gil:
-                    print 'entered inner gil section'
-                    print 'leaving inner gil section'
+                    print('entered inner gil section')
+                    print('leaving inner gil section')
                 puts("leaving inner nogil section")
 
-            print "leaving outer gil section"
+            print("leaving outer gil section")
         puts("leaving outer nogil section")
 
 def test_propagate_exception():
@@ -94,13 +94,13 @@ def test_catch_exception():
     try:
         with nogil:
             with gil:
-                print "This is executed"
+                print("This is executed")
                 raise Exception("Exception value")
-                print "This is not executed"
+                print("This is not executed")
             puts("This is also not executed")
     except Exception, e:
-        print e
-    print "This is also executed"
+        print(e)
+    print("This is also executed")
 
 def test_try_finally_and_outer_except():
     """
@@ -126,9 +126,9 @@ def test_try_finally_and_outer_except():
             puts("This is not executed")
 
     except Exception, e:
-        print "Caught:", e
+        print("Caught:", e)
 
-    print "End of function"
+    print("End of function")
 
 def test_restore_exception():
     """
@@ -158,15 +158,15 @@ def test_restore_exception():
 ##     """
 ##     cdef object somevar
 ##
-##     print somevar
+##     print(somevar)
 ##
 ##     with nogil:
 ##         with gil:
-##             print somevar
+##             print(somevar)
 ##             somevar = list("spam")
-##             print somevar
+##             print(somevar)
 ##
-##     print somevar
+##     print(somevar)
 
 ### DISABLED: this cannot work with flow control analysis
 ##
@@ -178,14 +178,14 @@ def test_restore_exception():
 ##     ['s', 'p', 'a', 'm']
 ##     ['s', 'p', 'a', 'm']
 ##     """
-##     print somevar
+##     print(somevar)
 ##     with nogil:
 ##         with gil:
-##             print somevar
+##             print(somevar)
 ##             somevar = list("spam")
-##             print somevar
+##             print(somevar)
 ##
-##     print somevar
+##     print(somevar)
 
 def test_loops_and_boxing():
     """
@@ -200,11 +200,11 @@ def test_loops_and_boxing():
 
     with nogil:
         with gil:
-            print string.decode('ascii')
+            print(string.decode('ascii'))
             for c in string[4:]:
-                print "%c" % c
+                print("%c" % c)
             else:
-                print "done looping"
+                print("done looping")
 
 cdef class SomeExtClass(object):
     cdef int some_attribute
@@ -220,7 +220,7 @@ def test_infer_types():
             obj = SomeExtClass()
             obj.some_attribute = 10
 
-    print obj.some_attribute
+    print(obj.some_attribute)
 
 def test_closure():
     """
@@ -250,7 +250,7 @@ cpdef test_cpdef():
     """
     with nogil:
         with gil:
-            print "Seems to work!"
+            print("Seems to work!")
         puts("Or does it?")
 
 
@@ -262,16 +262,16 @@ cdef void void_nogil_ignore_exception() nogil:
 
     puts("unreachable")
     with gil:
-        print "unreachable"
+        print("unreachable")
 
 cdef void void_nogil_nested_gil() nogil:
     with gil:
         with nogil:
             with gil:
-                print 'Inner gil section'
+                print('Inner gil section')
             puts("nogil section")
         raise ExceptionWithMsg("Swallow this")
-    puts("Don't print this")
+    puts("Don't print(this"))
 
 def test_nogil_void_funcs_with_gil():
     """
@@ -368,20 +368,20 @@ def test_nogil_try_finally_no_exception():
         try:
             puts("first nogil try")
             with gil:
-                print "nogil try gil"
+                print("nogil try gil")
             puts("second nogil try")
         finally:
             puts("nogil finally")
 
-    print '------'
+    print('------')
 
     with nogil:
         try:
             with gil:
-                print "First with gil block"
+                print("First with gil block")
 
             with gil:
-                print "Second with gil block"
+                print("Second with gil block")
         finally:
             puts("finally block")
 
@@ -401,12 +401,12 @@ def test_nogil_try_finally_propagate_exception():
             finally:
                 puts("Execute finally clause")
     except Exception, e:
-        print e
+        print(e)
 
 def test_nogil_try_finally_return_in_with_gil(x):
     """
     >>> test_nogil_try_finally_return_in_with_gil(10)
-    print me
+    print(me)
     10
     """
     with nogil:
@@ -415,10 +415,10 @@ def test_nogil_try_finally_return_in_with_gil(x):
                 raise Exception("Swallow me!")
         finally:
             with gil:
-                print "print me"
+                print("print me")
                 return x
 
-    print "I am not executed"
+    print("I am not executed")
 
 cdef void nogil_try_finally_return() nogil:
     try:
@@ -426,17 +426,17 @@ cdef void nogil_try_finally_return() nogil:
             raise Exception("I am swallowed in nogil code... right?")
     finally:
         with gil:
-            print "print me first"
+            print("print me first")
 
         return
 
     with gil:
-        print "I am not executed"
+        print("I am not executed")
 
 def test_nogil_try_finally_return():
     """
     >>> test_nogil_try_finally_return()
-    print me first
+    print(me first)
     """
     with nogil:
         nogil_try_finally_return()
@@ -447,7 +447,7 @@ cdef int error_func() except -1 with gil:
 def test_nogil_try_finally_error_label():
     """
     >>> test_nogil_try_finally_error_label()
-    print me first
+    print(me first)
     propagate this
     """
     try:
@@ -455,9 +455,9 @@ def test_nogil_try_finally_error_label():
             try:
                 error_func()
             finally:
-                with gil: print "print me first"
+                with gil: print("print me first")
     except Exception, e:
-        print e.args[0]
+        print(e.args[0])
 
 
 cdef void test_timing_callback() with gil:

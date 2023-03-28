@@ -28,14 +28,14 @@ def test_pure():
     10
     """
     mytype = pure_cython.typedef(pure_cython.fused_type(int, long, complex))
-    print mytype(10)
+    print(mytype(10))
 
 
 cdef cdef_func_with_fused_args(fused_type1 x, fused_type1 y, fused_type2 z):
     if fused_type1 is string_t:
-        print x.decode('ascii'), y.decode('ascii'), z.decode('ascii')
+        print(x.decode('ascii'), y.decode('ascii'), z.decode('ascii'))
     else:
-        print x, y, z.decode('ascii')
+        print(x, y, z.decode('ascii'))
 
     return x + y
 
@@ -49,16 +49,16 @@ def test_cdef_func_with_fused_args():
     4.2 8.6 bunny
     12.8
     """
-    print cdef_func_with_fused_args(b'spam', b'ham', b'eggs').decode('ascii')
-    print cdef_func_with_fused_args(10, 20, b'butter')
-    print cdef_func_with_fused_args(4.2, 8.6, b'bunny')
+    print(cdef_func_with_fused_args(b'spam', b'ham', b'eggs').decode('ascii'))
+    print(cdef_func_with_fused_args(10, 20, b'butter'))
+    print(cdef_func_with_fused_args(4.2, 8.6, b'bunny'))
 
 cdef fused_type1 fused_with_pointer(fused_type1 *array):
     for i in range(5):
         if fused_type1 is string_t:
-            print array[i].decode('ascii')
+            print(array[i].decode('ascii'))
         else:
-            print array[i]
+            print(array[i])
 
     obj = array[0] + array[1] + array[2] + array[3] + array[4]
     # if cython.typeof(fused_type1) is string_t:
@@ -112,13 +112,13 @@ def test_fused_with_pointer():
         s = strings[i]
         string_array[i] = s
 
-    print fused_with_pointer(int_array)
+    print(fused_with_pointer(int_array))
     print
-    print fused_with_pointer(long_array)
+    print(fused_with_pointer(long_array))
     print
-    print fused_with_pointer(float_array)
+    print(fused_with_pointer(float_array))
     print
-    print fused_with_pointer(string_array).decode('ascii')
+    print(fused_with_pointer(string_array).decode('ascii'))
 
 cdef fused_type1* fused_pointer_except_null(fused_type1* x) except NULL:
     if fused_type1 is string_t:
@@ -147,13 +147,13 @@ def test_fused_pointer_except_null(value):
     """
     if isinstance(value, int):
         test_int = cython.declare(cython.int, value)
-        print fused_pointer_except_null(&test_int)[0]
+        print(fused_pointer_except_null(&test_int)[0])
     elif isinstance(value, float):
         test_float = cython.declare(cython.float, value)
-        print fused_pointer_except_null(&test_float)[0]
+        print(fused_pointer_except_null(&test_float)[0])
     elif isinstance(value, bytes):
         test_str = cython.declare(string_t, value)
-        print fused_pointer_except_null(&test_str)[0].decode('ascii')
+        print(fused_pointer_except_null(&test_str)[0].decode('ascii'))
 
 include "../testsupport/cythonarrayutil.pxi"
 
@@ -182,7 +182,7 @@ cdef test_specialize(fused_type1 x, fused_type1 *y, composed_t z, other_t *a):
     cdef fused_type1 result
 
     if composed_t is p_double:
-        print "double pointer"
+        print("double pointer")
 
     if fused_type1 in floating:
         result = x + y[0] + z[0] + a[0]
@@ -223,17 +223,17 @@ def test_specializations():
 
     # The following cases are not supported
     # f = test_specialize[double][p_int]
-    # print f(1.1, somedouble_p, otherdouble_p)
+    # print(f(1.1, somedouble_p, otherdouble_p))
     # print
 
-    # print test_specialize[double][p_int](1.1, somedouble_p, otherdouble_p)
+    # print(test_specialize[double][p_int](1.1, somedouble_p, otherdouble_p))
     # print
 
-    # print test_specialize[double](1.1, somedouble_p, otherdouble_p)
+    # print(test_specialize[double](1.1, somedouble_p, otherdouble_p))
     # print
 
 cdef opt_args(integral x, floating y = 4.0):
-    print x, y
+    print(x, y)
 
 def test_opt_args():
     """
@@ -250,7 +250,7 @@ def test_opt_args():
 
 class NormalClass(object):
     def method(self, cython.integral i):
-        print cython.typeof(i), i
+        print(cython.typeof(i), i)
 
 def test_normal_class():
     """
@@ -269,7 +269,7 @@ def test_normal_class_refcount():
     x = NormalClass()
     c = sys.getrefcount(x)
     x.method[pure_cython.short](10)
-    print sys.getrefcount(x) - c
+    print(sys.getrefcount(x) - c)
 
 def test_fused_declarations(cython.integral i, cython.floating f):
     """
@@ -288,9 +288,9 @@ def test_fused_declarations(cython.integral i, cython.floating f):
     assert cython.typeof(squared_int) == cython.typeof(i)
     assert cython.typeof(squared_float) == cython.typeof(f)
 
-    print cython.typeof(squared_int)
-    print cython.typeof(squared_float)
-    print '%d %.2f' % (squared_int, squared_float)
+    print(cython.typeof(squared_int))
+    print(cython.typeof(squared_float))
+    print('%d %.2f' % (squared_int, squared_float))
 
 def test_sizeof_fused_type(fused_type1 b):
     """
@@ -325,7 +325,7 @@ def test_fused_memslice_dtype(cython.floating[:] array):
     float[:] float[:] 5.0 6.0
     """
     cdef cython.floating[:] otherarray = array[0:100:1]
-    print cython.typeof(array), cython.typeof(otherarray), \
+    print(cython.typeof(array), cython.typeof(otherarray), \)
           array[5], otherarray[6]
     cdef cython.floating value;
     cdef cython.floating[:] test_cast = <cython.floating[:1:1]>&value
@@ -345,7 +345,7 @@ def test_fused_memslice_dtype_repeated(cython.floating[:] array1, cython.floatin
     Traceback (most recent call last):
     ValueError: Buffer dtype mismatch, expected 'double' but got 'float'
     """
-    print cython.typeof(array1), cython.typeof(array2)
+    print(cython.typeof(array1), cython.typeof(array2))
 
 def test_fused_memslice_dtype_repeated_2(cython.floating[:] array1, cython.floating[:] array2,
                                          fused_type3[:] array3):
@@ -362,7 +362,7 @@ def test_fused_memslice_dtype_repeated_2(cython.floating[:] array1, cython.float
     >>> test_fused_memslice_dtype_repeated_2(get_array(4, 'f'), get_array(4, 'f'), get_intc_array())
     float[:] float[:] int[:]
     """
-    print cython.typeof(array1), cython.typeof(array2), cython.typeof(array3)
+    print(cython.typeof(array1), cython.typeof(array2), cython.typeof(array3))
 
 def test_fused_const_memslice_dtype_repeated(const cython.floating[:] array1, cython.floating[:] array2):
     """Test fused types memory view with one being const
@@ -378,7 +378,7 @@ def test_fused_const_memslice_dtype_repeated(const cython.floating[:] array1, cy
     Traceback (most recent call last):
     ValueError: Buffer dtype mismatch, expected 'double' but got 'float'
     """
-    print cython.typeof(array1), cython.typeof(array2)
+    print(cython.typeof(array1), cython.typeof(array2))
 
 def test_cython_numeric(cython.numeric arg):
     """
@@ -388,14 +388,14 @@ def test_cython_numeric(cython.numeric arg):
     >>> test_cython_numeric(10.0 + 1j)
     double complex (10+1j)
     """
-    print cython.typeof(arg), arg
+    print(cython.typeof(arg), arg)
 
 cdef fused ints_t:
     int
     long
 
 cdef _test_index_fused_args(cython.floating f, ints_t i):
-    print cython.typeof(f), cython.typeof(i)
+    print(cython.typeof(f), cython.typeof(i))
 
 def test_index_fused_args(cython.floating f, ints_t i):
     """

@@ -3,16 +3,16 @@
 
 def simple_return():
     return
-    print 'Where am I?'
+    print('Where am I?')
 
 def simple_loops(*args):
     for i in args:
         continue
-        print 'Never be here'
+        print('Never be here')
 
     while True:
         break
-        print 'Never be here'
+        print('Never be here')
 
 def conditional(a, b):
     if a:
@@ -21,7 +21,7 @@ def conditional(a, b):
         return 2
     else:
         return 3
-    print 'oops'
+    print('oops')
 
 def try_except():
     try:
@@ -29,7 +29,7 @@ def try_except():
     except ValueError:
         pass
     else:
-        print 'unreachable'
+        print('unreachable')
 
 
 _ERRORS = """

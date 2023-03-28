@@ -29,7 +29,7 @@ def while_finally_continue(p, f):
         try:
             x = f()
         finally:
-            print x
+            print(x)
             continue
 
 def while_finally_break(p, f):
@@ -37,14 +37,14 @@ def while_finally_break(p, f):
         try:
             x = f()
         finally:
-            print x
+            print(x)
             break
 
 def while_finally_outer(p, f):
     x = 1
     try:
         while p():
-            print x
+            print(x)
             x = f()
             if x > 0:
                 continue

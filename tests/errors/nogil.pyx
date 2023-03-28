@@ -52,7 +52,7 @@ cdef object m():
         x, y = y, x
         obj[i] = x
         obj.fred = x
-        print obj
+        print(obj)
         del fred
         return obj
         raise obj  # allowed!

@@ -9,5 +9,5 @@ def f():
 
     cdef char a
     a = 62
-    print (a == '>')
-    print (a == <char>'>')
+    print((a == '>'))
+    print((a == <char>'>'))

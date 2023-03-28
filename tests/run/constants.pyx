@@ -170,7 +170,7 @@ def multiplied_lists_nonconst_expression(x):
     return [1,2,3] * (x*2)
 
 cdef side_effect(int x):
-    print x
+    print(x)
     return x
 
 @cython.test_fail_if_path_exists("//MulNode")

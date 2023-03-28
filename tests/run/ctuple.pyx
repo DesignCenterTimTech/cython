@@ -37,7 +37,7 @@ def unpacking((int, double) xy):
     return x, y
 
 cdef (int, double) side_effect((int, double) xy):
-    print "called with", xy
+    print("called with", xy)
     return xy
 
 def unpacking_with_side_effect((int, double) xy):

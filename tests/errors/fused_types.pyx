@@ -20,7 +20,7 @@ dtype9 = cython.fused_type(int2_t, int)
 floating = cython.fused_type(float, double)
 
 cdef func(floating x, int2_t y):
-    print x, y
+    print(x, y)
 
 cdef float x = 10.0
 cdef int y = 10

@@ -17,7 +17,7 @@ __doc__ = """
 
 def print_args(func):
     def f(*args, **kwds):
-        print "args", args, "kwds", kwds
+        print("args", args, "kwds", kwds)
         return func(*args, **kwds)
     return f
 
@@ -40,12 +40,12 @@ cdef class Num:
             return False
         elif self.n % 2 == 0:
             if print_factors:
-                print 2, self.n // 2
+                print(2, self.n // 2)
         cdef int i = 3
         while i*i <= self.n:
             if self.n % i == 0:
                 if print_factors:
-                    print i, self.n // i
+                    print(i, self.n // i)
                 return False
             i += 2
         return True
