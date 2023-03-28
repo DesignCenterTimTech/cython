@@ -246,7 +246,7 @@ def optimistic_iterkeys_argerror(d):
     ... except (TypeError, AttributeError): pass
     """
     for k in d.iterkeys(1):
-        print k
+        print(k)
 
 @cython.test_assert_path_exists(
     "//WhileStatNode",

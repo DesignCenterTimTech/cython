@@ -189,9 +189,9 @@ def test_transpose():
     a_obj = a
 
     cdef dtype_t[:, :] b = a.T
-    print a.T.shape[0], a.T.shape[1]
-    print a_obj.T.shape
-    print tuple(map(int, numpy_obj.T.shape)) # might use longs in Py2
+    print(a.T.shape[0], a.T.shape[1])
+    print(a_obj.T.shape)
+    print(tuple(map(int, numpy_obj.T.shape)) # might use longs in Py2)
 
     cdef dtype_t[:, :] c
     with nogil:
@@ -200,7 +200,7 @@ def test_transpose():
     assert (<object> a).shape == (<object> c).shape
     assert (<object> a).strides == (<object> c).strides
 
-    print a[3, 2], a.T[2, 3], a_obj[3, 2], a_obj.T[2, 3], numpy_obj[3, 2], numpy_obj.T[2, 3]
+    print(a[3, 2], a.T[2, 3], a_obj[3, 2], a_obj.T[2, 3], numpy_obj[3, 2], numpy_obj.T[2, 3])
 
 
 @testcase
@@ -213,7 +213,7 @@ def test_transpose_type(a):
     """
     cdef double[:, ::1] m = a
     cdef double[::1, :] m_transpose = a.T
-    print m_transpose[6, 4]
+    print(m_transpose[6, 4])
 
 
 @testcase_numpy_1_5
@@ -265,14 +265,14 @@ cdef extern from "bufaccess.h":
 ctypedef td_h_short td_h_cy_short
 
 cdef void dealloc_callback(void *data):
-    print "deallocating..."
+    print("deallocating...")
 
 def build_numarray(array array):
     array.callback_free_data = dealloc_callback
     return np.asarray(array)
 
 def index(array array):
-    print build_numarray(array)[3, 2]
+    print(build_numarray(array)[3, 2])
 
 @testcase_numpy_1_5
 def test_coerce_to_numpy():
@@ -388,7 +388,7 @@ def test_coerce_to_numpy():
     ### Create a NumPy array and see if our element can be correctly retrieved
     #
     mystruct_array = build_numarray(<MyStruct[:4, :5]> <MyStruct *> mystructs)
-    print [int(x) for x in mystruct_array[3, 2]]
+    print([int(x) for x in mystruct_array[3, 2]])
     del mystruct_array
     index(<SmallStruct[:4, :5]> <SmallStruct *> smallstructs)
     index(<NestedStruct[:4, :5]> <NestedStruct *> nestedstructs)
@@ -425,7 +425,7 @@ def test_memslice_getbuffer():
 
 cdef class DeallocateMe(object):
     def __dealloc__(self):
-        print "deallocated!"
+        print("deallocated!")
 
 # Disabled! References cycles don't seem to be supported by NumPy
 # @testcase
@@ -504,8 +504,8 @@ def test_memslice_structarray(data, dtype):
     cdef int i, j
     for i in range(3):
         for j in range(4):
-            print myslice[i].a[j]
-        print myslice[i].b.decode('ASCII')
+            print(myslice[i].a[j])
+        print(myslice[i].b.decode('ASCII'))
 
 @testcase_numpy_1_5
 def test_structarray_errors(StructArray[:] a):
@@ -590,9 +590,9 @@ def test_struct_attributes():
     myslice[0].attrib3.c[0][0] = 'c'
 
     array = np.asarray(myslice)
-    print array[0]['attrib1']
-    print array[0]['attrib2']
-    print chr(array[0]['attrib3']['c'][0][0])
+    print(array[0]['attrib1'])
+    print(array[0]['attrib2'])
+    print(chr(array[0]['attrib3']['c'][0][0]))
 
 #
 ### Test for NULL strides (C contiguous buffers)
@@ -676,22 +676,22 @@ def test_null_strides_error(buffer_obj):
     try:
         indirect_buf1 = buffer_obj
     except ValueError, e:
-        print e
+        print(e)
 
     try:
         indirect_buf2 = buffer_obj
     except ValueError, e:
-        print e
+        print(e)
 
     try:
         fortran_buf1 = buffer_obj
     except ValueError, e:
-        print e
+        print(e)
 
     try:
         fortran_buf2 = buffer_obj
     except ValueError, e:
-        print e
+        print(e)
 
 def test_refcount_GH507():
     """

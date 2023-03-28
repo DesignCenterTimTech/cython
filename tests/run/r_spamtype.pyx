@@ -22,7 +22,7 @@ cdef class Spam:
         self.tons = 17
 
     def __dealloc__(self):
-        print self.tons, u"tons of spam is history."
+        print(self.tons, u"tons of spam is history.")
 
     def get_tons(self):
         return self.tons

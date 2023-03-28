@@ -18,7 +18,7 @@ def test_modify():
     """
     cdef int i, n = 5
     for i in range(n):
-        print i
+        print(i)
         n = 0
     print
     return i,n
@@ -38,7 +38,7 @@ def test_negindex():
     """
     cdef int i, n = 5
     for i in range(n+1, 1, -1):
-        print i
+        print(i)
         n = 0
     return i,n
 
@@ -57,7 +57,7 @@ def test_negindex_inferred():
     """
     cdef int n = 5
     for i in range(n, 1, -1):
-        print i
+        print(i)
         n = 0
     return i,n
 
@@ -77,7 +77,7 @@ def test_fix():
     """
     cdef int i
     for i in range(5):
-        print i
+        print(i)
     print
     return i
 
@@ -95,12 +95,12 @@ def test_break():
     """
     cdef int i, n = 5
     for i in range(n):
-        print i
+        print(i)
         n = 0
         if i == 2:
             break
     else:
-        print "FAILED!"
+        print("FAILED!")
     print
     return i,n
 
@@ -117,7 +117,7 @@ def test_return():
     """
     cdef int i, n = 5
     for i in range(n):
-        print i
+        print(i)
         n = 0
         if i == 2:
             return i,n

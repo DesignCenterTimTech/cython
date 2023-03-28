@@ -42,7 +42,7 @@ def test_outer_inner_pyarg():
     x = 1
     def inner(y):
         return x + y
-    print inner(1)
+    print(inner(1))
     return cython.typeof(x)
 
 
@@ -55,7 +55,7 @@ def test_outer_inner_carg():
     x = 1
     def inner(double y):
         return x + y
-    print inner(1)
+    print(inner(1))
     return cython.typeof(x)
 
 

@@ -10,7 +10,7 @@ def test_cglobals_reassignment():
     global g
     class Special:
         def __del__(self):
-            print g
+            print(g)
     g = (Special(),)
     g = 1234
 
@@ -21,6 +21,6 @@ def test_closure_reassignment():
     """
     class Special:
         def __del__(self):
-            print c
+            print(c)
     c = (Special(),)
     c = 4321

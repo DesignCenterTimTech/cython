@@ -43,10 +43,10 @@ include "../buffers/mockbuffers.pxi"
 include "../testsupport/cythonarrayutil.pxi"
 
 def _print_attributes(memview):
-    print "shape: " + " ".join(map(str, memview.shape))
-    print "strides: " + " ".join([str(stride // memview.itemsize)
+    print("shape: " + " ".join(map(str, memview.shape)))
+    print("strides: " + " ".join([str(stride // memview.itemsize))
                                       for stride in memview.strides])
-    print "suboffsets: " + " ".join(
+    print("suboffsets: " + " ".join()
         [str(suboffset if suboffset < 0 else suboffset // memview.itemsize)
              for suboffset in memview.suboffsets])
 
@@ -110,12 +110,12 @@ def acquire_failure1():
     """
     cdef int[:] buf
     buf = IntMockBuffer("working", range(4))
-    print buf[0], buf[3]
+    print(buf[0], buf[3])
     try:
         buf = ErrorBuffer()
         assert False
     except Exception:
-        print buf[0], buf[3]
+        print(buf[0], buf[3])
 
 @testcase
 def acquire_failure2():
@@ -127,12 +127,12 @@ def acquire_failure2():
     released working
     """
     cdef int[:] buf = IntMockBuffer("working", range(4))
-    print buf[0], buf[3]
+    print(buf[0], buf[3])
     try:
         buf = ErrorBuffer()
         assert False
     except Exception:
-        print buf[0], buf[3]
+        print(buf[0], buf[3])
 
 @testcase
 def acquire_failure3():
@@ -145,12 +145,12 @@ def acquire_failure3():
     """
     cdef int[:] buf
     buf = IntMockBuffer("working", range(4))
-    print buf[0], buf[3]
+    print(buf[0], buf[3])
     try:
         buf = object()
         assert False
     except Exception:
-        print buf[0], buf[3]
+        print(buf[0], buf[3])
 
 @testcase
 def acquire_nonbuffer1(first, second=None):
@@ -186,12 +186,12 @@ def acquire_nonbuffer2():
     released working
     """
     cdef int[:] buf = IntMockBuffer("working", range(4))
-    print buf[0], buf[3]
+    print(buf[0], buf[3])
     try:
         buf = ErrorBuffer
         assert False
     except Exception:
-        print buf[0], buf[3]
+        print(buf[0], buf[3])
 
 @testcase
 def as_argument(int[:] bufarg, int n):
@@ -204,8 +204,8 @@ def as_argument(int[:] bufarg, int n):
     """
     cdef int i
     for i in range(n):
-        print bufarg[i],
-    print 'END'
+        print(bufarg[i],)
+    print('END')
 
 @testcase
 def as_argument_defval(int[:] bufarg=IntMockBuffer('default', range(6)), int n=6):
@@ -220,8 +220,8 @@ def as_argument_defval(int[:] bufarg=IntMockBuffer('default', range(6)), int n=6
     """
     cdef int i
     for i in range(n):
-        print bufarg[i],
-    print 'END'
+        print(bufarg[i],)
+    print('END')
 
 @testcase
 def cdef_assignment(obj, n):
@@ -236,8 +236,8 @@ def cdef_assignment(obj, n):
     cdef int[:] buf = obj
     cdef int i
     for i in range(n):
-        print buf[i],
-    print 'END'
+        print(buf[i],)
+    print('END')
 
 @testcase
 def forin_assignment(objs, int pick):
@@ -260,7 +260,7 @@ def forin_assignment(objs, int pick):
     """
     cdef int[:] buf
     for buf in objs:
-        print buf[pick]
+        print(buf[pick])
 
 @testcase
 def cascaded_buffer_assignment(obj):
@@ -311,7 +311,7 @@ def explicitly_release_buffer():
     """
     cdef int[:] x = IntMockBuffer("A", range(10))  # , writable=False)
     del x
-    print "After release"
+    print("After release")
 
 #
 # Getting items and index bounds checking
@@ -593,7 +593,7 @@ def list_comprehension(int[:] buf, len):
     1|2|3
     """
     cdef int i
-    print "|".join([str(buf[i]) for i in range(len)])
+    print("|".join([str(buf[i]) for i in range(len)]))
 
 @testcase
 @cython.wraparound(False)
@@ -717,14 +717,14 @@ def generic(int[::view.generic, ::view.generic] buf1,
     >>> [str(x) for x in B.received_flags]
     ['FORMAT', 'INDIRECT', 'ND', 'STRIDES', 'WRITABLE']
     """
-    print buf1[1, 1]
-    print buf2[1, 1]
+    print(buf1[1, 1])
+    print(buf2[1, 1])
 
     buf1[2, -1] = 10
     buf2[2, -1] = 11
 
-    print buf1[2, 2]
-    print buf2[2, 2]
+    print(buf1[2, 2])
+    print(buf2[2, 2])
 
 # Note: disabled. generic_contiguous isn't very useful (you have to check suboffsets,
 #                                                       might as well multiply with strides)
@@ -747,14 +747,14 @@ def generic(int[::view.generic, ::view.generic] buf1,
 #     >>> [str(x) for x in B.received_flags]
 #     ['FORMAT', 'INDIRECT', 'ND', 'STRIDES', 'WRITABLE']
 #     """
-#     print buf1[1, 1]
-#     print buf2[1, 1]
+#     print(buf1[1, 1])
+#     print(buf2[1, 1])
 #
 #     buf1[2, -1] = 10
 #     buf2[2, -1] = 11
 #
-#     print buf1[2, 2]
-#     print buf2[2, 2]
+#     print(buf1[2, 2])
+#     print(buf2[2, 2])
 
 @testcase
 def indirect_strided_and_contig(
@@ -777,14 +777,14 @@ def indirect_strided_and_contig(
     >>> [str(x) for x in B.received_flags]
     ['FORMAT', 'INDIRECT', 'ND', 'STRIDES', 'WRITABLE']
     """
-    print buf1[1, 1]
-    print buf2[1, 1]
+    print(buf1[1, 1])
+    print(buf2[1, 1])
 
     buf1[2, -1] = 10
     buf2[2, -1] = 11
 
-    print buf1[2, 2]
-    print buf2[2, 2]
+    print(buf1[2, 2])
+    print(buf2[2, 2])
 
 
 @testcase
@@ -808,14 +808,14 @@ def indirect_contig(
     >>> [str(x) for x in B.received_flags]
     ['FORMAT', 'INDIRECT', 'ND', 'STRIDES', 'WRITABLE']
     """
-    print buf1[1, 1]
-    print buf2[1, 1]
+    print(buf1[1, 1])
+    print(buf2[1, 1])
 
     buf1[2, -1] = 10
     buf2[2, -1] = 11
 
-    print buf1[2, 2]
-    print buf2[2, 2]
+    print(buf1[2, 2])
+    print(buf2[2, 2])
 
 
 
@@ -894,8 +894,8 @@ def printbuf_int(int[:] buf, shape):
     # Utility func
     cdef int i
     for i in range(shape[0]):
-        print buf[i],
-    print 'END'
+        print(buf[i],)
+    print('END')
 
 
 @testcase
@@ -928,8 +928,8 @@ def printbuf_int_2d(o, shape):
     cdef int i, j
     for i in range(shape[0]):
         for j in range(shape[1]):
-            print buf[i, j],
-        print 'END'
+            print(buf[i, j],)
+        print('END')
 
 @testcase
 def printbuf_float(o, shape):
@@ -945,8 +945,8 @@ def printbuf_float(o, shape):
     buf = o
     cdef int i, j
     for i in range(shape[0]):
-        print buf[i],
-    print "END"
+        print(buf[i],)
+    print("END")
 
 
 #
@@ -992,8 +992,8 @@ def printbuf_td_cy_int(td_cy_int[:] buf, shape):
     """
     cdef int i
     for i in range(shape[0]):
-        print buf[i],
-    print 'END'
+        print(buf[i],)
+    print('END')
 
 @testcase
 def printbuf_td_h_short(td_h_short[:] buf, shape):
@@ -1007,8 +1007,8 @@ def printbuf_td_h_short(td_h_short[:] buf, shape):
     """
     cdef int i
     for i in range(shape[0]):
-        print buf[i],
-    print 'END'
+        print(buf[i],)
+    print('END')
 
 @testcase
 def printbuf_td_h_cy_short(const td_h_cy_short[:] buf, shape):
@@ -1022,8 +1022,8 @@ def printbuf_td_h_cy_short(const td_h_cy_short[:] buf, shape):
     """
     cdef int i
     for i in range(shape[0]):
-        print buf[i],
-    print 'END'
+        print(buf[i],)
+    print('END')
 
 @testcase
 def printbuf_td_h_ushort(const td_h_ushort[:] buf, shape):
@@ -1037,8 +1037,8 @@ def printbuf_td_h_ushort(const td_h_ushort[:] buf, shape):
     """
     cdef int i
     for i in range(shape[0]):
-        print buf[i],
-    print 'END'
+        print(buf[i],)
+    print('END')
 
 @testcase
 def printbuf_td_h_double(const td_h_double[:] buf, shape):
@@ -1052,8 +1052,8 @@ def printbuf_td_h_double(const td_h_double[:] buf, shape):
     """
     cdef int i
     for i in range(shape[0]):
-        print buf[i],
-    print 'END'
+        print(buf[i],)
+    print('END')
 
 
 #
@@ -1088,7 +1088,7 @@ def printbuf_object(object[:] buf, shape):
     """
     cdef int i
     for i in range(shape[0]):
-        print repr(buf[i]), (<PyObject*>buf[i]).ob_refcnt
+        print(repr(buf[i]), (<PyObject*>buf[i]).ob_refcnt)
 
 @testcase
 def assign_to_object(object[:] buf, int idx, obj):
@@ -1209,7 +1209,7 @@ def basic_struct(MyStruct[:] buf):
     >>> basic_struct(MyStructMockBuffer(None, [(1, 2, 3, 4, 5)], format="ccqii"))
     1 2 3 4 5
     """
-    print buf[0].a, buf[0].b, buf[0].c, buf[0].d, buf[0].e
+    print(buf[0].a, buf[0].b, buf[0].c, buf[0].d, buf[0].e)
 
 @testcase
 def const_struct(const MyStruct[:] buf):
@@ -1221,7 +1221,7 @@ def const_struct(const MyStruct[:] buf):
     >>> const_struct(MyStructMockBuffer(None, [(1, 2, 3, 4, 5)], format="ccqii", writable=False))
     1 2 3 4 5
     """
-    print buf[0].a, buf[0].b, buf[0].c, buf[0].d, buf[0].e
+    print(buf[0].a, buf[0].b, buf[0].c, buf[0].d, buf[0].e)
 
 @testcase
 def nested_struct(NestedStruct[:] buf):
@@ -1233,7 +1233,7 @@ def nested_struct(NestedStruct[:] buf):
     >>> nested_struct(NestedStructMockBuffer(None, [(1, 2, 3, 4, 5)], format="T{ii}T{2i}i"))
     1 2 3 4 5
     """
-    print buf[0].x.a, buf[0].x.b, buf[0].y.a, buf[0].y.b, buf[0].z
+    print(buf[0].x.a, buf[0].x.b, buf[0].y.a, buf[0].y.b, buf[0].z)
 
 @testcase
 def const_nested_struct(const NestedStruct[:] buf):
@@ -1245,7 +1245,7 @@ def const_nested_struct(const NestedStruct[:] buf):
     >>> const_nested_struct(NestedStructMockBuffer(None, [(1, 2, 3, 4, 5)], format="T{ii}T{2i}i", writable=False))
     1 2 3 4 5
     """
-    print buf[0].x.a, buf[0].x.b, buf[0].y.a, buf[0].y.b, buf[0].z
+    print(buf[0].x.a, buf[0].x.b, buf[0].y.a, buf[0].y.b, buf[0].z)
 
 @testcase
 def packed_struct(PackedStruct[:] buf):
@@ -1260,7 +1260,7 @@ def packed_struct(PackedStruct[:] buf):
     1 2
 
     """
-    print buf[0].a, buf[0].b
+    print(buf[0].a, buf[0].b)
 
 @testcase
 def const_packed_struct(const PackedStruct[:] buf):
@@ -1275,7 +1275,7 @@ def const_packed_struct(const PackedStruct[:] buf):
     1 2
 
     """
-    print buf[0].a, buf[0].b
+    print(buf[0].a, buf[0].b)
 
 @testcase
 def nested_packed_struct(NestedPackedStruct[:] buf):
@@ -1289,7 +1289,7 @@ def nested_packed_struct(NestedPackedStruct[:] buf):
     >>> nested_packed_struct(NestedPackedStructMockBuffer(None, [(1, 2, 3, 4, 5)], format="^c@i^ci@i"))
     1 2 3 4 5
     """
-    print buf[0].a, buf[0].b, buf[0].sub.a, buf[0].sub.b, buf[0].c
+    print(buf[0].a, buf[0].b, buf[0].sub.a, buf[0].sub.b, buf[0].c)
 
 
 @testcase
@@ -1304,7 +1304,7 @@ def const_nested_packed_struct(const NestedPackedStruct[:] buf):
     >>> const_nested_packed_struct(NestedPackedStructMockBuffer(None, [(1, 2, 3, 4, 5)], format="^c@i^ci@i", writable=False))
     1 2 3 4 5
     """
-    print buf[0].a, buf[0].b, buf[0].sub.a, buf[0].sub.b, buf[0].c
+    print(buf[0].a, buf[0].b, buf[0].sub.a, buf[0].sub.b, buf[0].c)
 
 
 @testcase
@@ -1313,7 +1313,7 @@ def complex_dtype(long double complex[:] buf):
     >>> complex_dtype(LongComplexMockBuffer(None, [(0, -1)]))  # , writable=False))
     -1j
     """
-    print buf[0]
+    print(buf[0])
 
 @testcase
 def complex_inplace(long double complex[:] buf):
@@ -1322,7 +1322,7 @@ def complex_inplace(long double complex[:] buf):
     (1+1j)
     """
     buf[0] = buf[0] + 1 + 2j
-    print buf[0]
+    print(buf[0])
 
 @testcase
 def complex_struct_dtype(LongComplex[:] buf):
@@ -1332,7 +1332,7 @@ def complex_struct_dtype(LongComplex[:] buf):
     >>> complex_struct_dtype(LongComplexMockBuffer(None, [(0, -1)]))  # , writable=False))
     0.0 -1.0
     """
-    print buf[0].real, buf[0].imag
+    print(buf[0].real, buf[0].imag)
 
 @testcase
 def complex_struct_inplace(LongComplex[:] buf):
@@ -1342,7 +1342,7 @@ def complex_struct_inplace(LongComplex[:] buf):
     """
     buf[0].real += 1
     buf[0].imag += 2
-    print buf[0].real, buf[0].imag
+    print(buf[0].real, buf[0].imag)
 
 #
 # Nogil
@@ -1377,8 +1377,8 @@ class UniqueObject(object):
 objs = [[UniqueObject("spam")], [UniqueObject("ham")], [UniqueObject("eggs")]]
 addref(*[obj for L in objs for obj in L])
 cdef cdef_function(int[:] buf1, object[::view.indirect, :] buf2 = ObjectMockBuffer(None, objs)):
-    print 'cdef called'
-    print buf1[6], buf2[1, 0]
+    print('cdef called')
+    print(buf1[6], buf2[1, 0])
     buf2[1, 0] = UniqueObject("eggs")
 
 @testcase
@@ -1427,8 +1427,8 @@ addref(*[obj for L in objs for obj in L])
 cdef object[::view.indirect, :] global_B = ObjectMockBuffer(None, objs)
 
 cdef cdef_function2(int[:] buf1, object[::view.indirect, :] buf2 = global_B):
-    print 'cdef2 called'
-    print buf1[6], buf2[1, 0]
+    print('cdef2 called')
+    print(buf1[6], buf2[1, 0])
     buf2[1, 0] = UniqueObject("eggs")
 
 @testcase
@@ -1449,7 +1449,7 @@ def test_cdef_function2():
     del A
     del B
 
-    print global_B[1, 0]
+    print(global_B[1, 0])
 
     cdef_function2(global_A, global_B)
 
@@ -1489,12 +1489,12 @@ def test_generic_slicing(arg, indirect=False):
     cdef int[::view.generic, ::view.generic, :] a = arg
     cdef int[::view.generic, ::view.generic, :] b = a[2:8:2, -4:1:-1, 1:3]
 
-    print b.shape[0], b.shape[1], b.shape[2]
+    print(b.shape[0], b.shape[1], b.shape[2])
 
     if indirect:
-        print b.suboffsets[0] // sizeof(int *),
-        print b.suboffsets[1] // sizeof(int),
-        print b.suboffsets[2]
+        print(b.suboffsets[0] // sizeof(int *),)
+        print(b.suboffsets[1] // sizeof(int),)
+        print(b.suboffsets[2])
     else:
         print_int_offsets(b.strides[0], b.strides[1], b.strides[2])
         print_int_offsets(b.suboffsets[0], b.suboffsets[1], b.suboffsets[2])
@@ -1553,23 +1553,23 @@ def test_indirect_slicing(arg):
     cdef int[::view.generic, :] generic_d = generic_b[4]
     cdef int[:] generic_e = generic_b[4, 2]
 
-    print b.shape[0], b.shape[1], b.shape[2]
-    print b.suboffsets[0] // sizeof(int *),
-    print b.suboffsets[1] // sizeof(int),
-    print b.suboffsets[2]
+    print(b.shape[0], b.shape[1], b.shape[2])
+    print(b.suboffsets[0] // sizeof(int *),)
+    print(b.suboffsets[1] // sizeof(int),)
+    print(b.suboffsets[2])
 
-    print b[4, 2, 1]
-    print c[4, 2]
+    print(b[4, 2, 1])
+    print(c[4, 2])
     # test adding offset from last dimension to suboffset
-    print b[..., 1][4, 2]
+    print(b[..., 1][4, 2])
 
-    print "index away indirect"
-    print d[2, 1]
-    print e[1]
+    print("index away indirect")
+    print(d[2, 1])
+    print(e[1])
 
-    print "index away generic"
-    print generic_d[2, 1]
-    print generic_e[1]
+    print("index away generic")
+    print(generic_d[2, 1])
+    print(generic_e[1])
 
 cdef class TestIndexSlicingDirectIndirectDims(object):
     "Test a int[:, ::view.indirect, :] slice"
@@ -1628,22 +1628,22 @@ def test_index_slicing_away_direct_indirect():
     cdef int[:, ::view.indirect, :] a = TestIndexSlicingDirectIndirectDims()
     a_obj = a
 
-    print a[1][2][3]
-    print a[1, 2, 3]
-    print a[1, 2][3]
-    print a[..., 3][1, 2]
+    print(a[1][2][3])
+    print(a[1, 2, 3])
+    print(a[1, 2][3])
+    print(a[..., 3][1, 2])
 
     print
 
-    print a_obj[1][2][3]
-    print a_obj[1, 2, 3]
-    print a_obj[1, 2][3]
-    print a_obj[..., 3][1, 2]
+    print(a_obj[1][2][3])
+    print(a_obj[1, 2, 3])
+    print(a_obj[1, 2][3])
+    print(a_obj[..., 3][1, 2])
 
     try:
-        print a_obj[1:, 2][3]
+        print(a_obj[1:, 2][3])
     except IndexError, e:
-        print e.args[0]
+        print(e.args[0])
 
 @testcase
 def test_direct_slicing(arg):
@@ -1669,7 +1669,7 @@ def test_direct_slicing(arg):
     cdef int[:, :, ::1] a = arg
     cdef int[:, :, :] b = a[2:8:2, -4:1:-1, 1:3]
 
-    print b.shape[0], b.shape[1], b.shape[2]
+    print(b.shape[0], b.shape[1], b.shape[2])
     print_int_offsets(b.strides[0], b.strides[1], b.strides[2])
     print_int_offsets(b.suboffsets[0], b.suboffsets[1], b.suboffsets[2])
 
@@ -1698,7 +1698,7 @@ def test_slicing_and_indexing(arg):
     cdef int[:, :] c = b[4:1:-1, ::-1]
     cdef int[:] d = c[2, 1:2]
 
-    print b.shape[0], b.shape[1]
+    print(b.shape[0], b.shape[1])
     print_int_offsets(b.strides[0], b.strides[1])
 
     cdef int i, j
@@ -1708,8 +1708,8 @@ def test_slicing_and_indexing(arg):
             itemB = b[i, j]
             assert itemA == itemB, (i, j, itemA, itemB)
 
-    print c[1, 1], c[2, 0]
-    print [d[i] for i in range(d.shape[0])]
+    print(c[1, 1], c[2, 0])
+    print([d[i] for i in range(d.shape[0])])
 
 
 @testcase
@@ -1721,7 +1721,7 @@ def test_oob():
     IndexError: Index out of bounds (axis 1)
     """
     cdef int[:, :] a = IntMockBuffer("A", range(4 * 9), shape=(4, 9))  # , writable=False)
-    print a[:, 20]
+    print(a[:, 20])
 
 
 cdef int nogil_oob(int[:, :] a) nogil except 0:
@@ -1747,13 +1747,13 @@ def test_nogil_oob1():
     try:
         nogil_oob(IntMockBuffer("B", range(4 * 9), shape=(4, 9)))
     except IndexError, e:
-        print e.args[0]
+        print(e.args[0])
 
     try:
         with nogil:
             nogil_oob(a)
     except IndexError, e:
-        print e.args[0]
+        print(e.args[0])
 
 @testcase
 def test_nogil_oob2():
@@ -1790,7 +1790,7 @@ def test_nogil():
     _a = IntMockBuffer("A", range(4 * 9), shape=(4, 9))
     assert cdef_nogil(_a) == 4
     cdef int[:, :] a = _a
-    print a[2, 7]
+    print(a[2, 7])
 
     cdef int length
     with nogil:
@@ -1812,7 +1812,7 @@ def test_convert_slicenode_to_indexnode():
     cdef int[:] a = IntMockBuffer("A", range(10), shape=(10,))  # , writable=False)
     with nogil:
         a = a[2:4]
-    print a[0]
+    print(a[0])
 
 @testcase
 @cython.boundscheck(False)
@@ -1942,7 +1942,7 @@ cdef test_structs_with_arr(FusedStruct array[10]):
         for j in range(3):
             assert myslice3[i].chars[j] == myslice4[i].chars[j] == myslice1[i].chars[j]
 
-    print myslice1[0].chars[:3].decode('ascii')
+    print(myslice1[0].chars[:3].decode('ascii'))
 
 cdef struct TestAttrs:
     int int_attrib
@@ -1958,9 +1958,9 @@ def test_struct_attributes_format():
     cdef TestAttrs[:] struct_memview = array
 
     if sys.version_info[:2] >= (2, 7):
-        print builtins.memoryview(struct_memview).format
+        print(builtins.memoryview(struct_memview).format)
     else:
-        print "T{i:int_attrib:c:char_attrib:}"
+        print("T{i:int_attrib:c:char_attrib:}")
 
 
 # Test padding at the end of structs in the buffer support
@@ -2061,7 +2061,7 @@ def test_object_indices():
         myslice[i] = i
 
     for j in range(3):
-        print myslice[j]
+        print(myslice[j])
 
 cdef fused slice_1d:
     object
@@ -2087,7 +2087,7 @@ def test_ellipsis_expr():
 cdef _test_ellipsis_expr(slice_1d m):
     m[4] = 8
     m[...] = m[...]
-    print m[4]
+    print(m[4])
 
 @testcase
 def test_slice_assignment():
@@ -2206,16 +2206,16 @@ def test_borrowed_slice():
     _not_borrowed2(carray)
 
 cdef _borrowed(int[:] m):
-    print m[5]
+    print(m[5])
 
 cdef _not_borrowed(int[:] m):
-    print m[5]
+    print(m[5])
     if object():
         del m
 
 cdef _not_borrowed2(int[:] m):
     cdef int[10] carray
-    print m[5]
+    print(m[5])
     if object():
         m = carray
 
@@ -2266,13 +2266,13 @@ def test_object_dtype_copying():
     del m1
 
     for i in range(10):
-        print m2[i]
+        print(m2[i])
 
     obj = m2[5]
-    print get_refcount(obj), obj
+    print(get_refcount(obj), obj)
 
     del m2
-    print get_refcount(obj), obj
+    print(get_refcount(obj), obj)
 
     assert unique_refcount == get_refcount(unique), (unique_refcount, get_refcount(unique))
 
@@ -2319,7 +2319,7 @@ cdef _test_scalar_slice_assignment(slice_1d m, slice_2d m2):
 
     m[-2:0:-2] = 6
     for i in range(10):
-        print m[i]
+        print(m[i])
 
     for i in range(m2.shape[0]):
         for j in range(m2.shape[1]):
@@ -2365,10 +2365,10 @@ def test_contig_scalar_to_slice_assignment():
     cdef int[:, ::1] m = a
 
     m[...] = 14
-    print m[0, 0], m[-1, -1], m[3, 2], m[4, 9]
+    print(m[0, 0], m[-1, -1], m[3, 2], m[4, 9])
 
     m[:, :] = 20
-    print m[0, 0], m[-1, -1], m[3, 2], m[4, 9]
+    print(m[0, 0], m[-1, -1], m[3, 2], m[4, 9])
 
 @testcase
 def test_dtype_object_scalar_assignment():
@@ -2423,11 +2423,11 @@ def test_noneslice_ext_attr():
     cdef NoneSliceAttr obj = NoneSliceAttr()
 
     with cython.nonecheck(True):
-        try: print obj.m
-        except Exception, e: print type(e).__name__, e.args[0]
+        try: print(obj.m)
+        except Exception, e: print(type(e).__name__, e.args[0])
 
         obj.m = None
-        print obj.m
+        print(obj.m)
 
 @testcase
 def test_noneslice_del():
@@ -2443,7 +2443,7 @@ def test_noneslice_del():
     with cython.nonecheck(True):
         m = None
         del m
-        print m
+        print(m)
 
 @testcase
 def test_noneslice_nogil_check_none(double[:] m):
@@ -2481,7 +2481,7 @@ def test_inplace_assignment():
     cdef int[:] m = a
 
     m[0] = get_int()
-    print m[0]
+    print(m[0])
 
 @testcase
 def test_newaxis(int[:] one_D):
@@ -2500,10 +2500,10 @@ def test_newaxis(int[:] one_D):
     cdef int[:, :] two_D_3 = one_D[:, None]
     cdef int[:, :] two_D_4 = one_D[..., None]
 
-    print two_D_1[0, 3]
-    print two_D_2[0, 3]
-    print two_D_3[3, 0]
-    print two_D_4[3, 0]
+    print(two_D_1[0, 3])
+    print(two_D_2[0, 3])
+    print(two_D_3[3, 0])
+    print(two_D_4[3, 0])
 
 @testcase
 def test_newaxis2(int[:, :] two_D):

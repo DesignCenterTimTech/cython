@@ -20,11 +20,11 @@ class ContextManager(object):
         self.exit_ret = exit_ret
 
     def __exit__(self, a, b, tb):
-        print u"exit", typename(a), typename(b), typename(tb)
+        print(u"exit", typename(a), typename(b), typename(tb))
         return self.exit_ret
 
     def __enter__(self):
-        print u"enter"
+        print(u"enter")
         return self.value
 
 def no_as():
@@ -35,7 +35,7 @@ def no_as():
     exit <type 'NoneType'> <type 'NoneType'> <type 'NoneType'>
     """
     with ContextManager(u"value"):
-        print u"hello"
+        print(u"hello")
 
 def basic():
     """
@@ -45,7 +45,7 @@ def basic():
     exit <type 'NoneType'> <type 'NoneType'> <type 'NoneType'>
     """
     with ContextManager(u"value") as x:
-        print x
+        print(x)
 
 def with_pass():
     """
@@ -70,10 +70,10 @@ def with_exception(exit_ret):
     """
     try:
         with ContextManager(u"value", exit_ret=exit_ret) as value:
-            print value
+            print(value)
             raise MyException()
     except:
-        print u"outer except"
+        print(u"outer except")
 
 def multitarget():
     """
@@ -83,7 +83,7 @@ def multitarget():
     exit <type 'NoneType'> <type 'NoneType'> <type 'NoneType'>
     """
     with ContextManager((1, 2, (3, (4, 5)))) as (a, b, (c, (d, e))):
-        print a, b, c, d, e
+        print(a, b, c, d, e)
 
 def tupletarget():
     """
@@ -93,7 +93,7 @@ def tupletarget():
     exit <type 'NoneType'> <type 'NoneType'> <type 'NoneType'>
     """
     with ContextManager((1, 2, (3, (4, 5)))) as t:
-        print t
+        print(t)
 
 def typed():
     """
@@ -106,7 +106,7 @@ def typed():
     c = ContextManager(255)
     with c as i:
         i += 11
-        print i
+        print(i)
 
 def multimanager():
     """
@@ -131,10 +131,10 @@ def multimanager():
     with ContextManager(1), ContextManager(2) as x, ContextManager(u'value') as y,\
             ContextManager(3), ContextManager((1, 2, (3, (4, 5)))) as (a, b, (c, (d, e))):
         with ContextManager(u'nested') as nested:
-            print x
-            print y
-            print a, b, c, d, e
-            print nested
+            print(x)
+            print(y)
+            print(a, b, c, d, e)
+            print(nested)
 
 # Tests borrowed from pyregr test_with.py,
 # modified to follow the constraints of Cython.

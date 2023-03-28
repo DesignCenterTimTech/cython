@@ -4,7 +4,7 @@
 # cython: boundscheck = true
 # cython: boundscheck = 9
 
-print 3
+print(3)
 
 # Options should not be interpreted any longer:
 # cython: boundscheck = true

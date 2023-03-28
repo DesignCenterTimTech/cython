@@ -22,7 +22,7 @@ cdef class A:
     A
     """
     cpdef void foo(self):
-        print "A"
+        print("A")
 
 cdef class B(A):
     """
@@ -30,7 +30,7 @@ cdef class B(A):
     B
     """
     cpdef void foo(self):
-        print "B"
+        print("B")
 
 class C(B):
     """
@@ -38,4 +38,4 @@ class C(B):
     C
     """
     def foo(self):
-        print "C"
+        print("C")

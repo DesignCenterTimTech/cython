@@ -4,7 +4,7 @@ cdef class VerboseGetItem(object):
     def __init__(self, seq):
         self.sequence = seq
     def __getitem__(self, i):
-        print i
+        print(i)
         return self.sequence[i] # may raise IndexError
 
 

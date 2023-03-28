@@ -8,12 +8,12 @@ def print_to_stdout(a, b):
     1 test 42 spam
     """
     print
-    print a
-    print a,
-    print b
-    print a, b
-    print a, b,
-    print 42, u"spam"
+    print(a)
+    print(a,)
+    print(b)
+    print(a, b)
+    print(a, b,)
+    print(42, u"spam")
 
 
 try:
@@ -33,10 +33,10 @@ def print_to_stringio(stream, a, b):
     1 test 42 spam
     <BLANKLINE>
     """
-    print >> stream
-    print >> stream, a
-    print >> stream, a,
-    print >> stream, b
-    print >> stream, a, b
-    print >> stream, a, b,
-    print >> stream, 42, u"spam"
+    print(>> stream)
+    print(>> stream, a)
+    print(>> stream, a,)
+    print(>> stream, b)
+    print(>> stream, a, b)
+    print(>> stream, a, b,)
+    print(>> stream, 42, u"spam")

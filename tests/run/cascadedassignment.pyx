@@ -30,7 +30,7 @@ def test_cascaded_assignment_typed():
 
     a = b = c = 5
 
-    print cython.typeof(a), cython.typeof(b), cython.typeof(c)
+    print(cython.typeof(a), cython.typeof(b), cython.typeof(c))
     return a, b, c
 
 def test_cascaded_assignment_builtin_expr():
@@ -45,7 +45,7 @@ def test_cascaded_assignment_builtin_expr():
     return a, b, c
 
 def expr():
-    print "expr called"
+    print("expr called")
     return 10
 
 def test_cascaded_assignment_evaluate_expr():

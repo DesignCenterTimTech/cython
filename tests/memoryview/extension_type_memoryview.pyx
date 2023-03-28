@@ -22,7 +22,7 @@ def test_getitem():
     """
     for i in range(view.shape[0]):
         item = view[i]
-        print item.dummy
+        print(item.dummy)
 
 def test_getitem_typed():
     """
@@ -33,4 +33,4 @@ def test_getitem_typed():
     cdef ExtensionType item
     for i in range(view.shape[0]):
         item = view[i]
-        print item.dummy
+        print(item.dummy)

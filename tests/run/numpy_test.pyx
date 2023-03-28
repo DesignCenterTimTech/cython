@@ -93,23 +93,23 @@ try:
     Write to slices
     >>> b = a.copy()
     >>> put_range_long_1d(b[:, 3])
-    >>> print (b)
+    >>> print((b))
     [[0 1 2 0 4]
      [5 6 7 1 9]]
     >>> put_range_long_1d(b[::-1, 3])
-    >>> print (b)
+    >>> print((b))
     [[0 1 2 1 4]
      [5 6 7 0 9]]
     >>> a = np.zeros(9, dtype='l')
     >>> put_range_long_1d(a[1::3])
-    >>> print (a)
+    >>> print((a))
     [0 0 0 0 1 0 0 2 0]
 
     Write to picked subarrays. This should NOT change the original
     array as picking creates a new mutable copy.
     >>> a = np.zeros(10, dtype='l').reshape(2, 5)
     >>> put_range_long_1d(a[[0, 0, 1, 1, 0], [0, 1, 2, 4, 3]])
-    >>> print (a)
+    >>> print((a))
     [[0 0 0 0 0]
      [0 0 0 0 0]]
 
@@ -307,24 +307,24 @@ def ndarray_str(arr):
 
 def basic():
     cdef object[int, ndim=2] buf = np.arange(10, dtype='i').reshape((2, 5))
-    print buf
-    print buf[0, 2], buf[0, 0], buf[1, 4], buf[1, 0]
+    print(buf)
+    print(buf[0, 2], buf[0, 0], buf[1, 4], buf[1, 0])
 
 def three_dim():
     cdef object[double, ndim=3] buf = np.arange(24, dtype='d').reshape((3,2,4))
-    print ndarray_str(buf)
-    print buf[0, 1, 2], buf[0, 0, 0], buf[1, 1, 1], buf[1, 0, 0]
+    print(ndarray_str(buf))
+    print(buf[0, 1, 2], buf[0, 0, 0], buf[1, 1, 1], buf[1, 0, 0])
 
 def obj_array():
     cdef object[object, ndim=1] buf = np.array(["a", 1, {}])
-    print str(buf).replace('"', '').replace("'", '')
-    print buf[0], buf[1], buf[2]
+    print(str(buf).replace('"', '').replace("'", ''))
+    print(buf[0], buf[1], buf[2])
 
 
 def print_long_2d(np.ndarray[long, ndim=2] arr):
     cdef int i, j
     for i in range(arr.shape[0]):
-        print u" ".join([unicode(arr[i, j]) for j in range(arr.shape[1])])
+        print(u" ".join([unicode(arr[i, j]) for j in range(arr.shape[1])]))
 
 def put_range_long_1d(np.ndarray[long] arr):
     u"""Writes 0,1,2,... to array and returns array"""
@@ -336,12 +336,12 @@ def put_range_long_1d(np.ndarray[long] arr):
 def test_c_contig(np.ndarray[int, ndim=2, mode='c'] arr):
     cdef int i, j
     for i in range(arr.shape[0]):
-        print u" ".join([unicode(arr[i, j]) for j in range(arr.shape[1])])
+        print(u" ".join([unicode(arr[i, j]) for j in range(arr.shape[1])]))
 
 def test_f_contig(np.ndarray[int, ndim=2, mode='fortran'] arr):
     cdef int i, j
     for i in range(arr.shape[0]):
-        print u" ".join([unicode(arr[i, j]) for j in range(arr.shape[1])])
+        print(u" ".join([unicode(arr[i, j]) for j in range(arr.shape[1])]))
 
 # Exhaustive dtype tests -- increments element [1] by 1 (or 1+1j) for all dtypes
 def inc1_bool(np.ndarray[unsigned char] arr):           arr[1] += 1
@@ -406,18 +406,18 @@ def test_dtype(dtype, inc1):
     if dtype in ('F', 'D', 'G'):
         a = np.array([0, 10+10j], dtype=dtype)
         inc1(a)
-        if a[1] != (11 + 11j): print u"failed!", a[1]
+        if a[1] != (11 + 11j): print(u"failed!", a[1])
     elif dtype == '?':
         # bool ndarrays coerce all values to 0 or 1
         a = np.array([0, 0], dtype=dtype)
         inc1(a)
-        if a[1] != 1: print u"failed!"
+        if a[1] != 1: print(u"failed!")
         inc1(a)
-        if a[1] != 1: print u"failed!"
+        if a[1] != 1: print(u"failed!")
     else:
         a = np.array([0, 10], dtype=dtype)
         inc1(a)
-        if a[1] != 11: print u"failed!"
+        if a[1] != 11: print(u"failed!")
 
 cdef struct DoubleInt:
     int x, y
@@ -427,16 +427,16 @@ def test_recordarray():
     arr = np.array([(5,5), (4, 6)], dtype=np.dtype('i,i'))
     cdef DoubleInt rec
     rec = arr[0]
-    if rec.x != 5: print u"failed"
-    if rec.y != 5: print u"failed"
+    if rec.x != 5: print(u"failed")
+    if rec.y != 5: print(u"failed")
     rec.y += 5
     arr[1] = rec
     arr[0].x -= 2
     arr[0].y += 3
-    if arr[0].x != 3: print u"failed"
-    if arr[0].y != 8: print u"failed"
-    if arr[1].x != 5: print u"failed"
-    if arr[1].y != 10: print u"failed"
+    if arr[0].x != 3: print(u"failed")
+    if arr[0].y != 8: print(u"failed")
+    if arr[1].x != 5: print(u"failed")
+    if arr[1].y != 10: print(u"failed")
 
 cdef struct NestedStruct:
     DoubleInt a
@@ -523,10 +523,10 @@ def test_complextypes():
     cdef np.complex64_t x64 = 1, y64 = 1j
     cdef np.complex128_t x128 = 1, y128 = 1j
     x64 = x64 + y64
-    print "%.0f,%.0f" % (x64.real, x64.imag)
+    print("%.0f,%.0f" % (x64.real, x64.imag))
     x128 = x128 + y128
-    print "%.0f,%.0f" % (x128.real, x128.imag)
-    print "%d,%d" % (sizeof(x64), sizeof(x128))
+    print("%.0f,%.0f" % (x128.real, x128.imag))
+    print("%d,%d" % (sizeof(x64), sizeof(x128)))
 
 
 cdef struct Point:
@@ -540,7 +540,7 @@ def test_point_record():
     for i in range(3):
         test[i].x = i
         test[i].y = -i
-    print re.sub(
+    print(re.sub()
         r'\.0+\b', '.', repr(test).replace('<', '!').replace('>', '!')
                                   .replace('( ', '(').replace(',  ', ', '))
 
@@ -564,7 +564,7 @@ def test_fused_ndarray_floating_dtype(np.ndarray[cython.floating, ndim=1] a):
     ndarray[float,ndim=1] ndarray[float,ndim=1] 5.0 6.0
     """
     cdef np.ndarray[cython.floating, ndim=1] b = a
-    print cython.typeof(a), cython.typeof(b), a[5], b[6]
+    print(cython.typeof(a), cython.typeof(b), a[5], b[6])
 
 
 double_array = np.linspace(0, 1, 100)
@@ -592,7 +592,7 @@ def test_fused_external(np.ndarray[fused_external, ndim=1] a):
     >>> test_fused_external(np.arange(100, dtype=np.int64))
     int64
     """
-    print a.dtype
+    print(a.dtype)
 
 cdef fused fused_buffers:
     np.ndarray[np.int32_t, ndim=1]
@@ -606,7 +606,7 @@ def test_fused_buffers(fused_buffers arg):
     """
 
 cpdef _fused_cpdef_buffers(np.ndarray[fused_external] a):
-    print a.dtype
+    print(a.dtype)
 
 @testcase
 def test_fused_cpdef_buffers():
@@ -638,9 +638,9 @@ def test_fused_ndarray_integral_dtype(np.ndarray[cython.integral, ndim=1] a):
     5 6
     """
     cdef np.ndarray[cython.integral, ndim=1] b = a
-    # Don't print the types, the platform specific sizes can make the dispatcher
+    # Don't print(the types, the platform specific sizes can make the dispatcher)
     # select different integer types with equal sizeof()
-    print a[5], b[6]
+    print(a[5], b[6])
 
 cdef fused fused_dtype:
     float complex
@@ -661,7 +661,7 @@ def test_fused_ndarray_other_dtypes(np.ndarray[fused_dtype, ndim=1] a):
     ndarray[Python object,ndim=1] ndarray[Python object,ndim=1] 5 6
     """
     cdef np.ndarray[fused_dtype, ndim=1] b = a
-    print cython.typeof(a), cython.typeof(b), a[5], b[6]
+    print(cython.typeof(a), cython.typeof(b), a[5], b[6])
 
 
 # Test fusing the array types together and runtime dispatch
@@ -702,12 +702,12 @@ def test_fused_ndarray(fused_ndarray a):
     5.0
     """
     cdef fused_ndarray b = a
-    print cython.typeof(a), cython.typeof(b)
+    print(cython.typeof(a), cython.typeof(b))
 
     if fused_ndarray in fused_FooArray:
-        print b[5].b
+        print(b[5].b)
     else:
-        print b[5]
+        print(b[5])
 
 cpdef test_fused_cpdef_ndarray(fused_ndarray a):
     """
@@ -726,12 +726,12 @@ cpdef test_fused_cpdef_ndarray(fused_ndarray a):
     5.0
     """
     cdef fused_ndarray b = a
-    print cython.typeof(a), cython.typeof(b)
+    print(cython.typeof(a), cython.typeof(b))
 
     if fused_ndarray in fused_FooArray:
-        print b[5].b
+        print(b[5].b)
     else:
-        print b[5]
+        print(b[5])
 
 testcase_have_buffer_interface(test_fused_cpdef_ndarray)
 
@@ -771,7 +771,7 @@ def test_dispatch_non_clashing_declarations_repeating_types(np.ndarray[cython.fl
     Traceback (most recent call last):
     ValueError: Buffer dtype mismatch, expected 'int64_t'...
     """
-    print a1[1], a2[2], a3[3], a4[4]
+    print(a1[1], a2[2], a3[3], a4[4])
 
 ctypedef np.int32_t typedeffed_type
 
@@ -786,7 +786,7 @@ def test_dispatch_typedef(np.ndarray[typedeffed_fused_type] a):
     >>> test_dispatch_typedef(int32_array)
     5
     """
-    print a[5]
+    print(a[5])
 
 
 cdef extern from "types.h":
@@ -805,7 +805,7 @@ def test_dispatch_external_typedef(np.ndarray[confusing_fused_typedef] a):
     >>> test_dispatch_external_typedef(np.arange(-5, 5, dtype=np.int_))
     -2
     """
-    print a[3]
+    print(a[3])
 
 # test fused memoryview slices
 cdef fused memslice_fused_dtype:
@@ -835,7 +835,7 @@ def test_fused_memslice_other_dtypes(memslice_fused_dtype[:] a):
     object[:] object[:] 5 6
     """
     cdef memslice_fused_dtype[:] b = a
-    print cython.typeof(a), cython.typeof(b), a[5], b[6]
+    print(cython.typeof(a), cython.typeof(b), a[5], b[6])
 
 cdef fused memslice_fused:
     float[:]
@@ -864,7 +864,7 @@ def test_fused_memslice(memslice_fused a):
     object[:] object[:] 5 6
     """
     cdef memslice_fused b = a
-    print cython.typeof(a), cython.typeof(b), a[5], b[6]
+    print(cython.typeof(a), cython.typeof(b), a[5], b[6])
 
 @testcase
 def test_dispatch_memoryview_object():
@@ -899,7 +899,7 @@ def test_dispatch_ndim(ndim_t array):
     >>> test_dispatch_ndim[cython.double[:, :]](np.empty((5, 5), dtype=np.double))
     double[:, :] 2
     """
-    print cython.typeof(array), np.asarray(array).ndim
+    print(cython.typeof(array), np.asarray(array).ndim)
 
 
 @testcase

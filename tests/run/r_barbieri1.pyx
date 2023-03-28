@@ -16,4 +16,4 @@ cdef class A:
 
 cdef class B(A):
     def __cinit__(self):
-        print "hello world"
+        print("hello world")

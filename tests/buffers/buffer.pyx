@@ -36,7 +36,7 @@ s = b"abcdefg"
 
 cdef class TestBuffer:
     def __getbuffer__(self, Py_buffer* buffer, int flags):
-        print u"__getbuffer__ called"
+        print(u"__getbuffer__ called")
         buffer.buf = <char*>s
         buffer.obj = self
         buffer.len = len(s)
@@ -51,7 +51,7 @@ cdef class TestBuffer:
 
 cdef class TestBufferRelease(TestBuffer):
     def __releasebuffer__(self, Py_buffer* buffer):
-        print u"releasing!"
+        print(u"releasing!")
 
 cdef class TestCompileWithDocstring(object):
     def __getbuffer__(self, Py_buffer* buffer, int flags):

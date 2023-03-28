@@ -6,7 +6,7 @@ cimport cython
 
 class loud_list(list):
     def __len__(self):
-        print "calling __len__"
+        print("calling __len__")
         return super(loud_list, self).__len__()
 
 
@@ -116,15 +116,15 @@ def test_min2():
     cdef object my_pyint = 2
     cdef object my_list = loud_list([1,2,3])
 
-    print min(1, 2)
-    print min(2, my_int)
-    print min(my_int, 2)
+    print(min(1, 2))
+    print(min(2, my_int))
+    print(min(my_int, 2))
 
-    print min(my_int, my_pyint)
-    print min(my_pyint, my_int)
+    print(min(my_int, my_pyint))
+    print(min(my_pyint, my_int))
 
-    print min(my_int, len(my_list))
-    print min(len(my_list), my_int)
+    print(min(my_int, len(my_list)))
+    print(min(len(my_list), my_int))
 
 
 @cython.test_assert_path_exists(
@@ -145,8 +145,8 @@ def test_min3():
     cdef object my_pyint = 2
     cdef object my_list = loud_list([1,2,3])
 
-    print min(my_int, my_pyint, len(my_list))
-    print min(my_pyint, my_list.__len__(), len(my_list))
+    print(min(my_int, my_pyint, len(my_list)))
+    print(min(my_pyint, my_list.__len__(), len(my_list)))
 
 
 @cython.test_assert_path_exists(
@@ -168,9 +168,9 @@ def test_minN():
     cdef object my_pyint = 2
     cdef object my_list = loud_list([1,2,3])
 
-    print min(my_int, 2, my_int, 0, my_pyint, my_int, len(my_list))
-    print min(my_int, my_int, 0, my_pyint, my_int, len(my_list))
-    print min(my_int, my_int, 2, my_int, 0, my_pyint, my_int, len(my_list))
+    print(min(my_int, 2, my_int, 0, my_pyint, my_int, len(my_list)))
+    print(min(my_int, my_int, 0, my_pyint, my_int, len(my_list)))
+    print(min(my_int, my_int, 2, my_int, 0, my_pyint, my_int, len(my_list)))
 
 
 # max()
@@ -253,15 +253,15 @@ def test_max2():
     cdef object my_pyint = 2
     cdef object my_list = loud_list([1,2,3])
 
-    print max(1, 2)
-    print max(2, my_int)
-    print max(my_int, 2)
+    print(max(1, 2))
+    print(max(2, my_int))
+    print(max(my_int, 2))
 
-    print max(my_int, my_pyint)
-    print max(my_pyint, my_int)
+    print(max(my_int, my_pyint))
+    print(max(my_pyint, my_int))
 
-    print max(my_int, len(my_list))
-    print max(len(my_list), my_int)
+    print(max(my_int, len(my_list)))
+    print(max(len(my_list), my_int))
 
 
 @cython.test_assert_path_exists(
@@ -282,8 +282,8 @@ def test_max3():
     cdef object my_pyint = 2
     cdef object my_list = loud_list([1,2,3])
 
-    print max(my_int, my_pyint, len(my_list))
-    print max(my_pyint, my_list.__len__(), len(my_list))
+    print(max(my_int, my_pyint, len(my_list)))
+    print(max(my_pyint, my_list.__len__(), len(my_list)))
 
 
 @cython.test_assert_path_exists(
@@ -305,9 +305,9 @@ def test_maxN():
     cdef object my_pyint = 2
     cdef object my_list = loud_list([1,2,3])
 
-    print max(my_int, 2, my_int, 0, my_pyint, my_int, len(my_list))
-    print max(my_int, my_int, 0, my_pyint, my_int, len(my_list))
-    print max(my_int, my_int, 2, my_int, 0, my_pyint, my_int, len(my_list))
+    print(max(my_int, 2, my_int, 0, my_pyint, my_int, len(my_list)))
+    print(max(my_int, my_int, 0, my_pyint, my_int, len(my_list)))
+    print(max(my_int, my_int, 2, my_int, 0, my_pyint, my_int, len(my_list)))
 
 
 '''

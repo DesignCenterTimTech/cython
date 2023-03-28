@@ -46,5 +46,5 @@ def test_derived_types(int size, bint round):
         ptr = new Circle(size)
     else:
         ptr = new Square(size)
-    print typeof(ptr)
+    print(typeof(ptr))
     del ptr

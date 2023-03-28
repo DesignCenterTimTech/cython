@@ -12,7 +12,7 @@ def for_from_plain_ulong():
     """
     cdef object j = 0
     for j from 0 <= j < size2():
-        print j
+        print(j)
 
 def for_in_plain_ulong():
     """
@@ -23,7 +23,7 @@ def for_in_plain_ulong():
     """
     cdef object j = 0
     for j in range(size2()):
-        print j
+        print(j)
 
 
 cdef extern from *:
@@ -42,7 +42,7 @@ def for_from_ctypedef_ulong():
     """
     cdef object j = 0
     for j from 0 <= j < size():
-        print j
+        print(j)
 
 def for_in_ctypedef_ulong():
     """
@@ -53,7 +53,7 @@ def for_in_ctypedef_ulong():
     """
     cdef object j = 0
     for j in range(size()):
-        print j
+        print(j)
 
 
 class ForFromLoopInPyClass(object):

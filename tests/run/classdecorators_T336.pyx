@@ -32,7 +32,7 @@ def print_name(c):
 @print_msg(u"Py-Honk ")
 class PyTestClass(object):
     def __init__(self):
-        print u"Ho, Ho, Ho!"
+        print(u"Ho, Ho, Ho!")
 
 # not currently working:
 #
@@ -43,4 +43,4 @@ class PyTestClass(object):
 ## @print_msg("Cy-Honk ")
 ## cdef class CyTestClass(object):
 ##     def __init__(self):
-##         print u"Ho, Ho, Ho!"
+##         print(u"Ho, Ho, Ho!")

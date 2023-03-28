@@ -74,7 +74,7 @@ def raise_stat(a):
             raise IndexError
     except IndexError:
         oops = 1
-    print oops
+    print(oops)
 
 def try_loop(args):
     try:
@@ -110,7 +110,7 @@ def try_finally_nested(m):
         finally:
             pass
     except:
-        print f
+        print(f)
 
 _ERRORS = """
 12:11: local variable 'e' might be referenced before assignment

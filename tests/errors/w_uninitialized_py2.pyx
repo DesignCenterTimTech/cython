@@ -13,7 +13,7 @@ def dict_comp(a):
 
 def dict_comp2(a):
     r = {i: j for i, j in a}
-    print i, j
+    print(i, j)
     i, j = 0, 0
 
 

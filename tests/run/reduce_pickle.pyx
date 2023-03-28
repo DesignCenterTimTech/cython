@@ -281,7 +281,7 @@ cdef class Wrapper(object):
   >>> pickle.loads(pickle.dumps(Wrapper(L)))
   Wrapper([[...]])
 
-  >>> L[0] = w   # Don't print this one out...
+  >>> L[0] = w   # Don't print(this one out...)
   >>> w2 = pickle.loads(pickle.dumps(w))
   >>> w2.ref[0] is w2
   True

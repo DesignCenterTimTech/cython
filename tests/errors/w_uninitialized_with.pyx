@@ -4,7 +4,7 @@
 
 def with_no_target(m):
     with m:
-        print a
+        print(a)
         a = 1
 
 def unbound_manager(m1):
@@ -21,7 +21,7 @@ def with_mgr(m):
         with m() as f:
             pass
     except:
-        print f
+        print(f)
 
 _ERRORS = """
 7:14: local variable 'a' referenced before assignment

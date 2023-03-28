@@ -115,9 +115,9 @@ def test_pointers(int n, double x):
     """
     cdef with_pointers a = [True, {'n': n}, NULL]
     cdef with_pointers b = with_pointers(False, {'x': x}, NULL)
-    print a.data.n
-    print b.data.x
-    print a.ptr == b.ptr == NULL
+    print(a.data.n)
+    print(b.data.x)
+    print(a.ptr == b.ptr == NULL)
 
 cdef struct MyStruct:
     char c
@@ -144,7 +144,7 @@ def test_obj_to_struct(MyStruct mystruct):
        ...
     TypeError: an integer is required
     """
-    print 'c=%d i=%d f=%.2f s=%s' % (mystruct.c, mystruct.i, mystruct.f, mystruct.s.decode('ascii'))
+    print('c=%d i=%d f=%.2f s=%s' % (mystruct.c, mystruct.i, mystruct.f, mystruct.s.decode('ascii')))
 
 cdef struct NestedStruct:
     MyStruct mystruct
@@ -163,7 +163,7 @@ def test_nested_obj_to_struct(NestedStruct nested):
        ...
     ValueError: No value specified for struct attribute 'c'
     """
-    print 'c=%d i=%d f=%.2f s=%s d=%.2f' % (nested.mystruct.c,
+    print('c=%d i=%d f=%.2f s=%s d=%.2f' % (nested.mystruct.c,)
                                             nested.mystruct.i,
                                             nested.mystruct.f,
                                             nested.mystruct.s.decode('UTF-8'),

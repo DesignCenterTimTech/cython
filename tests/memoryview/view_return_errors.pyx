@@ -29,6 +29,6 @@ def propagate(i):
     try:
         foo(i)
     except Exception as e:
-        print '%s(%r)' % (e.__class__.__name__, e.args[0])
+        print('%s(%r)' % (e.__class__.__name__, e.args[0]))
     else:
-        print 'Exception subclass not raised'
+        print('Exception subclass not raised')

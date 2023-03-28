@@ -29,7 +29,7 @@ def test_parallel_numpy_arrays():
         import numpy
     except ImportError:
         for i in range(-5, 5):
-            print i
+            print(i)
         return
 
     x = numpy.zeros(10, dtype=numpy.int_)
@@ -38,5 +38,5 @@ def test_parallel_numpy_arrays():
         x[i] = i - 5
 
     for i in x:
-        print i
+        print(i)
 

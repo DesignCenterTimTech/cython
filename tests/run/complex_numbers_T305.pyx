@@ -130,11 +130,11 @@ def test_coercion(int a, float b, double c, float complex d, double complex e):
     (9+21j)
     """
     cdef double complex z
-    z = a; print z
-    z = b; print z
-    z = c; print z
-    z = d; print z
-    z = e; print z
+    z = a; print(z)
+    z = b; print(z)
+    z = c; print(z)
+    z = d; print(z)
+    z = e; print(z)
     return z + a + b + c + d + e
 
 

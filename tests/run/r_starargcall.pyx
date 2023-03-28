@@ -1,5 +1,5 @@
 def spam(a, b, c):
-    print u"Args:", a, b, c
+    print(u"Args:", a, b, c)
 
 def eggs():
     """

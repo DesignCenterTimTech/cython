@@ -679,7 +679,7 @@ def with_statement_untyped():
 def self_lookup(a):
     b = a
     b = b.foo(keyword=None)
-    print typeof(b)
+    print(typeof(b))
 
 # Regression test for trac #638.
 

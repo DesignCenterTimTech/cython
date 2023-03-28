@@ -10,8 +10,8 @@ def global_c_and_s():
     abcdef
     """
     pys = s
-    print c
-    print (pys.decode(u'ASCII'))
+    print(c)
+    print((pys.decode(u'ASCII')))
 
 def local_c_and_s():
     """
@@ -22,5 +22,5 @@ def local_c_and_s():
     cdef char c = 'b'
     cdef char* s = 'bcdefg'
     pys = s
-    print c
-    print (pys.decode(u'ASCII'))
+    print(c)
+    print((pys.decode(u'ASCII')))

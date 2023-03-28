@@ -24,7 +24,7 @@ def inspect_isfunction():
     False
     """
     import inspect, types
-    print isinstance(inspect_isfunction, types.FunctionType)
+    print(isinstance(inspect_isfunction, types.FunctionType))
     return inspect.isfunction(inspect_isfunction)
 
 
@@ -35,7 +35,7 @@ def inspect_isbuiltin():
     False
     """
     import inspect, types
-    print isinstance(inspect_isfunction, types.BuiltinFunctionType)
+    print(isinstance(inspect_isfunction, types.BuiltinFunctionType))
     return inspect.isbuiltin(inspect_isbuiltin)
 
 

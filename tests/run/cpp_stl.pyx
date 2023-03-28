@@ -34,7 +34,7 @@ def test_vector(L):
         v.push_back(a)
     cdef int i
     for i in range(len(L)):
-        print v.at(i)
+        print(v.at(i))
     del v
 
 ctypedef int my_int
@@ -60,7 +60,7 @@ def test_vector_iterator(L):
         v.push_back(a)
     cdef vector[int].iterator iter = v.begin()
     while iter != v.end():
-        print deref(iter)
+        print(deref(iter))
         inc(iter)
     del v
 

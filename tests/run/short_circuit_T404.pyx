@@ -1,7 +1,7 @@
 # ticket: 404
 
 cdef long foo(long x):
-    print "foo(%s)" % x
+    print("foo(%s)" % x)
     return x
 
 def test_or(long a, long b):
@@ -21,7 +21,7 @@ def test_or(long a, long b):
     foo(0)
     0
     """
-    print foo(a) or foo(b)
+    print(foo(a) or foo(b))
 
 def test_and(long a, long b):
     """
@@ -40,4 +40,4 @@ def test_and(long a, long b):
     foo(0)
     0
     """
-    print foo(a) and foo(b)
+    print(foo(a) and foo(b))

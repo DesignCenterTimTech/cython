@@ -145,7 +145,7 @@ def test_defaults_fused(cython.floating arg1, cython.floating arg2 = counter2())
     >>> get_defaults(test_defaults_fused[float])
     (2.0,)
     """
-    print arg1, arg2
+    print(arg1, arg2)
 
 funcs = []
 for i in range(10):
@@ -168,7 +168,7 @@ def test_dynamic_defaults_fused():
     i 9 func result (1.0, 9.0) defaults (9,)
     """
     for i, f in enumerate(funcs):
-        print "i", i, "func result", f(1.0), "defaults", get_defaults(f)
+        print("i", i, "func result", f(1.0), "defaults", get_defaults(f))
 
 
 def test_memoryview_none(const unsigned char[:] b=None):
@@ -233,7 +233,7 @@ def test_func_default_scope():
     i = -1
     def func(arg=[ i for i in range(4) ]):
         return arg
-    print i  # list comps leak in Py2 mode => i == 3
+    print(i  # list comps leak in Py2 mode => i == 3)
     return func
 
 
@@ -249,5 +249,5 @@ def test_func_default_scope_local():
     i = -1
     def func(arg=list(i for i in range(4))):
         return arg
-    print i  # genexprs don't leak
+    print(i  # genexprs don't leak)
     return func

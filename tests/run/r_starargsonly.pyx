@@ -7,4 +7,4 @@ def spam(*args):
     >>> spam("one", 2, "buckle my shoe")
     Args: ('one', 2, 'buckle my shoe')
     """
-    print u"Args:", args
+    print(u"Args:", args)

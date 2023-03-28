@@ -42,9 +42,9 @@ def test_new_del():
     c,d = constructor_count, destructor_count
     cdef Rectangle *rect = new Rectangle(10, 20)
     cdef Circle *circ = new Circle(15)
-    print constructor_count-c, destructor_count-d
+    print(constructor_count-c, destructor_count-d)
     del rect, circ
-    print constructor_count-c, destructor_count-d
+    print(constructor_count-c, destructor_count-d)
 
 
 def test_default_constructor():
@@ -94,8 +94,8 @@ def test_overload_bint_int():
     cdef Rectangle *rect2 = new Rectangle(10, 20)
 
     try:
-        print rect1.method(<int> 2)
-        print rect2.method(<bint> True)
+        print(rect1.method(<int> 2))
+        print(rect2.method(<bint> True))
     finally:
         del rect1
         del rect2
@@ -143,7 +143,7 @@ def test_stack_allocation(int w, int h):
     cdef Rectangle rect
     rect.width = w
     rect.height = h
-    print rect.method(<int>5)
+    print(rect.method(<int>5))
     return destructor_count
 
 

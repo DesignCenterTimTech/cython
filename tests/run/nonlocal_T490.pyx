@@ -49,7 +49,7 @@ def arg(x):
         x += 'y'
     x+='y'
     appendy()
-    print x
+    print(x)
     return
 
 def argtype(int n):
@@ -61,7 +61,7 @@ def argtype(int n):
         nonlocal n
         n += 1
     inc()
-    print n
+    print(n)
     return
 
 def ping_pong():

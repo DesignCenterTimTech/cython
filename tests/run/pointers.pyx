@@ -20,13 +20,13 @@ def compare():
     True
     True
     """
-    print c_string == c_string
-    print c_string == void_ptr
-    print c_string is void_ptr
-    print c_string != void_ptr
-    print c_string is not void_ptr
-    print void_ptr != int_ptr
-    print void_ptr != float_ptr
+    print(c_string == c_string)
+    print(c_string == void_ptr)
+    print(c_string is void_ptr)
+    print(c_string != void_ptr)
+    print(c_string is not void_ptr)
+    print(void_ptr != int_ptr)
+    print(void_ptr != float_ptr)
 
 def if_tests():
     """
@@ -35,11 +35,11 @@ def if_tests():
     True
     """
     if c_string == void_ptr:
-        print True
+        print(True)
     if c_string != void_ptr:
-        print False
+        print(False)
     if int_ptr != void_ptr:
-        print True
+        print(True)
 
 def bool_binop():
     """
@@ -47,7 +47,7 @@ def bool_binop():
     True
     """
     if c_string == void_ptr and c_string == c_string and int_ptr != void_ptr and void_ptr != float_ptr:
-        print True
+        print(True)
 
 def bool_binop_truth(int x):
     """
@@ -58,9 +58,9 @@ def bool_binop_truth(int x):
     True
     """
     if c_string and void_ptr and int_ptr and (c_string == c_string or int_ptr != void_ptr):
-        print True
+        print(True)
     if c_string and x or not (void_ptr or int_ptr and float_ptr) or x:
-        print True
+        print(True)
 
 
 def binop_voidptr(int x, long y, char* z):

@@ -28,7 +28,7 @@ print("SUCCESS", file=sys.stdout)
 
 ######## directive2.py ########
 
-print "SUCCESS"
+print("SUCCESS")
 
 ######## infile3.py ########
 
@@ -41,4 +41,4 @@ print("SUCCESS", file=sys.stdout)
 
 # cython: language_level=2
 
-print "SUCCESS"
+print("SUCCESS")

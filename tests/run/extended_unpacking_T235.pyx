@@ -109,13 +109,13 @@ def unpack_in_loop(list_of_sequences):
     (1, [2], 3)
     (1, [2, 3], 4)
     """
-    print 1
+    print(1)
     for *a,b in list_of_sequences:
         print((a,b))
-    print 2
+    print(2)
     for a,*b in list_of_sequences:
         print((a,b))
-    print 3
+    print(3)
     for a,*b, c in list_of_sequences:
         print((a,b,c))
 

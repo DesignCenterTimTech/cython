@@ -5,4 +5,4 @@ cdef class A:
         ma(self)
 
 cpdef ma(x):
-    print x
+    print(x)

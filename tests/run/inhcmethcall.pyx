@@ -8,7 +8,7 @@ Parrot
 cdef class Parrot:
 
   cdef void _describe(self):
-    print u"Parrot"
+    print(u"Parrot")
 
   def describe(self):
     self._describe()
@@ -16,5 +16,5 @@ cdef class Parrot:
 cdef class Norwegian(Parrot):
 
   cdef void _describe(self):
-    print u"Norwegian"
+    print(u"Norwegian")
     Parrot._describe(self)

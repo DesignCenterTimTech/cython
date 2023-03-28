@@ -34,7 +34,7 @@ cdef class Collector:
     # The __dealloc__ method of SimpleGarbage won't trigger the bug as the
     # refcount is artificially inflated for the duration of that function.
     def __dealloc__(self):
-        print "Collector.__dealloc__"
+        print("Collector.__dealloc__")
         global new_unreachable
         new_unreachable = gc.collect()
 
@@ -45,11 +45,11 @@ cdef class SimpleGarbage:
     def __cinit__(self):
         self.index = next_counter()
         self.c = Collector()
-        print self, "__cinit__"
+        print(self, "__cinit__")
     def __dealloc__(self):
-        print self, "__dealloc__"
+        print(self, "__dealloc__")
         if self.deallocated:
-            print "Double dealloc!"
+            print("Double dealloc!")
         self.deallocated = True
         gc.collect()
     def __str__(self):

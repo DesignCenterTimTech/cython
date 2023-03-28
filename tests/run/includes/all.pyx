@@ -19,4 +19,4 @@ cdef extern from "e.h":
     cdef int e
 
 def test():
-    print a, b, c, indirect_d.d, e
+    print(a, b, c, indirect_d.d, e)

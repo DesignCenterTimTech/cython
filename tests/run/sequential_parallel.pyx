@@ -148,7 +148,7 @@ def test_closure_parallel_privates():
             pass
         return x
 
-    print test_target(), x
+    print(test_target(), x)
 
     def test_reduction():
         nonlocal x
@@ -160,7 +160,7 @@ def test_closure_parallel_privates():
 
         return x
 
-    print test_reduction(), x
+    print(test_reduction(), x)
 
     def test_generator():
         nonlocal x
@@ -176,7 +176,7 @@ def test_closure_parallel_privates():
         yield x
 
     g = test_generator()
-    print next(g), x, next(g), x
+    print(next(g), x, next(g), x)
 
 def test_closure_parallel_with_gil():
     """
@@ -200,8 +200,8 @@ def test_closure_parallel_with_gil():
 
         return sum
 
-    print test_reduction()
-    print sum
+    print(test_reduction())
+    print(sum)
 
 def test_pure_mode():
     """
@@ -222,13 +222,13 @@ def test_pure_mode():
     pure_parallel = sys.modules['cython.parallel']
 
     for i in pure_parallel.prange(5):
-        print i
+        print(i)
 
     for i in pure_parallel.prange(4, -1, -1, schedule='dynamic', nogil=True):
-        print i
+        print(i)
 
     with pure_parallel.parallel():
-        print pure_parallel.threadid()
+        print(pure_parallel.threadid())
 
 cdef extern from "types.h":
     ctypedef short actually_long_t
@@ -316,7 +316,7 @@ def test_nan_init():
 
 
 cdef void nogil_print(char *s) with gil:
-    print s.decode('ascii')
+    print(s.decode('ascii'))
 
 def test_else_clause():
     """
@@ -372,7 +372,7 @@ def test_prange_continue():
         nogil_print('else clause executed')
 
     for i in range(10):
-       print i, p[i]
+       print(i, p[i])
 
     free(p)
 
@@ -395,7 +395,7 @@ def test_nested_break_continue():
 
         break
 
-    print i, j, result1, result2
+    print(i, j, result1, result2)
 
     with nogil, cython.parallel.parallel(num_threads=2):
         for i in prange(10, schedule='static'):
@@ -404,7 +404,7 @@ def test_nested_break_continue():
             else:
                 continue
 
-    print i
+    print(i)
 
 cdef int parallel_return() nogil:
     cdef int i
@@ -422,7 +422,7 @@ def test_return():
     >>> test_return()
     8
     """
-    print parallel_return()
+    print(parallel_return())
 
 def test_parallel_exceptions():
     """
@@ -447,8 +447,8 @@ def test_parallel_exceptions():
                 with gil:
                     mylist.append("I am executed first")
     except Exception, e:
-        print mylist[0]
-        print e.args, sum
+        print(mylist[0])
+        print(e.args, sum)
 
 def test_parallel_exceptions_unnested():
     """
@@ -472,8 +472,8 @@ def test_parallel_exceptions_unnested():
                 with gil:
                     mylist.append(("I am executed first", sum))
     except Exception, e:
-        print mylist[0]
-        print e.args, sum
+        print(mylist[0])
+        print(e.args, sum)
 
 cdef int parallel_exc_cdef() except -3:
     cdef int i, j
@@ -561,9 +561,9 @@ def test_parallel_exc_nogil_swallow():
     execute me
     """
     parallel_exc_nogil_swallow_unnested()
-    print 'execute me'
+    print('execute me')
     parallel_exc_nogil_swallow()
-    print 'execute me'
+    print('execute me')
 
 def parallel_exc_replace():
     """
@@ -617,7 +617,7 @@ def test_parallel_with_gil_return():
             obj = i
             sum += obj
 
-    print obj in range(10)
+    print(obj in range(10))
 
     with nogil, cython.parallel.parallel():
         with gil:
@@ -637,7 +637,7 @@ def test_parallel_with_gil_continue_unnested():
 
         sum += i
 
-    print sum
+    print(sum)
 
 
 cdef int inner_parallel_section() nogil:
@@ -698,23 +698,23 @@ def test_chunksize():
     sum = 0
     for i in prange(10, nogil=True, num_threads=2, schedule='static', chunksize=chunksize()):
         sum += i
-    print sum
+    print(sum)
 
     sum = 0
     for i in prange(10, nogil=True, num_threads=6, schedule='dynamic', chunksize=chunksize()):
         sum += i
-    print sum
+    print(sum)
 
     sum = 0
     with nogil, cython.parallel.parallel():
         for i in prange(10, schedule='guided', chunksize=chunksize()):
             sum += i
-    print sum
+    print(sum)
 
 
 cdef class PrintOnDealloc(object):
     def __dealloc__(self):
-        print "deallocating..."
+        print("deallocating...")
 
 def error():
     raise Exception("propagate me")
@@ -732,7 +732,7 @@ def test_clean_temps():
             with gil:
                 x = PrintOnDealloc() + error()
     except Exception, e:
-        print e.args[0]
+        print(e.args[0])
 
 
 def test_pointer_temps(double x):

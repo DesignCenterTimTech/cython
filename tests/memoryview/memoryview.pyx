@@ -89,8 +89,8 @@ def test_external_dtype():
     2.0
     """
     cdef TestExcClassExternalDtype obj = TestExcClassExternalDtype()
-    print obj.arr_float[4, 4]
-    print obj.arr_double[4, 4]
+    print(obj.arr_float[4, 4])
+    print(obj.arr_double[4, 4])
 
 
 cdef class ExtClassMockedAttr(object):
@@ -130,11 +130,11 @@ def test_coerce_to_temp():
     print
     _coerce_to_temp()[...] = 0
     print
-    print _coerce_to_temp()[4, 4]
+    print(_coerce_to_temp()[4, 4])
     print
-    print _coerce_to_temp()[..., 4][4]
+    print(_coerce_to_temp()[..., 4][4])
     print
-    print _coerce_to_temp()[4][4]
+    print(_coerce_to_temp()[4][4])
 
 def test_extclass_attribute_dealloc():
     """
@@ -144,7 +144,7 @@ def test_extclass_attribute_dealloc():
     released self.arr
     """
     cdef ExtClassMockedAttr obj = ExtClassMockedAttr()
-    print obj.arr[4, 4]
+    print(obj.arr[4, 4])
 
 cdef float[:,::1] global_mv = array((10,10), itemsize=sizeof(float), format='f')
 global_mv = array((10,10), itemsize=sizeof(float), format='f')
@@ -170,7 +170,7 @@ def call():
     pf = PyClass()
 
 cdef ExtClass get_ext_obj():
-    print 'get_ext_obj called'
+    print('get_ext_obj called')
     return ExtClass.__new__(ExtClass)
 
 def test_cdef_attribute():
@@ -185,34 +185,34 @@ def test_cdef_attribute():
     """
     cdef ExtClass extobj = ExtClass.__new__(ExtClass)
     try:
-        print extobj.mview
+        print(extobj.mview)
     except AttributeError, e:
-        print e.args[0]
+        print(e.args[0])
     else:
-        print "No AttributeError was raised"
+        print("No AttributeError was raised")
 
     cdef int[:] myview
     try:
-        print myview
+        print(myview)
     except UnboundLocalError, e:
-        print e.args[0]
+        print(e.args[0])
     else:
-        print "No UnboundLocalError was raised"
+        print("No UnboundLocalError was raised")
 
     cdef int[:] otherview
     try:
          otherview = myview
     except UnboundLocalError, e:
-        print e.args[0]
+        print(e.args[0])
 
     try:
-        print get_ext_obj().mview
+        print(get_ext_obj().mview)
     except AttributeError, e:
-        print e.args[0]
+        print(e.args[0])
     else:
-        print "No AttributeError was raised"
+        print("No AttributeError was raised")
 
-    print ExtClass().mview
+    print(ExtClass().mview)
 
 @cython.boundscheck(False)
 def test_nogil_unbound_localerror():
@@ -248,7 +248,7 @@ def basic_struct(MyStruct[:] mslice):
     [('a', 1), ('b', 2), ('c', 3), ('d', 4), ('e', 5)]
     """
     buf = mslice
-    print sorted([(k, int(v)) for k, v in buf[0].items()])
+    print(sorted([(k, int(v)) for k, v in buf[0].items()]))
 
 def nested_struct(NestedStruct[:] mslice):
     """
@@ -261,7 +261,7 @@ def nested_struct(NestedStruct[:] mslice):
     """
     buf = mslice
     d = buf[0]
-    print d['x']['a'], d['x']['b'], d['y']['a'], d['y']['b'], d['z']
+    print(d['x']['a'], d['x']['b'], d['y']['a'], d['y']['b'], d['z'])
 
 def packed_struct(PackedStruct[:] mslice):
     """
@@ -276,7 +276,7 @@ def packed_struct(PackedStruct[:] mslice):
 
     """
     buf = mslice
-    print buf[0]['a'], buf[0]['b']
+    print(buf[0]['a'], buf[0]['b'])
 
 def nested_packed_struct(NestedPackedStruct[:] mslice):
     """
@@ -291,7 +291,7 @@ def nested_packed_struct(NestedPackedStruct[:] mslice):
     """
     buf = mslice
     d = buf[0]
-    print d['a'], d['b'], d['sub']['a'], d['sub']['b'], d['c']
+    print(d['a'], d['b'], d['sub']['a'], d['sub']['b'], d['c'])
 
 
 def complex_dtype(long double complex[:] mslice):
@@ -300,7 +300,7 @@ def complex_dtype(long double complex[:] mslice):
     -1j
     """
     buf = mslice
-    print buf[0]
+    print(buf[0])
 
 def complex_inplace(long double complex[:] mslice):
     """
@@ -309,7 +309,7 @@ def complex_inplace(long double complex[:] mslice):
     """
     buf = mslice
     buf[0] = buf[0] + 1 + 2j
-    print buf[0]
+    print(buf[0])
 
 def complex_struct_dtype(LongComplex[:] mslice):
     """
@@ -319,7 +319,7 @@ def complex_struct_dtype(LongComplex[:] mslice):
     0.0 -1.0
     """
     buf = mslice
-    print buf[0]['real'], buf[0]['imag']
+    print(buf[0]['real'], buf[0]['imag'])
 
 #
 # Getting items and index bounds checking
@@ -501,14 +501,14 @@ def generic(int[::view.generic, ::view.generic] mslice1,
     """
     buf1, buf2 = mslice1, mslice2
 
-    print buf1[1, 1]
-    print buf2[1, 1]
+    print(buf1[1, 1])
+    print(buf2[1, 1])
 
     buf1[2, -1] = 10
     buf2[2, -1] = 11
 
-    print buf1[2, 2]
-    print buf2[2, 2]
+    print(buf1[2, 2])
+    print(buf2[2, 2])
 
 #def generic_contig(int[::view.generic_contiguous, :] mslice1,
 #                   int[::view.generic_contiguous, :] mslice2):
@@ -527,14 +527,14 @@ def generic(int[::view.generic, ::view.generic] mslice1,
 #    """
 #    buf1, buf2 = mslice1, mslice2
 #
-#    print buf1[1, 1]
-#    print buf2[1, 1]
+#    print(buf1[1, 1])
+#    print(buf2[1, 1])
 #
 #    buf1[2, -1] = 10
 #    buf2[2, -1] = 11
 #
-#    print buf1[2, 2]
-#    print buf2[2, 2]
+#    print(buf1[2, 2])
+#    print(buf2[2, 2])
 
 ctypedef int td_cy_int
 cdef extern from "bufaccess.h":
@@ -555,8 +555,8 @@ def printbuf_td_cy_int(td_cy_int[:] mslice, shape):
     buf = mslice
     cdef int i
     for i in range(shape[0]):
-        print buf[i],
-    print 'END'
+        print(buf[i],)
+    print('END')
 
 def printbuf_td_h_short(td_h_short[:] mslice, shape):
     """
@@ -570,8 +570,8 @@ def printbuf_td_h_short(td_h_short[:] mslice, shape):
     buf = mslice
     cdef int i
     for i in range(shape[0]):
-        print buf[i],
-    print 'END'
+        print(buf[i],)
+    print('END')
 
 def printbuf_td_h_cy_short(td_h_cy_short[:] mslice, shape):
     """
@@ -585,8 +585,8 @@ def printbuf_td_h_cy_short(td_h_cy_short[:] mslice, shape):
     buf = mslice
     cdef int i
     for i in range(shape[0]):
-        print buf[i],
-    print 'END'
+        print(buf[i],)
+    print('END')
 
 def printbuf_td_h_ushort(td_h_ushort[:] mslice, shape):
     """
@@ -600,8 +600,8 @@ def printbuf_td_h_ushort(td_h_ushort[:] mslice, shape):
     buf = mslice
     cdef int i
     for i in range(shape[0]):
-        print buf[i],
-    print 'END'
+        print(buf[i],)
+    print('END')
 
 def printbuf_td_h_double(td_h_double[:] mslice, shape):
     """
@@ -615,8 +615,8 @@ def printbuf_td_h_double(td_h_double[:] mslice, shape):
     buf = mslice
     cdef int i
     for i in range(shape[0]):
-        print buf[i],
-    print 'END'
+        print(buf[i],)
+    print('END')
 
 #
 # Object access
@@ -650,7 +650,7 @@ def printbuf_object(object[:] mslice, shape):
     buf = mslice
     cdef int i
     for i in range(shape[0]):
-        print repr(buf[i]), (<PyObject*>buf[i]).ob_refcnt
+        print(repr(buf[i]), (<PyObject*>buf[i]).ob_refcnt)
 
 def assign_to_object(object[:] mslice, int idx, obj):
     """
@@ -746,12 +746,12 @@ def test_generic_slicing(arg, indirect=False):
     a = _a
     b = a[2:8:2, -4:1:-1, 1:3]
 
-    print b.shape
+    print(b.shape)
 
     if indirect:
-        print b.suboffsets[0] // sizeof(int *),
-        print b.suboffsets[1] // sizeof(int),
-        print b.suboffsets[2]
+        print(b.suboffsets[0] // sizeof(int *),)
+        print(b.suboffsets[1] // sizeof(int),)
+        print(b.suboffsets[2])
     else:
         print_int_offsets(b.strides[0], b.strides[1], b.strides[2])
         print_int_offsets(b.suboffsets[0], b.suboffsets[1], b.suboffsets[2])
@@ -795,15 +795,15 @@ def test_indirect_slicing(arg):
     a = _a
     b = a[-5:, ..., -5:100:2]
 
-    print b.shape
+    print(b.shape)
     print_int_offsets(*b.suboffsets)
 
-    print b[4, 2, 1]
-    print b[..., 0][4, 2]
-    print b[..., 1][4, 2]
-    print b[..., 1][4][2]
-    print b[4][2][1]
-    print b[4, 2][1]
+    print(b[4, 2, 1])
+    print(b[..., 0][4, 2])
+    print(b[..., 1][4, 2])
+    print(b[..., 1][4][2])
+    print(b[4][2][1])
+    print(b[4, 2][1])
 
 def test_direct_slicing(arg):
     """
@@ -829,7 +829,7 @@ def test_direct_slicing(arg):
     a = _a
     b = a[2:8:2, -4:1:-1, 1:3]
 
-    print b.shape
+    print(b.shape)
     print_int_offsets(*b.strides)
     print_int_offsets(*b.suboffsets)
 
@@ -859,7 +859,7 @@ def test_slicing_and_indexing(arg):
     c = b[4:1:-1, ::-1]
     d = c[2, 1:2]
 
-    print b.shape
+    print(b.shape)
     print_int_offsets(*b.strides)
 
     cdef int i, j
@@ -869,8 +869,8 @@ def test_slicing_and_indexing(arg):
             itemB = b[i, j]
             assert itemA == itemB, (i, j, itemA, itemB)
 
-    print c[1, 1], c[2, 0]
-    print [d[i] for i in range(d.shape[0])]
+    print(c[1, 1], c[2, 0])
+    print([d[i] for i in range(d.shape[0])])
 
 def test_oob():
     """
@@ -880,7 +880,7 @@ def test_oob():
     IndexError: Index out of bounds (axis 1)
     """
     cdef int[:, :] a = IntMockBuffer("A", range(4 * 9), shape=(4, 9))
-    print a[:, 20]
+    print(a[:, 20])
 
 def test_acquire_memoryview():
     """
@@ -896,15 +896,15 @@ def test_acquire_memoryview():
     cdef int[:, :] a = IntMockBuffer("A", range(4 * 9), shape=(4, 9))
     cdef object b = a
 
-    print a[2, 4]
+    print(a[2, 4])
 
     # Make sure we don't have to keep this around
     del a
 
-    print b
+    print(b)
     cdef int[:, :] c = b
-    print b[2, 4]
-    print c[2, 4]
+    print(b[2, 4])
+    print(c[2, 4])
 
 def test_acquire_memoryview_slice():
     """
@@ -921,15 +921,15 @@ def test_acquire_memoryview_slice():
 
     cdef object b = a
 
-    print a[2, 4]
+    print(a[2, 4])
 
     # Make sure we don't have to keep this around
     del a
 
-    print b
+    print(b)
     cdef int[:, :] c = b
-    print b[2, 4]
-    print c[2, 4]
+    print(b[2, 4])
+    print(c[2, 4])
 
 class SingleObject(object):
     def __init__(self, value):
@@ -962,7 +962,7 @@ def test_assign_scalar(int[:, :] m):
     m[..., 5] = 6
 
     for i in range(6):
-        print " ".join([str(m[i, j]) for j in range(m.shape[1])])
+        print(" ".join([str(m[i, j]) for j in range(m.shape[1])]))
 
 
 def test_contig_scalar_to_slice_assignment():
@@ -976,10 +976,10 @@ def test_contig_scalar_to_slice_assignment():
     m = _m
 
     m[...] = 14
-    print m[0, 0], m[-1, -1], m[3, 2], m[4, 9]
+    print(m[0, 0], m[-1, -1], m[3, 2], m[4, 9])
 
     m[:, :] = 20
-    print m[0, 0], m[-1, -1], m[3, 2], m[4, 9]
+    print(m[0, 0], m[-1, -1], m[3, 2], m[4, 9])
 
 def test_dtype_object_scalar_assignment():
     """
@@ -1019,12 +1019,12 @@ def test_assignment_in_conditional_expression(bint left):
     C = A if left else B
 
     for i in range(C.shape[0]):
-        print C[i]
+        print(C[i])
 
     # create new memoryviews
     c = a if left else b
     for i in range(c.shape[0]):
-        print c[i]
+        print(c[i])
 
 
 def test_cpython_offbyone_issue_23349():

@@ -17,7 +17,7 @@ cdef double pi
 pi = 3.14159265358979323846
 
 def main():
-  #print n1
-  print "%.18f" % M_PI
-  print "%.18f" % (<float> M_PI)
-  print "%.18f" % pi
+  #print(n1)
+  print("%.18f" % M_PI)
+  print("%.18f" % (<float> M_PI))
+  print("%.18f" % pi)

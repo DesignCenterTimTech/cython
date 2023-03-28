@@ -30,8 +30,8 @@ def test_nested():
     10
     100
     """
-    print outer_value
-    print inner_value
+    print(outer_value)
+    print(inner_value)
 
 def test_typedef(A_t a):
     """
