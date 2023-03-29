@@ -844,12 +844,14 @@ class PrintSkipTree(PrintTree):
     # MIPT: _positions - code markers,
     #       _text - original pyrex code
     #       _structs - list of struct names from code
-    #       _cimport_names - list to change after cimport
+    #       _cimport_names - dict of names to update after cimport
+    #       _cimport_names_done - set of names been updated to exclude multiple updates
     #       _python_dir - python3-dev dir path
     _positions = []
     _text = []
     _structs = ["list", "dict", "tuple"]
-    _cimport_names = []
+    _cimport_names = {}
+    _cimport_names_done = set()
     _python_dir = ""
     _source_root = "/usr/include"
 
@@ -919,8 +921,10 @@ class PrintSkipTree(PrintTree):
         py_code += "sys.path.append('%s')\n" % cython_source
         py_code += "NULL = cython.NULL\n"
         py_code += self.print_Node(tree)
-        for name in self._cimport_names:
-            py_code = py_code.replace(name[0], name[1])
+        for oldname, newname in self._cimport_names.items():
+            if oldname not in self._cimport_names_done:
+                py_code = py_code.replace(oldname, newname)
+                self._cimport_names_done.add(oldname)
 
         # get output path name
         path_out = tree.pos[0].get_description()
@@ -1494,7 +1498,7 @@ class PrintSkipTree(PrintTree):
                                             node.as_name)
         else:
             result = "import %s\n" % (module)
-            self._cimport_names.append([initial_name, module])
+            self._cimport_names[initial_name] = module
         return result
 
     # MIPT: prints from cimport constructions as followed:
@@ -1515,7 +1519,7 @@ class PrintSkipTree(PrintTree):
             else:
                 result += "from %s import %s\n" % (module,
                                                   argument[1])
-                self._cimport_names.append([initial_name, module])
+                self._cimport_names[initial_name] = module
         return result
 
     # MIPT: debug printing of possible unprocessed node
