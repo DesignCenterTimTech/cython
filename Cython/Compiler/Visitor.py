@@ -899,6 +899,9 @@ class PrintSkipTree(PrintTree):
         if path_in.endswith(".py"):
             # dont change anything in .py file
             return tree
+        elif path_in.endswith("__init__.pxd"):
+            # skip init file
+            return tree
 
         # fill code markers
         positions = self.fill_pos(tree)
@@ -907,22 +910,17 @@ class PrintSkipTree(PrintTree):
         self._positions = positions
 
         cython_source = __file__[:__file__.rfind(".") - 16] + "Includes/"
-        try:
-            f = open(path_in, 'r')
-        except:
-            # stdlib from pyrex Includes
-            path_in = cython_source + path_in
-            f = open(path_in, 'r')
-
-        # get source code
-        self._text = f.readlines()
-        f.close()
+        sys.path.append(cython_source)
+        with open(path_in, 'r') as f:
+            # get source code
+            self._text = f.readlines()
 
         py_code = "import cython\n"
         py_code += "import sys\n"
         py_code += "sys.path.append('%s')\n" % cython_source
         py_code += "NULL = cython.NULL\n"
         py_code += self.print_Node(tree)
+
         for oldname, newname in self._cimport_names.items():
             if oldname not in self._cimport_names_done:
                 py_code = py_code.replace(oldname, newname)
@@ -1536,19 +1534,37 @@ class PrintSkipTree(PrintTree):
     def print_FromCImportStatNode(self, node):
         # change name(.pxd) to m_name(.pxd)
         module = node.module_name
-        initial_name = "." * node.relative_level + module
-        module = "." * node.relative_level + \
-                 module[:module.rfind(".") + 1] + "m_" + \
-                 module[module.rfind(".") + 1:]
+
+        if os.path.isdir(node.relative_level * "../" + module) or \
+           os.path.isdir(__file__[:__file__.rfind(".") - 16] + "Includes/" + module):
+            # ex. from libc cimport stdlib -> from libc cimport m_stdlib
+            module = "." * node.relative_level + module
+            is_dir = True
+        else:
+            # ex. from libc.stdlib cimport malloc -> from libc.m_stdlib cimport malloc
+            initial_name = module
+            module = "." * node.relative_level + \
+                     module[:module.rfind(".") + 1] + "m_" + \
+                     module[module.rfind(".") + 1:]
+            is_dir = False
+
         result = ""
         for argument in node.imported_names:
             if argument[2]:
                 result += "from %s import %s as %s\n" % (module,
                                                         argument[1],
                                                         argument[2])
+            elif is_dir:
+                sub_module = argument[1]
+                initial_name = sub_module
+                sub_module = sub_module[:sub_module.rfind(".") + 1] + "m_" + \
+                             sub_module[sub_module.rfind(".") + 1:]
+                result += "from %s import %s\n" % (module,
+                                                       sub_module)
+                self._cimport_names[initial_name] = sub_module
             else:
                 result += "from %s import %s\n" % (module,
-                                                  argument[1])
+                                                   argument[1])
                 self._cimport_names[initial_name] = module
         return result
 
