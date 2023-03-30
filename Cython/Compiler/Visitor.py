@@ -844,12 +844,14 @@ class PrintSkipTree(PrintTree):
     # MIPT: _positions - code markers,
     #       _text - original pyrex code
     #       _structs - list of struct names from code
+    #       _enums - list of enum names from code
     #       _cimport_names - dict of names to update after cimport
     #       _cimport_names_done - set of names been updated to exclude multiple updates
     #       _python_dir - python3-dev dir path
     _positions = []
     _text = []
     _structs = ["list", "dict", "tuple"]
+    _enums = []
     _cimport_names = {}
     _cimport_names_done = set()
     _python_dir = ""
@@ -1232,7 +1234,12 @@ class PrintSkipTree(PrintTree):
         if self.check_IfNotCChildren(node):
             s_expr = self.print_ExprByPos(node).strip()
             if "=" in s_expr: # initialisation
-                result += "%s" % s_expr
+                if s_type in self._enums:
+                    result += "%s = %s.%s" % (s_expr[:s_expr.find("=")],
+                                             s_type,
+                                             s_expr[s_expr.find("=") + 1:])
+                else:
+                    result += "%s" % s_expr
             elif "[" in s_expr: # list declaration
                 name, size = s_expr.split("[")
                 if size[:-1]:
@@ -1244,8 +1251,10 @@ class PrintSkipTree(PrintTree):
                     result += "%s" % (s_expr)
                 elif s_type in self._structs:
                     result += "%s = %s()" % (s_expr, s_type)
+                elif "[]" in s_type:
+                    result += "%s = []" % (s_expr)
                 else:
-                    result += "%s : %s" % (s_expr, s_type)
+                    result += "%s : %s = 0" % (s_expr, s_type)
             else: # simple declaration
                 if   '"' in s_expr:
                     s_expr = s_expr[:s_expr.find('"')]
@@ -1313,7 +1322,7 @@ class PrintSkipTree(PrintTree):
         elif isinstance(node, Nodes.CConstTypeNode):
             result = self.print_CBaseTypeNode(node.base_type, ctypes)
         elif isinstance(node, Nodes.TemplatedTypeNode):
-            result = "%s" % self.print_CBaseTypeNode(node.base_type_node, ctypes)
+            result = "'%s[]'" % self.print_CBaseTypeNode(node.base_type_node, ctypes)
         elif isinstance(node, Nodes.CComplexBaseTypeNode):
             result = "%s" % self.print_CBaseTypeNode(node.base_type, ctypes)
         else:
@@ -1401,6 +1410,8 @@ class PrintSkipTree(PrintTree):
         self.unindent()
         result = "class %s():\n%s\n\n" % (node.name,
                                           "\n".join(arguments))
+
+        self._enums.append(node.name)
         return result
 
     # MIPT: prints one enum variable declaration
