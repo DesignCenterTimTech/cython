@@ -1034,6 +1034,8 @@ class PrintSkipTree(PrintTree):
             result += self.print_DefNode(node)
         elif isinstance(node, Nodes.CClassDefNode):
             result += self.print_CClassDefNode(node)
+        elif isinstance(node, Nodes.PyClassDefNode):
+            result += self.print_PyClassDefNode(node)
         elif isinstance(node, Nodes.CImportStatNode):
             result += self.print_CImportStatNode(node)
         elif isinstance(node, Nodes.FromCImportStatNode):
@@ -1465,6 +1467,21 @@ class PrintSkipTree(PrintTree):
         result += self.print_Decorators(node)
         result += "%sclass %s(%s):\n" % (self._indent,
                                         node.class_name,
+                                        ", ".join(arguments))
+        self.indent()
+        result += "%s" % (self.print_Node(node.body))
+        self.unindent()
+        return result
+
+    # MIPT: prints py class
+    def print_PyClassDefNode(self, node):
+        arguments = []
+        for base in node.bases.args:
+            arguments.append(base.name)
+
+        result =  self.print_Decorators(node)
+        result += "%sclass %s(%s):\n" % (self._indent,
+                                        node.name,
                                         ", ".join(arguments))
         self.indent()
         result += "%s" % (self.print_Node(node.body))
