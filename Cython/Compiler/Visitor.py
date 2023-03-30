@@ -1241,11 +1241,13 @@ class PrintSkipTree(PrintTree):
                 else:
                     result += "%s" % s_expr
             elif "[" in s_expr: # list declaration
-                name, size = s_expr.split("[")
-                if size[:-1]:
-                    result += "%s = [None] * %s" % (name, size[:-1])
-                else:
-                    result += "%s" % name
+                code_data = s_expr.split("[")
+                name = code_data[0]
+                sizes = code_data[1:]
+                size_result = "[None] * %s" % (sizes[-1][:-1])
+                for size in reversed(sizes[:-1]):
+                    size_result = "[%s] * %s" % (size_result, size[:-1])
+                result += "%s = %s" % (name, size_result)
             elif s_type: # declaration with annotation
                 if s_type == s_expr or s_type == "None":
                     result += "%s" % (s_expr)
