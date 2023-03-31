@@ -1058,6 +1058,12 @@ class PrintSkipTree(PrintTree):
         if not include_name:
             if int(os.getenv("CYTHON2PYTHON_DEBUG", "1")) >= 2:
                 print("# got blank extern in %s" % include_name)
+            # cdef extern from *:
+            with open("your_combined_lib", 'a') as f:
+                for stat in node.body.stats:
+                    result += self.print_CTypes_Node(stat, f)
+            return result
+
             return self.print_Node(node.body)
         if "<" in include_name:
             is_std = True
@@ -1077,10 +1083,6 @@ class PrintSkipTree(PrintTree):
                 else:
                     f.write('#include "%s"\n' % h_name)
                 f.write("#include <stdio.h>\n")
-        elif not c_name:
-            # cdef extern from *:
-            result += "%s\n" % self.print_Node(node.body)
-            return result
 
         c_name  = os.path.abspath(c_name)
         so_name = os.path.abspath(so_name)
@@ -1111,9 +1113,7 @@ class PrintSkipTree(PrintTree):
         elif isinstance(node, Nodes.CStructOrUnionDefNode):
             result += self.print_CTypes_StructOrUnionDefNode(node)
         elif isinstance(node, Nodes.CEnumDefNode):
-            raw_result = self.print_CNode(node).split("\n")[1:]
-            raw_result = [s.strip() for s in raw_result]
-            result += "\n".join(raw_result)
+            result += self.print_CTypes_EnumDefNode(node, c_file)
         elif isinstance(node, Nodes.CTypeDefNode):
             type = self.print_Ctypes_FullType(node)
             name = self.print_CNode(node)
@@ -1151,6 +1151,27 @@ class PrintSkipTree(PrintTree):
         self.unindent()
 
         self._structs.append(node.name)
+        return result
+
+    # MIPT: print Enum in extern statement
+    def print_CTypes_EnumDefNode(self, node, c_file):
+        # variable definition
+        for item in node.items:
+            name = item.name
+            # add variables for compiling for change via define
+            c_type = "int"
+            export_name = "_my_cython_var_" + name
+            check_name = "MY_CASE_" +  name
+            # not the best desicion - file bigger with each compile, think about it later
+            c_file.write("#ifdef %s\n" % (name))
+            c_file.write("#ifndef %s\n" % (check_name))
+            c_file.write("#define %s\n" % (check_name))
+            c_file.write("%s %s = %s;\n" % (c_type, export_name, name))
+            c_file.write("#endif\n")
+            c_file.write("#endif\n")
+            result = "%s = %s.in_dll(exported_lib, '%s').value\n" % (name,
+                                                                     c_type,
+                                                                     export_name)
         return result
 
     # MIPT: CVarDefNode print in extern statement
