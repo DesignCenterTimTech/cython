@@ -848,6 +848,8 @@ class PrintSkipTree(PrintTree):
     #       _cimport_names - dict of names to update after cimport
     #       _cimport_names_done - set of names been updated to exclude multiple updates
     #       _python_dir - python3-dev dir path
+    #       _source_root - c source
+    #       _cython_source - cython include dir
     _positions = []
     _text = []
     _structs = ["list", "dict", "tuple"]
@@ -856,6 +858,7 @@ class PrintSkipTree(PrintTree):
     _cimport_names_done = set()
     _python_dir = ""
     _source_root = "/usr/include"
+    _cython_source = __file__[:__file__.rfind(".") - 16] + "Includes/"
 
     # MIPT: Get python3-dev dir path
     def get_Python_dir(self, path):
@@ -909,15 +912,14 @@ class PrintSkipTree(PrintTree):
         positions.append(self.Position(positions[-1].line, -1, '', 0))
         self._positions = positions
 
-        cython_source = __file__[:__file__.rfind(".") - 16] + "Includes/"
-        sys.path.append(cython_source)
+        sys.path.append(self._cython_source)
         with open(path_in, 'r') as f:
             # get source code
             self._text = f.readlines()
 
         py_code = "import cython\n"
         py_code += "import sys\n"
-        py_code += "sys.path.append('%s')\n" % cython_source
+        py_code += "sys.path.append('%s')\n" % self._cython_source
         py_code += "NULL = cython.NULL\n"
         py_code += self.print_Node(tree)
 
@@ -931,8 +933,7 @@ class PrintSkipTree(PrintTree):
         # change /name.pxd->/m_name.pxd of a .pxd lib
         # for no intersection with possible py files
         if path_out.endswith(".pxd"):
-            path_out = path_out[:path_out.rfind("/") + 1] + "m_"\
-                     + path_out[path_out.rfind("/") + 1:]
+            path_out = self.modify_name(path_out, sep = "/")
         path_out = path_out[:-3] + "py"
 
         # create dirs if needed
@@ -1516,17 +1517,20 @@ class PrintSkipTree(PrintTree):
     # MIPT: prints cimport constructions as followed:
     #       cimport file(.pxd) (as ...)
     def print_CImportStatNode(self, node):
-        # change name(.pxd) to m_name(.pxd)
-        # to call correct files (because .pxd are changed in __call__)
         module = node.module_name
-        initial_name = module
-        module = module[:module.rfind(".") + 1] + "m_" + module[module.rfind(".") + 1:]
+
         if node.as_name:
-            result = "import %s as %s\n" % (module,
-                                            node.as_name)
-        else:
+            result = "import %s as %s\n" % (module, node.as_name)
+        elif os.path.isdir(module) or os.path.isdir(self._cython_source + module):
+            # ex. cimport libc -> cimport libc
             result = "import %s\n" % (module)
+        else:
+            # ex. cimport stdlib -> cimport m_stdlib
+            initial_name = module
+            module = self.modify_name(module)
             self._cimport_names[initial_name] = module
+            result = "import %s\n" % (module)
+
         return result
 
     # MIPT: prints from cimport constructions as followed:
@@ -1536,16 +1540,14 @@ class PrintSkipTree(PrintTree):
         module = node.module_name
 
         if os.path.isdir(node.relative_level * "../" + module) or \
-           os.path.isdir(__file__[:__file__.rfind(".") - 16] + "Includes/" + module):
+           os.path.isdir(self._cython_source + module):
             # ex. from libc cimport stdlib -> from libc cimport m_stdlib
             module = "." * node.relative_level + module
             is_dir = True
         else:
             # ex. from libc.stdlib cimport malloc -> from libc.m_stdlib cimport malloc
             initial_name = module
-            module = "." * node.relative_level + \
-                     module[:module.rfind(".") + 1] + "m_" + \
-                     module[module.rfind(".") + 1:]
+            module = "." * node.relative_level + self.modify_name(module)
             is_dir = False
 
         result = ""
@@ -1555,13 +1557,9 @@ class PrintSkipTree(PrintTree):
                                                         argument[1],
                                                         argument[2])
             elif is_dir:
-                sub_module = argument[1]
-                initial_name = sub_module
-                sub_module = sub_module[:sub_module.rfind(".") + 1] + "m_" + \
-                             sub_module[sub_module.rfind(".") + 1:]
+                sub_module = self.modify_name(argument[1])
                 result += "from %s import %s\n" % (module,
-                                                       sub_module)
-                self._cimport_names[initial_name] = sub_module
+                                                   sub_module)
             else:
                 result += "from %s import %s\n" % (module,
                                                    argument[1])
@@ -1576,7 +1574,14 @@ class PrintSkipTree(PrintTree):
 
     # MIPT: Block of utility functions
 
-    # MIPT: checks the node and its children for having C-like nodes
+    # MIPT: Add a "m_" to filename in path with sep to 
+    #       change name(.pxd) to m_name(.pxd) to call
+    #       correct files (because .pxd are changed in __call__)
+    def modify_name(self, name, sep = "."):
+        name = name[:name.rfind(sep) + 1] + "m_" + name[name.rfind(sep) + 1:]
+        return name
+
+    # MIPT: checks the node an:d its children for having C-like nodes
     def check_IfNotC(self, node):
         if node is None: return True
 
